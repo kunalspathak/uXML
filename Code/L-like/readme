@@ -1,0 +1,46 @@
+***   L-like (Lisp-like) Language   ***
+1. Constants : numeric, character, float, boolean, string
+2. Build-in functions : map, reduce, cdr, car, cat 
+done 3. If: (if x true false)
+4. Function definition :
+  ( defun FUNCTION_NAME (arg1(, args)*) 
+    (" comment ")?
+	(body)*
+  )
+  OR
+  (
+	(lambda (args1,..,argsN) 
+		(body)*
+	) actualArgs1 ... actualArgsN
+  )
+  
+5. Body : TODO
+( FUNCTION_NAME (ARG1 | (body) )*)
+
+6. Variable declaration - visible only inside the paranthesis of let
+(let ( var-list )+ body )
+where var-list is (element(, element)*) 
+and element is (id (body)?) <-- value of body (if present) is assigned to id
+bindings happen at the same time
+eg.  (setq w 77)
+-> 77
+
+? (let ((w 8)
+        (x w))
+    (+ w x))
+-> 85
+
+7. for-loop, do-while, while-do : Functions 
+
+8. Closures - http://www.psg.com/~dlamkins/sl/chapter11.html#closures
+
+
+NEW CONCEPTS :
+1. Symbol <-- List for implementing lisp processing
+	- No list since uXML should represent generic functional languages.
+2. No print statements
+	- But Llike will print the side-effects
+	- While evaluating functions, result of last stmt. executed will be returned.
+done 3. Operators as function calls
+	- Maths, conditional, functional, logicalnot, set
+

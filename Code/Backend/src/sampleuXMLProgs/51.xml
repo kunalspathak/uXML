@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program is same version of 6.xml program i.e. demonstration of
+		the reduce function (int) However this one takes functional
+		programming approach.
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+		<!-- 
+		(reduce * (1,2,3,4,5) ) 
+		-->
+		<print>
+			<call>
+				<variable name="reduce" />
+
+				<function>
+					<automatic-Var>
+						<var name="num1" type="int" mutable="no" />
+						<var name="num2" type="int" mutable="no" />
+					</automatic-Var>
+					<returns type="int" />
+					<block>
+						<return>
+							<operator value="*">
+								<variable name="num1" />
+								<variable name="num2" />
+							</operator>
+						</return>
+					</block>
+				</function>
+
+				<cast type="int">
+					<constant type="string" value="1" />
+				</cast>
+				<cast type="int">
+					<constant type="float" value="2.5" />
+				</cast>
+				<constant type="int" value="3" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</call>
+		</print>
+
+	</block>
+</uXML>
+

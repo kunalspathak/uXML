@@ -1,0 +1,7 @@
+# Demonstrates the reduce function
+def factorial(a,b)
+{	
+	return a * b
+}
+x = reduce(factorial, [1,2,3,4,5])
+print x

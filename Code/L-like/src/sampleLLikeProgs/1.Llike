@@ -1,0 +1,11 @@
+; This program checks the scope of 'let'.
+; After the inner most let's scope, try accessing 'z'. It will be a runtime error.
+(
+let ( (x 32) (y 23) )
+(
+let ((z 5))
+	(setq x (+ z 0))
+)
+( setq x 
+	(* x y))
+)

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Desc : Constructor definition 
+-->
+   
+<Constructor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="overall.xsd"  
+ name="HelloWorld"> 
+    <!-- 
+        Desc : Formal Parameters passed to the constructor 
+        There will be atleast 1 parameter that will be passed and that is current instance of this class.
+        
+        Since formal parameters act like local variables, a block will have list of automatic variables 
+    -->
+    <automatic-Var> 
+        <!-- 
+            Desc : Parameter names and type that is passed.
+            Attr : name
+            - Name of the formal parameter
+            Attr : type
+            - Data-type of the parameter
+            
+            There will be atleast 1 parameter that will be passed and that is current instance of this class.
+            Other parameters are optional. Data-type could be anything defined in variableDeclaration.xml
+            Data-type should adhere to the rules of programming language whose source code the uXML is representating.
+            eg. Java can't pass a parameter of type function, but C,C++, LISP, Python can do that.
+        -->
+        <var name="this" type="className"/> 
+        <var name="var1" type="int"/>
+        <var name="var2" type="string"/>
+        <var name="var3" type="arrayA2"/>
+    </automatic-Var>
+    <block>
+
+       
+        <!-- 
+                Optional call to base class constructor.
+                There would be an explicit call to base class constructor in source code so that uXML will also generate a call
+                to the base class constructor.
+                
+                For struct, there won't be a call to base constructor.
+            -->
+        <!-- Rest of the code follows here. It con contain anything valid mentioned in code.xml -->
+
+    </block>
+</Constructor>

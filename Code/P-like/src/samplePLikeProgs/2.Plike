@@ -1,0 +1,50 @@
+// This program test the creation of arrays
+PROGRAM array_test;
+
+{
+const
+	bas := 5;
+	c := 'a';
+var
+	//a : array [1..5, 0..2] of int;
+	main_i : int;
+	}
+	
+	procedure b(b_a : int);
+		var
+			b_i : int;
+		
+		procedure b_b(b_b_a : int);
+		var
+			b_b_i : int;
+		begin
+			write("Inside b_b"); //b_b_i := 1;
+			//call b_b(b_a);
+		end
+		
+		
+		procedure b_b_c(b_b_a : int);
+		var
+			b_b_i : int;
+		begin
+			write("Inside b_b_c"); b_b_i := 1;
+			call b_b(b_a);
+		end
+		
+		
+		
+	begin
+		call b_b_c(5);
+	end
+	{
+	procedure b(a,b:int; procedure kp(kp1,kp2:int) : char; procedure ads(mn:int) : int);
+	var
+		l : int;
+	begin
+		i := i + 1;
+	end
+	}
+
+	begin
+		call b(5);	
+	end

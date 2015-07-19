@@ -1,0 +1,35 @@
+/**
+ * Arrays - Passing 2 arrays to a function
+ */
+
+// Currently needed to set the prototype in function argument
+int sample[3];
+
+function void func(int a[3], int b[3]) {
+	int i;
+	for(i = 0; i < 3;i=i+1) {
+		print(a[i] + b[i]);
+	}
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int i;
+	int a[3],b[3];
+	for(i = 0; i < 3;i=i+1) {
+		a[i] = i * i;
+		b[i] = i * i * i;
+	}
+	
+	call func(a,b);
+}
+
+/*
+Output :
+0 
+2 
+12 
+
+*/

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<array-type name="2D" type="int">
+			<dim size="2"/>
+			<dim size="2"/>
+		</array-type>
+		
+		<var name="i" type="2D" mutable="yes"/>
+		
+		<!-- i[0][0] = 5; -->
+		<assign>
+			<operator value="[]">
+				<operator value="[]">
+					<variable name="i"/>
+					<constant type="int" value="0"/>
+				</operator>
+				<constant type="int" value="0"/>
+			</operator>
+			<constant type="int" value="5"/>
+		</assign>
+		
+		<print>
+			<operator value="[]">
+				<operator value="[]">
+					<variable name="i"/>
+					<constant type="int" value="0"/>
+				</operator>
+				<constant type="int" value="1"/>
+			</operator>
+		</print>
+		
+	</block>
+</uXML>

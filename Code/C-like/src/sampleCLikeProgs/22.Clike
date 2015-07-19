@@ -1,0 +1,56 @@
+/**
+ * This program defines function pointer whose definition contains another function pointer.
+ * 
+ * See 6.Clike for function pointer contained in return type of function pointer definition
+ */
+
+/* Pointer to a function that takes 2 'int' and returns nothing */
+funcptr (void(int,int)) *fun;
+
+/* Pointer to a function that takes function pointer of type 'fun' and returns nothing. */
+funcptr (void (funcptr fun)) *fun2;
+
+/* Sum */
+function void sum(int var1, int var2) {
+	print(var1,"+",var2,"=", (var1 + var2));
+}
+
+/* Difference */
+
+function void diff(int var1, int var2) {
+	print(var1,"-",var2,"=", (var1 - var2));
+}
+
+/* Executor */
+function void executor(funcptr fun machine) {
+	print("inside executor");
+	call *machine(10,5);
+}
+
+
+/*
+ * Main function
+ */
+function void main() {
+	funcptr fun a;
+	funcptr fun2 b;
+	
+	// Assign sum
+	a = &sum;
+	b = &executor;
+	call *b(a);
+	
+	// Assign diff
+	a = &diff;
+	call *b(a);
+}
+
+/*
+Output :
+
+inside executor 
+10 + 5 = 15 
+inside executor 
+10 - 5 = 5 
+
+*/

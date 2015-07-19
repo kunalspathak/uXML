@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<function-type name="(int,int)">
+			<automatic-Var>
+				<var mutable="no" name="" type="int" />
+				<var mutable="no" name="" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+		</function-type>
+		<pointer-type name="(int,int)*" refType="(int,int)" />
+		<var name="fun" ptrMutable="yes" type="(int,int)*" valueMutable="yes" />
+		<function-type name="((int,int)*)">
+			<automatic-Var>
+				<var mutable="no" name="" type="(int,int)*" />
+			</automatic-Var>
+			<returns type="void" />
+		</function-type>
+		<pointer-type name="((int,int)*)*" refType="((int,int)*)" />
+		<var name="fun2" ptrMutable="yes" type="((int,int)*)*"
+			valueMutable="yes" />
+		<function name="sum">
+			<automatic-Var>
+				<var mutable="yes" name="var1" type="int" />
+				<var mutable="yes" name="var2" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<variable name="var1" />
+					<constant type="string" value="+" />
+					<variable name="var2" />
+					<constant type="string" value="=" />
+					<operator value="+">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<function name="diff">
+			<automatic-Var>
+				<var mutable="yes" name="var1" type="int" />
+				<var mutable="yes" name="var2" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<variable name="var1" />
+					<constant type="string" value="-" />
+					<variable name="var2" />
+					<constant type="string" value="=" />
+					<operator value="-">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<function name="executor">
+			<automatic-Var>
+				<var mutable="yes" name="machine" type="(int,int)*" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<constant type="string" value="inside executor" />
+				</print>
+				<call>
+					<operator value="#">
+						<variable name="machine" />
+					</operator>
+					<constant type="int" value="10" />
+					<constant type="int" value="5" />
+				</call>
+			</block>
+		</function>
+		<function name="main">
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="a" type="(int,int)*" />
+				<var mutable="yes" name="b" type="((int,int)*)*" />
+				<assign>
+					<variable name="a" />
+					<operator value="@">
+						<variable name="sum" />
+					</operator>
+				</assign>
+				<assign>
+					<variable name="b" />
+					<operator value="@">
+						<variable name="executor" />
+					</operator>
+				</assign>
+				<call>
+					<operator value="#">
+						<variable name="b" />
+					</operator>
+					<variable name="a" />
+				</call>
+				<assign>
+					<variable name="a" />
+					<operator value="@">
+						<variable name="diff" />
+					</operator>
+				</assign>
+				<call>
+					<operator value="#">
+						<variable name="b" />
+					</operator>
+					<variable name="a" />
+				</call>
+			</block>
+		</function>
+		<call>
+			<variable name="main" />
+		</call>
+	</block>
+</uXML>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<function name="main">
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="i" type="int">
+					<constant type="int" value="1" />
+				</var>
+				<operator value="==">
+					<variable name="i" />
+					<constant type="int" value="2" />
+					<block>
+						<print>
+							<constant type="string" value="If" />
+						</print>
+					</block>
+					<block>
+						<print>
+							<constant type="string" value="Else" />
+						</print>
+					</block>
+				</operator>
+			</block>
+		</function>
+		<call>
+			<variable name="main" />
+		</call>
+	</block>
+</uXML>

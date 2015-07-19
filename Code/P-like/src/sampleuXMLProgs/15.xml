@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static"><block><global-Var><var mutable="yes" name="a" type="string"><constant type="string" value="Kunal"/></var></global-Var><print><variable name="a"/></print></block></uXML>

@@ -1,0 +1,38 @@
+PROGRAM A;
+
+class A {
+
+	//int[5][5] i;
+	int [2] c ;
+	int j = 23;	
+	class A[5] b;
+
+	constructor A() {
+		int i = 5;
+	}	
+	
+	function void fun2() {
+		int i = 5;
+	}
+	
+	function void fun1(int inta) {
+		class A[2] a;
+		a[1].b[2].c[0] = 5;
+		call a[1].fun3(void);
+	}
+	
+	/*
+	class A a ;
+	final string a = "string";
+	final int i = 5;
+	
+	
+	constructor A() {
+		int i = 5;
+	}
+	function int a(int a , class A[5][5] b, class A b) {
+		class A[5] a ;
+		call a[1].a[1].a(void);
+		
+	} */
+}

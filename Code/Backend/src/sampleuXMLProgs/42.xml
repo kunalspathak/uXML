@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates block scope. It also test rename of decimal to float -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<!-- block0 -->
+<block>
+	<var name="i" type="float" mutable="yes"/>
+	
+	<print>	
+		<constant type="string" value="block0"/>
+		<variable name="i"/>
+	</print>
+	
+	<assign>
+		<variable name="i"/>
+		<operator value="*">
+			<variable name="i"/>
+			<constant type="float" value="2.5"/>
+		</operator>
+	</assign>
+	<!-- block1 -->
+	<block>
+		<var name="i" type="float" mutable="yes">
+			<constant type="float" value="0.1"/>
+		</var>
+		
+		<print>	
+			<constant type="string" value="block1"/>
+			<variable name="i"/>
+		</print>
+		
+		<assign>
+			<variable name="i"/>
+			<operator value="*">
+				<variable name="i"/>
+				<constant type="float" value="2.5"/>
+			</operator>
+		</assign>
+		<!-- block2 -->
+		<block>
+			<var name="i" type="float" mutable="yes">
+				<constant type="float" value="0.2"/>
+			</var>
+			
+			<print>	
+				<constant type="string" value="block2"/>
+				<variable name="i"/>
+			</print>
+			
+			<assign>
+				<variable name="i"/>
+				<operator value="*">
+					<variable name="i"/>
+					<constant type="float" value="2.5"/>
+				</operator>
+			</assign>
+			<!-- block3 -->
+			<block>
+				<var name="i" type="string" mutable="yes">
+					<constant type="string" value="block3"/>
+				</var>
+				
+				<print>	
+					<constant type="string" value="block3"/>
+					<variable name="i"/>
+				</print>
+				
+				<print>	
+					<constant type="string" value="block3"/>
+					<variable name="i"/>
+				</print>
+				 
+			</block>
+			
+			<print>	
+				<constant type="string" value="block2"/>
+				<variable name="i"/>
+			</print>
+			 
+		</block>
+		
+		<print>	
+			<constant type="string" value="block1"/>
+			<variable name="i"/>
+		</print>
+		 
+	</block>
+	
+	 <print>	
+		<constant type="string" value="block0"/>
+		<variable name="i"/>
+	</print>
+</block>
+</uXML>

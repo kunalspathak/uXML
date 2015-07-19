@@ -1,0 +1,12 @@
+; Demonstrates lambda function
+(let ((x 3))
+
+(defun calc (n) 
+	(* ((lambda (x) (* x x)) (+ n 1)) 7)
+)
+((lambda (x) (+ x 1)) (calc x))
+)
+
+; Prints 113
+
+

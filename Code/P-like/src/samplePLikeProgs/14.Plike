@@ -1,0 +1,25 @@
+// This program test the static vs. dynamic scoping
+{
+	The example below is taken from 
+	http://en.wikipedia.org/wiki/Scope_%28programming%29#Example
+}
+PROGRAM if_check;
+	
+	
+	procedure f (x,y : int);
+	begin
+		if x = y then
+		begin
+			write("equal");
+		end
+		else
+		begin
+			write("not equal");	
+		end
+	end
+	
+	
+begin { main }
+	call f(5,5);
+end
+	

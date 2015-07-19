@@ -1,0 +1,34 @@
+/**
+ * Arrays - Passing array to a function
+ */
+
+// Currently needed to set the prototype in function argument
+int sample[3];
+
+function void func(int a[3]) {
+	int i;
+	for(i = 0; i < 3;i=i+1) {
+		print(a[i]);
+	}
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int i;
+	int b[3];
+	for(i = 0; i < 3;i=i+1) {
+		b[i] = i * i;
+	}
+	
+	call func(b);
+}
+
+/*
+Output :
+
+0 
+1 
+4 
+*/

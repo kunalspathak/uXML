@@ -1,0 +1,6 @@
+; Demonstrates let keyword
+( let ((w 77))
+(let ((w 8)
+        (x w))
+    (+ w x)) ; prints 16
+	(+ 1 w)) ; prints 78

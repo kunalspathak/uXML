@@ -1,0 +1,625 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.5";
+}
+PARSER_BEGIN(L)
+package parserOfL;  
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader; 
+import java.io.LineNumberReader;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import compiler.components.*;
+import compiler.dataTypes.*;
+import compiler.exceptions.*;
+import compiler.operator.*;
+import compiler.util.*;
+import compiler.util.Constants.DATA_TYPE;
+import compiler.uXMLGenerator.*;
+
+import xvHandler.Executor;
+import xvHandler.CodeAnalysis;
+import xvHandler.ProcedureCallSeq;
+
+import parserOfL.exceptions.*;
+
+public class L { 
+	  
+	private static UXMLElement currentNode = null;
+	private static FunctionType currentFunctionType = null;
+	private static int nestedLevelOfFunction = 0; // Represents the nested level of a procedure
+	private static boolean isVarDeclaration = false;
+	private static FunctionType currentFunction = null;
+	private static String currentFunctionName = null;
+	private static boolean isFunctionCallRequired = true;
+	private static boolean skipFunctionCall = false;
+	
+	public static void main(String args[]) throws ParseException {
+		FileInputStream io = null; 
+		String codeAnalysisFlag = null;
+		LineNumberReader loc = null;
+     
+		String fileName = null;
+		String filePath = null;
+	    if(args.length == 0) {
+	    	Scanner in = new Scanner(System.in);
+	    	System.out.print("Enter the file name @ src/sampleLLikeProgs/");
+	    	fileName = in.nextLine();
+	    	while(fileName.trim().length() == 0)
+	    		fileName = in.nextLine();
+	    	codeAnalysisFlag = in.nextLine();
+	    	args = new String[1];
+	    	args[0] = fileName;
+	    }
+	    else  {
+	        fileName = args[0];
+	        if(args.length > 1)
+	        	codeAnalysisFlag = args[1];
+	    }
+	    
+	    try {
+	    	filePath = "src" + File.separator + "sampleLLikeProgs" + File.separator + fileName + ".Llike"; 
+	    	io = new FileInputStream(filePath); 
+	    	L parser = new L(io);
+	    	
+	    	// Initialize the environment with ignore dynamic variable flag
+	    	Environment.initialize(new ProcedureCallSeq(), true);
+	    	// Initialize the uXMLDocument generator
+	    	currentNode = UXMLElementFactory.initialize("Llike", Constants.STATIC);
+	        
+	        Environment.currentActivationRecord.enterTheBlock(); 
+	        parser.LLike(); 
+	        Environment.currentActivationRecord.leaveTheBlock();
+	        
+	        // Save the uXML document
+	        UXMLElementFactory.done(fileName);
+	        
+	        if("-analysis".equals(codeAnalysisFlag)) {
+	        	loc = new LineNumberReader(new FileReader(filePath));
+	        	while (loc.readLine() != null) {}
+	        	CodeAnalysis.main(args, loc.getLineNumber());
+	        }
+	        else
+	        	Executor.main(args);
+        
+	    } catch (FileNotFoundException fe) {
+	    	System.err.println("File '" + fileName + "' not found.");
+	    	System.exit(1);
+	    } catch(IOException ie) {
+	    	System.err.println("Error reading file '" + fileName + "'.");
+	    	System.exit(1);
+	    } catch(ParseException e) {
+	        String message = e.getMessage();
+	        int startIndex = message.indexOf("line ") + 5;
+	        int endIndex = message.indexOf(",");
+	        String lineNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("column ") + 7;
+	        endIndex = message.indexOf(".");
+	        String columnNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("\"") + 1;
+	        endIndex = message.lastIndexOf("\" at line");
+	        String keyword = message.substring(startIndex, endIndex).replaceAll("\"","").trim();
+	        
+	        System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	        StringBuffer expectedTokens = new StringBuffer("Expected tokens : ");
+	        String tokenValue = null;
+	        tokenValue = tokenImage[e.expectedTokenSequences[0][0]]; 
+	    	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	    	expectedTokens.append(tokenValue);
+	        for(int tokenId = 1; tokenId < e.expectedTokenSequences.length;tokenId++) {
+	        	tokenValue = tokenImage[e.expectedTokenSequences[tokenId][0]];
+	        	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	        	expectedTokens.append(", ")
+	        		.append(tokenValue);
+	        }
+	    	System.err.println(expectedTokens.toString());
+	    } catch(TokenMgrError e) {
+	    	String message = e.getMessage();
+			int startIndex = message.indexOf("line ") + 5;
+			int endIndex = message.indexOf(",");
+			String lineNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("column ") + 7;
+			endIndex = message.indexOf(".");
+			String columnNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("\"") + 1;
+			endIndex = message.indexOf("\"",startIndex);
+			String keyword = message.substring(startIndex, endIndex).trim();
+			
+			System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	    }
+	    catch(CompilationException e) {
+	    	System.err.println(e.getMessage());
+	    }
+  }
+
+
+
+	/**
+	 * Scope Start
+	 */
+	private static void ScopeStart() /*throws CompilationException :*/ 
+	{
+		UXMLElement block = null;
+	
+		nestedLevelOfFunction++; // Increase the nested level
+		
+		// Execute the calling sequence of a caller - 
+//	        Environment.callSequenceProcessor.callAction_caller(nestedLevelOfFunction);
+//        Environment.currentActivationRecord.enterTheBlock();
+	}
+
+	/**
+	 * Scope End
+	 */
+	private static void ScopeEnd() /*throws CompilationException : {}*/
+	{
+//		Environment.currentActivationRecord.leaveTheBlock();
+//			Environment.callSequenceProcessor.returnAction_caller();
+		nestedLevelOfFunction--; // Decrease the nested level
+	}
+}
+PARSER_END(L)
+
+SKIP : { " " | "\r" | "\t" | "\n" }
+
+SPECIAL_TOKEN : {<";"> : InsideComment}
+<InsideComment> SPECIAL_TOKEN :
+{
+	<"\n" | "\r"> : DEFAULT
+}
+<InsideComment> MORE: {<~[]>}
+
+/* Constants */
+TOKEN: { < INT_CONSTANT : ( < DIGIT > ) + > }
+TOKEN: { < FLOAT_CONSTANT : ( < DIGIT > ) + "." ( < DIGIT > ) + > }
+TOKEN: { < STRING_CONSTANT : "\"" (~["\""])+ "\"" > }
+TOKEN: { < BOOL_CONSTANT : "true" | "false" > }
+TOKEN: { < CHAR_CONSTANT : "'" ~["'"] "'" > }
+
+TOKEN: { < START : "(" > }
+TOKEN: { < END : ")" > }
+
+/* Built-in functions */
+TOKEN: { < LET : "let" > }
+TOKEN: { < SETQ : "setq" > }
+TOKEN: { < IF : "if" > }
+TOKEN: { < MAP : "map" > }
+TOKEN: { < REDUCE : "reduce" > }
+
+/* Arithmetic functions */
+TOKEN : { < PLUS: "+" > }	
+TOKEN : { < MINUS: "-" > }
+TOKEN : { < MULTIPLY : "*" > }
+TOKEN : { < DIVIDE: "/" > } 
+TOKEN : { <MOD: "%" > }
+TOKEN : { < BIT_OR : "|" > } 
+TOKEN : { < BIT_XOR : "^" > }
+TOKEN : { < BIT_COMPLEMENT : "~" > }
+
+/* Conditional functions */
+TOKEN: { < NT_EQ : "!=" > }
+TOKEN: { < LT: "<" > }
+TOKEN: { < LT_EQ : "<=" > }
+TOKEN: { < GT_EQ : ">=" > }
+TOKEN: { < GT: ">" > }
+
+/* Keywords */
+TOKEN: { < DEFUN: "defun" > }
+TOKEN: { < LAMBDA: "lambda" > }
+TOKEN: { < COMMA: "," > }
+
+TOKEN : { <ID : ("_" | <ALPHA>)("_" | <DIGIT> | <ALPHA>)* > }
+
+TOKEN : {<ALPHA : ["a" - "z"] | ["A" - "Z"]>}
+TOKEN : {<DIGIT : ["0" - "9"]>}
+
+/**
+ * Constants
+ */
+Symbol Constants() throws CompilationException : {Token t = null; }
+{ 
+	try {
+		(t = < INT_CONSTANT > { return new ConstantValue(Constants.INT,t.image);} 
+		| t = < FLOAT_CONSTANT > { return new ConstantValue(Constants.FLOAT,t.image);}
+		| t = < CHAR_CONSTANT > 
+		{
+			String ch = t.image.substring(1,2);
+			return new ConstantValue(Constants.CHAR,ch);
+		}
+		| t = < STRING_CONSTANT > 
+		{ 
+			String str = t.image;
+			str = str.substring(1, str.length() - 1);
+			return new ConstantValue(Constants.STRING,str);
+		}
+		| t = < BOOL_CONSTANT >{ return new ConstantValue(Constants.BOOLEAN,t.image);}
+		)
+	} catch(IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	}
+}
+
+/**
+ * Conditional operators
+ */
+String Conditional_Operators() throws CompilationException :
+{
+	Token t = null;
+}
+{
+	/* Conditional */
+	(t = <NT_EQ> | t = <LT>  {t.image = "(";} | t = <LT_EQ>  {t.image = "(=";} | t = <GT_EQ>  {t.image = ")=";} | t = <GT>   {t.image = ")";})
+	{ return t.image; }
+}
+
+/**
+ * Built-in functions
+ */
+UXMLElement BuiltInFunctions() throws CompilationException : 
+{
+	Token t = null; Symbol value = null;
+	UXMLElement functionNameElement = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+		(
+		/* Arithematic */
+		t = <PLUS> | t = <MINUS> | t = <MULTIPLY> | t = <DIVIDE> | t = <MOD> | 
+		t = <BIT_OR> | t = <BIT_XOR> | t = <BIT_COMPLEMENT> |
+		/* Functional */
+		// If map/reduce, then immediate function should be just appended and hence it is not a function call.
+		t = <MAP> { skipFunctionCall = true; }  | t = <REDUCE> { skipFunctionCall = true; } |  
+		/* Assignment */ 
+		t = <SETQ> {t.image = "="; }| 
+		/* Call to defun function name */
+		t = <ID> {
+			try {
+				if(t.image.equals(currentFunctionName)) // If current function
+					value = currentFunction;
+				else
+					value = Environment.getSymbol(t.image);
+			} catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+		}
+		)
+		{
+			attributes.put(Constants.NAME,t.image);
+			functionNameElement = UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, value);
+		}
+		{
+			return functionNameElement;
+		}
+}
+
+/**
+ * Llike program
+ */
+void LLike() throws CompilationException : 
+{
+	UXMLElement block = null, expressionElement = null, printElement = null, fatherOfLastElement = null;
+}
+{
+	{
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+		currentNode.appendChild(block);
+		currentNode = block;
+	}
+	(expressionElement = Expression() )*
+	{
+		// Add the print statement to last evaluated statement
+		fatherOfLastElement = expressionElement.getParent();
+		printElement = UXMLElementFactory.generateElement(Constants.PRINT, null, null);
+		printElement.appendChild(expressionElement);
+		fatherOfLastElement.appendChild(printElement);
+	}
+}
+
+/**
+ * Variable declaration
+ */
+UXMLElement VarDeclaration() throws CompilationException : 
+{
+	UXMLElement savedCurrentNode = currentNode, block = null, expressionElement = null;
+}
+{
+	<LET> <START> 
+	{
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+		currentNode.appendChild(block);
+		currentNode = block;
+	}
+	/* Defines a pair of expression, first is the symbol name followed by value that is assigned*/
+		(<START> ValueBinding() <END>)*   
+	<END>
+	{
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+		currentNode.appendChild(block);
+		currentNode = block;
+	}
+
+	/* Closure or scope where above declared variables are valid */
+	(expressionElement = Expression() )* 
+	{
+		currentNode = savedCurrentNode;
+		return expressionElement;
+	}
+}
+
+/**
+ * Defines the value binding that is used in variable declaration during 'let' function call.
+ */
+void ValueBinding() throws CompilationException : 
+{
+	Token t = null;
+	String variableName = null;
+	UXMLElement variableElement = null, valueElement = null;
+	Symbol variable, value = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+}
+{
+	t = <ID> { variableName = t.image;} 
+	valueElement = Expression()
+	{
+		value = valueElement.getSymbol();
+		try {
+			variable = SymbolMachine.generate(variableName, value.getType(), true); // non-mutable
+			Environment.currentActivationRecord.addSymbol(variable); // Add in symbol table
+		} catch(IllegalSymbolValueException e) {throw new CompilationException(e.getMessage());}
+		attributes.clear();
+		attributes.put(Constants.NAME, variableName);
+		attributes.put(Constants.TYPE, value.getType());
+		attributes.put(Constants.MUTABLE, "yes"); // non-mutable
+		variableElement = UXMLElementFactory.generateElement(Constants.VAR, attributes, variable);
+		variableElement.appendChild(valueElement);
+		currentNode.appendChild(variableElement);
+	}
+}
+
+/**
+ * Expression
+ */
+UXMLElement Expression() throws CompilationException : 
+{
+	Symbol value = null; Token t = null;
+	UXMLElement returnFactorValue = null, procedureNode = null, call = null, savedCurrentNode = currentNode, returnElement = null
+	, expressionElement = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+}
+{
+	(
+		<START> 
+			(	/* Function call */
+				(
+					(
+						procedureNode = BuiltInFunctions() 	/* Built-in function name  */
+						{
+							call = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+							returnFactorValue = call;
+							call.appendChild(procedureNode);
+							currentNode = currentNode.appendChild(call);
+						}
+					  | procedureNode = LambdaFunction() /* Lambda function */
+						{
+						  	
+					  		UXMLElement childOfCall = currentNode.getFirstChild();
+					  		
+					  		// If currentNode is 'map' or 'reduce', then don't append the function
+					  		// to 'call' element, instead directly append it to current node.
+					  		// By this the function will be appended to the sibling <variable name='map'/>
+					  		// or <variable name='reduce'/>
+					  		if(Constants.CALL.equals(currentNode.getElementName()) && childOfCall != null && Constants.VARIABLE.equals(childOfCall.getElementName())
+					  				&& 
+					  		(Constants.MAP.equals(childOfCall.getAttributeValue(Constants.NAME)) || 
+					  					Constants.REDUCE.equals(childOfCall.getAttributeValue(Constants.NAME)))) {
+					  			
+					  			returnFactorValue = procedureNode;
+					  			currentNode = currentNode.appendChild(procedureNode);
+					  			
+					  		}
+					  		else {
+					  			call = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+								returnFactorValue = call;
+								call.appendChild(procedureNode);
+								currentNode = currentNode.appendChild(call);
+					  		}
+						}
+					)
+					/* Closure or scope where above declared variables are valid */
+					(Expression())*
+				) |
+				/* Condition */
+				returnFactorValue = Cond() {currentNode.appendChild(returnFactorValue);} |
+				/* Variable Declaration */
+				returnFactorValue = VarDeclaration() |
+				/* Function definition call */
+				returnFactorValue = DefunFunction() { currentNode.appendChild(returnFactorValue); }  
+			)
+		<END>
+		/* Constants */
+		| value = Constants() 
+		{ 
+			returnFactorValue = new UXMLElement(null,value);
+			currentNode.appendChild(returnFactorValue); 
+		} 	
+		/* Variable */
+		| t = <ID> 
+		{ 
+			attributes.clear();
+			attributes.put(Constants.NAME, t.image);
+			try {
+				// If variable declaration then generate the variable, else get it from symbol table.
+				if(isVarDeclaration) {
+					value = SymbolMachine.generate(t.image,Constants.INT, true); // HARD_CODING
+					attributes.put(Constants.TYPE, Constants.INT);				 // HARD_CODING
+					attributes.put(Constants.MUTABLE, Constants.YES);
+					returnFactorValue = UXMLElementFactory.generateElement(Constants.VAR, attributes,value );
+				}
+				else {
+					value = Environment.getSymbol(t.image);
+					returnFactorValue = UXMLElementFactory.generateElement(Constants.VARIABLE, attributes,value );
+				}
+			} catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+			catch(IllegalSymbolValueException e) {throw new CompilationException(e.getMessage());}
+			
+			currentNode.appendChild(returnFactorValue); 
+		}
+	)  
+	{ 	
+		currentNode = savedCurrentNode;
+		if(isVarDeclaration && value != null)
+			Environment.currentActivationRecord.addSymbol(value);
+		return returnFactorValue; 
+	} 
+}
+
+/**
+ * Condition
+ */
+UXMLElement Cond() throws CompilationException : 
+{
+	UXMLElement savedCurrentNode = currentNode, block = null, returnElement = null, expressionElement = null;
+	UXMLElement call = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+	String operatorName = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+	<IF> <START> 
+	operatorName = Conditional_Operators() 
+	{
+		attributes.put(Constants.NAME, operatorName);
+		call.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		currentNode = call;
+	}
+	/* Arguments to the if-condition */
+	expressionElement = Expression() { call.appendChild(expressionElement); }
+	expressionElement = Expression() { call.appendChild(expressionElement); }  
+	<END>
+	{
+		block = call.appendChild(UXMLElementFactory.generateElement(Constants.BLOCK,null,null));
+		block = block.appendChild(UXMLElementFactory.generateElement(Constants.RETURN,null,null));
+	}
+	/* true */
+	expressionElement = Expression()			
+ 	{
+		block.appendChild(expressionElement);
+		returnElement = expressionElement; 
+		call.setSymbol(expressionElement.getSymbol()); // Set the return value
+		block = call.appendChild(UXMLElementFactory.generateElement(Constants.BLOCK,null,null));
+		block = block.appendChild(UXMLElementFactory.generateElement(Constants.RETURN,null,null));
+	}
+	/* false */
+	(expressionElement =  Expression() { block.appendChild(expressionElement); } )?			
+	{
+		currentNode = savedCurrentNode;
+		return call;
+	}
+}
+
+
+/**
+ * Function definition of a Defun function.
+ */
+UXMLElement DefunFunction() throws CompilationException : 
+{
+	UXMLElement functionBodyElement = null;
+	Token t = null;
+}
+{
+	{
+		ScopeStart();
+	}
+	<DEFUN> t = <ID>  /* Function name */
+	functionBodyElement = FunctionDefinition(t.image) 
+	{
+		return functionBodyElement;
+	}
+}
+
+/**
+ * Function definition of a Lambda function.
+ */
+UXMLElement LambdaFunction() throws CompilationException : 
+{
+	UXMLElement functionBodyElement = null;
+}
+{
+	{
+		ScopeStart();
+	}
+	<START> <LAMBDA> 
+	functionBodyElement = FunctionDefinition(Constants.LAMBDA)  <END>  
+	{
+		return functionBodyElement;
+	}
+}
+
+/**
+ * Function Definition of a function (lambda/defun)
+ */
+UXMLElement FunctionDefinition(String procedureName) throws CompilationException :
+{
+	Token t = null;
+	Symbol returnValue = null;
+	FunctionType functionType = null;
+	UXMLElement returnValueElement = null, procedureNode = null, functionBlock = null, automaticElement = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+	{
+		functionType = new FunctionType(procedureName, true, Constants.VOID);
+		currentFunction = functionType; currentFunctionName = procedureName; // save current function.
+		functionType.setNestedLevel(nestedLevelOfFunction);
+		Environment.currentActivationRecord.addSymbol(functionType);
+		attributes.clear();
+		attributes.put(Constants.NAME, procedureName);
+		procedureNode = UXMLElementFactory.generateElement(Constants.FUNCTION , attributes, null);
+		automaticElement = UXMLElementFactory.generateElement(Constants.AUTOMATIC_VAR, null, null);
+		procedureNode.appendChild(automaticElement);
+	}
+	<START> FormalParameters(automaticElement) <END> /* Formal parameters of the lambda function. */
+	{
+		functionBlock = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+	}
+	returnValueElement = Expression()  /* Lambda function body. */
+	{
+		// Set the return type
+		returnValue = returnValueElement.getSymbol();
+		functionType.setReturnType(Constants.VOID);
+		functionType.setReturnValue(returnValue);
+		// Lastly, set the function body
+		functionBlock.appendChild(returnValueElement);
+		procedureNode.appendChild(functionBlock); // Append the function block 
+		
+		ScopeEnd();
+		return procedureNode;
+	}
+}
+
+/**
+ * Formal parameters of the function.
+ */
+void FormalParameters(UXMLElement automaticElement) throws CompilationException : 
+{
+	UXMLElement expressionElement = null;	
+}
+{
+	{ isVarDeclaration = true; }
+	(expressionElement = Expression() { automaticElement.appendChild(expressionElement); } 
+			
+	(<COMMA> expressionElement = Expression(){ automaticElement.appendChild(expressionElement); })*)
+	{ isVarDeclaration = false; }
+}
+

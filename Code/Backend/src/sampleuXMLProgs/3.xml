@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This program demonstrates procedure parameters feature -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    scope="dynamic">
+    <block>
+    <var name="m" type="int" mutable="yes"/>
+    
+    <!-- Square calculator -->
+    <function name="square">
+        <automatic-Var>
+            <var name="num" type="int" mutable="no"/>
+        </automatic-Var>
+        <returns type="int"/>
+        <block>
+            <!-- 
+                Should println the value that is assigned to m in the static scope i.e.
+                which is assigned in main block.
+                if dynamic scope, then should print value and it's square that was assigned in the caller
+                of this method
+            -->
+            <println>
+                <constant type="string" value="Inside square()"/>
+                <variable name="m"/>
+            </println>
+            
+            <return>
+                <operator value="*">
+                    <variable name="m"/>
+                    <variable name="m"/>
+                </operator>
+            </return>
+        </block>
+    </function>
+    
+    <function name="answer">
+        <automatic-Var>
+            <var name="int evaluator(int)" type="function" mutable="no"/>
+            <var name="x" type="int" mutable="no"/>
+        </automatic-Var>
+        <returns type="int"/>
+        <block>
+            <!-- Same variable 'm' defined in answer() procedure -->
+            <var name="m" type="int" mutable="yes"/>
+            <assign>
+                <variable name="m"/>
+                <constant type="int" value="23"/>
+            </assign>
+            
+            <!-- void inner_answer(int x) -->
+            <function name="inner_answer">
+                <automatic-Var>
+                    <var name="m" type="int" mutable="yes"/>
+                </automatic-Var>
+                <returns type="int"/>
+                <block>
+                    
+                    <!--<assign>
+                        <variable name="m"/>
+                        <constant type="int" value="1"/>
+                    </assign>
+                    
+                    --><println>
+                        <constant type="string" value="Inside inner_answer()"/>
+                        <variable name="m"/>
+                    </println>
+                    <return>
+                    	<constant type="int" value="5"/>
+                    </return>
+                </block>
+            </function>
+            
+            <println>
+                <constant type="string" value="Inside answer(), before inner_answer()"/>
+                <variable name="m"/>
+            </println>
+            
+            <call>
+                <variable name="inner_answer"/>
+                <variable name="m"/>
+            </call>
+            
+            <assign>
+            	<variable name="m"/>
+            	<constant type="int" value="20"/>
+            </assign>
+            
+            <println>
+            	<constant type="string" value="Executing square"/>
+            	<call>
+            		<variable name="evaluator"/>
+            		<variable name="m"/>
+            	</call>
+            </println>
+            
+            <println>
+                <constant type="string" value="Inside answer(), after inner_answer()"/>
+                <variable name="m"/>
+            </println>
+                
+            
+            <return>
+                <call>
+                    <variable name="inner_answer"/>
+                    <variable name="x"/>
+                </call>
+            </return>
+        </block>
+    </function>
+    
+    <assign>
+        <variable name="m"/>
+        <constant type="int" value="5"/>
+    </assign>
+    
+    <println>
+        <call>
+            <variable name="answer"/>
+            <variable name="square"/>
+            <constant type="int" value="5"/>
+        </call>
+    </println>
+    </block>
+</uXML>

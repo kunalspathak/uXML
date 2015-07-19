@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program demonstrates matrix addition - Part 2 (Using array as arguments and return type)
+		
+		void printArray(int arrayToPrint[3][3]) {
+			for(int i = 0; i < 3;i++) 
+				for(int j = 0; j < 3;j++)
+					print(arrayToPrint[i][j]); 
+		}
+		
+		int[3][3] assignArray(int number) {
+			int intArray[3][3] 
+			for(int i = 0; i < 3;i++) 
+				for(int j = 0; j < 3;j++)
+					intArray[i][j] = number; 
+			return intArray;
+		}
+		
+		int[3][3] sumArray(int[3][3] a, int[3][3] b) {
+			int c[3][3];
+			for(int i = 0; i < 3;i++) 
+		 		for(int j = 0; j < 3;j++) 
+		 			c[i][j] = a[i][j] + b[i][j]
+		 	return c;
+		} 
+		
+		main() { 
+			int a[3][3], b[3][3], c[3][3],count = 0; 
+			
+			a = assignArray(5);
+			b = assignArray(23);
+			c = sumArray(a,b);		
+		 	
+		 	printArray(a); 
+		 	printArray(b);
+			printArray(c); 
+		}
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<array-type name="2D" type="int">
+		<dim size="2" />
+		<dim size="2" />
+	</array-type>
+	
+	<var name="arraySize" type="int" mutable="no">
+		<constant type="int" value="2"/>
+	</var>
+
+	<!--   function printArray --> 
+	<function name="printArray">
+		<automatic-Var>
+			<var name="arrayToPrint" type="2D" mutable="yes" />
+		</automatic-Var>
+		<block>
+			<var name="i" type="int" mutable="yes" />
+			<var name="j" type="int" mutable="yes" />
+			<for-loop>
+				<from>
+					<assign>
+						<variable name="i" />
+						<constant type="int" value="0" />
+					</assign>
+				</from>
+				<till>
+					<operator value="(">
+						<variable name="i" />
+						<variable name="arraySize"/>
+					</operator>
+				</till>
+				<step>
+					<assign>
+						<variable name="i"/>
+						<operator value="+">
+							<variable name="i" />
+							<constant type="int" value="1" />
+						</operator>
+					</assign>
+				</step>
+				<block>
+					<for-loop>
+						<from>
+							<assign>
+								<variable name="j" />
+								<constant type="int" value="0" />
+							</assign>
+						</from>
+						<till>
+							<operator value="(">
+								<variable name="j" />
+								<variable name="arraySize"/>
+							</operator>
+						</till>
+						<step>
+							<assign>
+								<variable name="j"/>
+								<operator value="+">
+									<variable name="j" />
+									<constant type="int" value="1" />
+								</operator>
+							</assign>
+						</step>
+						<block>
+							<print>
+								<operator value="[]">
+									<operator value="[]">
+										<variable name="arrayToPrint" />
+										<variable name="i" />
+									</operator>
+									<variable name="j" />
+								</operator>
+							</print>
+						</block>
+					</for-loop>
+					<println>
+						<constant type="char" value=" " />
+					</println>
+				</block>
+			</for-loop>
+		</block>
+	</function>
+
+	<function name="assignArray">
+		<automatic-Var>
+			<var name="number" type="int" mutable="no"/> 
+		</automatic-Var>
+		<returns type="2D"/>
+		<block>
+			<var name="intArray" type="2D" mutable="yes"/>
+			<var name="i" type="int" mutable="yes" />
+			<var name="j" type="int" mutable="yes" />
+			<for-loop>
+				<from>
+					<assign>
+						<variable name="i" />
+						<constant type="int" value="0" />
+					</assign>
+				</from>
+				<till>
+					<operator value="(">
+						<variable name="i" />
+						<variable name="arraySize"/>
+					</operator>
+				</till>
+				<step>
+					<assign>
+						<variable name="i"/>
+						<operator value="+">
+							<variable name="i" />
+							<constant type="int" value="1" />
+						</operator>
+					</assign>
+				</step>
+				<block>
+					<for-loop>
+						<from>
+							<assign>
+								<variable name="j" />
+								<constant type="int" value="0" />
+							</assign>
+						</from>
+						<till>
+							<operator value="(">
+								<variable name="j" />
+								<variable name="arraySize"/>
+							</operator>
+						</till>
+						<step>
+							<assign>
+								<variable name="j"/>
+								<operator value="+">
+									<variable name="j" />
+									<constant type="int" value="1" />
+								</operator>
+							</assign>
+						</step>
+						<block>
+							<assign>
+								<operator value="[]">
+									<operator value="[]">
+										<variable name="intArray" />
+										<variable name="i" />
+									</operator>
+									<variable name="j" />
+								</operator>
+								<variable name="number" />
+							</assign>
+						</block>
+					</for-loop>
+				</block>
+			</for-loop>
+			
+			<return>
+				<variable name="intArray"/>
+			</return>
+		</block>
+	</function>
+	
+	<function name="sumArray">	
+		<automatic-Var>
+			<var name="a" type="2D" mutable="yes" />
+			<var name="b" type="2D" mutable="yes" />		
+		</automatic-Var>
+		<returns type="2D"/>
+		<block>
+			<var name="c" type="2D" mutable="yes"/>
+			<var name="i" type="int" mutable="yes" />
+			<var name="j" type="int" mutable="yes" />
+			<for-loop>
+				<from>
+					<assign>
+						<variable name="i" />
+						<constant type="int" value="0" />
+					</assign>
+				</from>
+				<till>
+					<operator value="(">
+						<variable name="i" />
+						<variable name="arraySize"/>
+					</operator>
+				</till>
+				<step>
+					<assign>
+						<variable name="i"/>
+						<operator value="+">
+							<variable name="i" />
+							<constant type="int" value="1" />
+						</operator>
+					</assign>
+				</step>
+				<block>
+					<for-loop>
+						<from>
+							<assign>
+								<variable name="j" />
+								<constant type="int" value="0" />
+							</assign>
+						</from>
+						<till>
+							<operator value="(">
+								<variable name="j" />
+								<variable name="arraySize"/>
+							</operator>
+						</till>
+						<step>
+							<assign>
+								<variable name="j"/>
+								<operator value="+">
+									<variable name="j" />
+									<constant type="int" value="1" />
+								</operator>
+							</assign>
+						</step>
+						<block>
+							<assign>
+								<operator value="[]">
+									<operator value="[]">
+										<variable name="c" />
+										<variable name="i" />
+									</operator>
+									<variable name="j" />
+								</operator>
+								<operator value="+">
+									<operator value="[]">
+										<operator value="[]">
+											<variable name="a" />
+											<variable name="i" />
+										</operator>
+										<variable name="j" />
+									</operator>
+									<operator value="[]">
+										<operator value="[]">
+											<variable name="b" />
+											<variable name="i" />
+										</operator>
+									<variable name="j" />
+								</operator>
+								</operator>
+							</assign>
+						</block>
+					</for-loop>
+				</block>
+			</for-loop>
+			<return>
+				<variable name="c"/>
+			</return>
+		</block>
+	</function>
+	
+	<var name="a" type="2D" mutable="yes" />
+	<var name="b" type="2D" mutable="yes" />
+	<var name="c" type="2D" mutable="yes" />
+	
+	<assign>
+		<variable name="a"/>
+		<call>
+			<variable name="assignArray"/>
+			<constant type="int" value="5"/>
+		</call>
+	</assign>
+	
+	<assign>
+		<variable name="b"/>
+		<call>
+			<variable name="assignArray"/>
+			<constant type="int" value="23"/>
+		</call>
+	</assign>
+	
+	<assign>
+		<variable name="c"/>
+		<call>
+			<variable name="sumArray"/>
+			<variable name="a"/>
+			<variable name="b"/>
+		</call>
+	</assign>
+	
+	
+	<println>
+		<constant type="string" value="Matrix A : "/>
+	</println>
+	
+	<call>
+		<variable name="printArray" />
+		<variable name="a" />
+	</call>
+
+	<println>
+		<constant type="string" value="Matrix B : "/>
+	</println>
+	
+	<call>
+		<variable name="printArray" />
+		<variable name="b" />
+	</call>
+
+	<println>
+		<constant type="string" value="Matrix C : "/>
+	</println>
+
+	<call>
+		<variable name="printArray" />
+		<variable name="c" />
+	</call>
+</block>
+</uXML>
+<!--
+ Output :
+ Matrix A : 
+5 5 
+ 
+5 5 
+ 
+
+Matrix B : 
+23 23 
+ 
+23 23 
+ 
+
+Matrix C : 
+28 28 
+ 
+28 28 
+-->

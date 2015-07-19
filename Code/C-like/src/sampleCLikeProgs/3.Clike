@@ -1,0 +1,31 @@
+function void main() {
+	
+	int *i,*j,i1,j1;
+	char *ch, ch1;
+	ch1 = 'a';
+	ch = &ch1;
+	i1 = 5;
+	j1 = 23;
+	
+	i = &i1;
+	j = &j1;
+	
+	print(i,j,*i,*j);
+	
+	i1 = i1 * 5;
+	j1 = j1 * 10;
+	print(i,j,*i,*j);
+	
+	*i = *i / 5;
+	*j = *j / 10;
+	print(i,j,*i,&j,ch1,ch);
+}
+
+/*
+Output :
+
+{5}* {23}* 5 23 
+{25}* {230}* 25 230 
+{5}* {23}* 5 {{23}*}* a {a}* 
+
+*/

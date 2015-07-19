@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no"><block><assign><variable name="x"/><array><constant type="int" value="1"/><operator value=")=("><function><automatic-Var><var mutable="yes" name="z" type="Dynamic"/></automatic-Var><block><operator value="+"><constant type="string" value="Hello-"/><variable name="z"/></operator></block></function><constant type="string" value="A"/><constant type="string" value="B"/></operator><constant type="int" value="2"/></array></assign><print><variable name="x"/></print></block></uXML>

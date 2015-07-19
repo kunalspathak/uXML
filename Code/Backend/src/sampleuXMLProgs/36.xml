@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program  defines 3 classes, C inherited from B inherited from A.
+It test various method calls, assignment and type-cast. -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static" poly="yes">
+<block>
+<class-type name="A">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="23"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India A.sayHi()"/>
+			</println>
+		
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+			
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+		</block>
+	</function>
+	
+</class-type>
+
+<class-type name="B">
+
+	<inherits>
+		<variable name="A"/>
+	</inherits>
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="5"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHello">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India B.sayHi()"/>
+			</println>
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+		</block>
+	</function>
+	
+</class-type>
+
+<class-type name="C">
+
+	<inherits>
+		<variable name="B"/>
+	</inherits>
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="32"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India C.sayHi()"/>
+			</println>
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+		</block>
+	</function>
+	
+</class-type>
+
+<var name="objA1" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+<var name="objA2" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+<var name="objB1" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+<var name="objB2" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+<var name="objC1" type="C" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="C"/>
+ 	</call>
+</var>
+<var name="objC2" type="C" mutable="yes">
+ 	<!--<call>
+ 		<variable name="#new#"/>
+ 		<variable name="C"/>
+ 	</call>
+--></var>
+
+<!-- 
+	1. objA1 = objB
+	   should work fine without any error 
+
+<assign>
+	<variable name="objA1"/>
+	<variable name="objB1"/>
+</assign>
+ -->
+
+<!--  
+Since objA1 now contains object of  objB1, objA1.sayHi() method calls method of B
+Ideally it should be type-casted like ((B)objA1).sayHi(), however it is assumed that 
+the uXML code will already contain the type-casted code. 
+
+In case, above assignment is not present, since sayHello is not present in A, below code will 
+give compilation error stating that 'sayHello' is not present because even though objA1 is type-casted
+it still contains the instance of class A. To test it, try commenting the assignment.
+
+<call>
+	<variable name="sayHello"/>
+	<cast type="B">
+		<variable name="objA1"/>
+	</cast>
+	<constant type="string" value="World"/>
+</call>
+-->
+
+<!--
+	2. objB = objA1
+	   A a; B extends A b; 
+	   b = a ; should give error 
+
+<assign>
+	<variable name="objB1"/>
+	<variable name="objA1"/>
+</assign>
+-->
+
+ 
+ objC1 contains an instance of C. So print C.sayHi()
+<call>
+	<variable name="sayHi"/>
+	<variable name="objC1"/>
+	<constant type="string" value="ats"/>
+</call>
+ 
+ 
+<!-- 
+	objC1 = (C)objA1;
+	Now objC1 contains an instance of A
+
+<assign>
+	<variable name="objC1"/>
+	<cast type="C">
+		<variable name="objA1"/>				
+	</cast>
+</assign>
+--> 
+
+<!-- Since objC1 contains an instance of A. So print A.sayHi() 
+<call>
+	<variable name="sayHi"/>
+	<variable name="objC1"/>
+	<constant type="string" value="jeh"/>
+</call>
+-->
+
+ <!-- 
+ 3. objA1 now contains an instance of B. So print B.sayHi() 
+ Note that here 'sayHello' method is called which belongs to class B and not of A or C.
+ So if assignment is not present, compilation error will be generated
+<assign>
+	<variable name="objA1"/>
+	<variable name="objB1"/>
+</assign>
+
+<call>
+	<variable name="sayHello"/>
+	<variable name="objA1"/>
+	<constant type="string" value="Kunal"/>
+</call>
+
+  -->
+
+ <!-- 
+4. objC1 = (C)objA1;
+Now objC1 contains an instance of B. print B.sayHi()
+Note that here 'sayHello' method is called which belongs to class B and inherited to C but doesn't belong to A.
+ So if assignment is not present, compilation error will not be generated, since C will automatically call it's
+ parent i.e. B's method sayHello
+<assign>
+	<variable name="objC1"/>
+	<cast type="C">
+		<variable name="objA1"/>				
+	</cast>
+</assign>
+
+<call>
+	<variable name="sayHello"/>
+	<variable name="objC1"/>
+	<constant type="string" value="RIT"/>
+</call>
+  
+-->  
+</block>
+</uXML>

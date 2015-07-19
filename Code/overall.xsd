@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO : 
+    1. Club common element definition in single element and reuse the element.
+       eg. body of function and constructor has similar structure i.e. automatic-Var and block.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- All the IR code will be present inside a root element uXML -->
+    <xs:element name="uXML">
+        <!-- a block element contains all the code -->
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="block"/>
+            </xs:sequence>
+            <xs:attribute name="var-declaration" default="yes">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="poly" default="no">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="language" type="xs:string"/>
+            <xs:attribute name="scope" default="static">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="static"/>
+                        <xs:enumeration value="dynamic"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Block definition -->
+    <xs:element name="block">
+        <xs:complexType>
+            <xs:sequence>
+                
+                <!-- Every block starts with variable declaration. It can also contain the type-def elements -->
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <!-- Global variable will be part of block only if block is a direct descendant of a <class-type> or <uXML> node -->
+                    <xs:element ref="global-Var"/>
+                    
+                    <!-- Member variable will be part of block only if block is a direct descendant of a <class-type> node
+                    Commented, since block will not present as direct descendant of class body anymore. 
+                    <xs:element ref="member-Var"/>
+                    
+                    -->
+                    <xs:element ref="automatic-Var"/>
+                    
+                    <!-- type-def elements -->
+                    <xs:element minOccurs="0" ref="function-type"/>
+                    <xs:element minOccurs="0" ref="array-type"/>
+                    <xs:element minOccurs="0" ref="enum-type"/>
+                    <xs:element minOccurs="0" ref="map-type"/>
+                    <xs:element minOccurs="0" ref="pointer-type"/>
+                    <xs:element minOccurs="0" ref="class-type"/>
+              <!--  </xs:choice>
+                
+                Program code contains any of these statements. Note that all the below elements are optional. 
+                <xs:choice minOccurs="0" maxOccurs="unbounded">-->
+				
+					<!-- nested blocks-->
+					<xs:element minOccurs="0" ref="block"/>
+					<!-- Can have var types in block and they will be considered as local variables -->
+                    <xs:element minOccurs="0" ref="var"/>
+					
+                    <xs:element minOccurs="0" ref="call"/>
+                    <xs:element minOccurs="0" ref="return"/>
+                    
+                    <xs:element minOccurs="0" ref="assign"/>
+                    <xs:element minOccurs="0" ref="operator"/> 
+                    <xs:element minOccurs="0" ref="for-loop"/>
+                    <xs:element minOccurs="0" ref="iterate"/>
+                    
+                    <!-- Function definition -->
+                    <xs:element minOccurs="0" ref="function"/>
+                    
+                    <!--  Print -->
+                    <xs:element minOccurs="0" ref="print"/>
+                    <xs:element minOccurs="0" ref="println"/>
+                    
+                    <!--  Access field variables of a class -->
+                    <xs:element minOccurs="0" ref="field"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Call to a function -->
+    <xs:element name="call">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="scope"/>
+                <!-- Function could be called by either of below ways -->
+                <xs:choice>
+                    <!-- Function name -->
+                    <xs:element ref="variable"/>
+                    <!-- Array of function pointers --> 
+                    <xs:element ref="operator"/>
+                    <!-- Calling a function that returns a function pointer -->
+                    <xs:element ref="call"/> 
+					<!-- Calling a lambda function-->
+					<xs:element ref="function"/> 
+                    
+                </xs:choice>
+                
+                <!-- 
+                    Arguments to the function. If OO language, the first element will represent 
+                    the object-type whose method is getting called. 
+                -->
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="variable"/>
+                    <xs:element ref="constant"/>
+                    <xs:element ref="operator"/>
+                    <xs:element ref="call"/>
+                    <xs:element ref="array"/>
+					<!-- For function programming, a call can contain a 'block' -->
+                    <xs:element ref="block"/>
+					<!-- Calling a lambda/built-in function for functional programming language-->
+					<xs:element ref="function"/> 
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Scope of a class/function - Package information -->
+    <xs:element name="scope">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="trace"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Tree structure of a scope -->
+    <xs:element name="trace">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="trace"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Cast -->
+    <xs:element name="cast">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Return one of the following  -->
+                <xs:choice>
+                    <!-- variable -->
+                    <xs:element ref="variable"/>
+                    <!-- constant -->
+                    <xs:element ref="constant"/>
+                    <!-- result of an expression -->
+                    <xs:element ref="operator"/>
+                    <!-- result returned by the function call -->
+                    <xs:element ref="call"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="type" type="xs:NCName" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Return statement  -->
+    <xs:element name="return">
+        <xs:complexType>
+            <!-- Return one of the following  -->
+            <xs:choice>
+                <!-- variable -->
+                <xs:element ref="variable"/>
+                <!-- constant -->
+                <xs:element ref="constant"/>
+                <!-- result of an expression -->
+                <xs:element ref="operator"/>
+                <!-- result returned by the function call -->
+                <xs:element ref="call"/>
+                <!-- result defined by an array -->
+                <xs:element ref="array"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Expression could be either a variable name, constant value, method call or an expr involving operators 
+    <xs:element name="expr">
+        <xs:complexType mixed="true">
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element ref="call"/>
+                <xs:element ref="operator"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    -->
+    
+    <!-- Operator contains -->
+    <xs:element name="operator">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element ref="variable"/>
+                    <xs:element ref="constant"/>
+                    <xs:element ref="call"/>
+                    <xs:element ref="operator"/>
+                    <xs:element ref="array"/> <!-- Useful for map/reduce operation -->
+                    <xs:element ref="function"/> <!-- Useful for map/reduce operation -->
+                    
+                    <!-- Blocks for if-else statements. 1st block executes if 'if-condition' is true.
+                        2nd block executes if 'else-condition', if any, is true. -->
+                    <xs:element ref="block"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="value" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="+"/>
+                        <xs:enumeration value="-"/>
+                        <xs:enumeration value="*"/>
+                        <xs:enumeration value="/"/>
+                        <xs:enumeration value="%"/>
+                        
+                        <!-- Bit-wise -->
+                        <xs:enumeration value="$"/> <!-- AND -->
+                        <xs:enumeration value="|"/> <!-- OR -->
+                        <xs:enumeration value="^"/> <!-- XOR -->
+                        <xs:enumeration value="~"/> <!-- Complement -->
+                        <xs:enumeration value="))"/> <!-- Right shift-->
+                        <xs:enumeration value="(("/> <!-- Left Shift -->
+                        
+                        <!-- Logical -->
+                        <xs:enumeration value="$$"/> <!-- And -->
+                        <xs:enumeration value="||"/> <!-- Or -->
+                        <xs:enumeration value="!"/> <!-- Not -->
+                        
+                        <!-- Conditional -->
+                        <xs:enumeration value="=="/> <!-- Equal to -->
+                        <xs:enumeration value="!="/> <!-- Not Equal to -->
+                        <xs:enumeration value=")"/> <!-- Greater than -->
+                        <xs:enumeration value=")="/> <!-- Greater than or equal to-->
+                        <xs:enumeration value="("/> <!-- Less than -->
+                        <xs:enumeration value="(="/> <!-- Less than -->
+                        
+                        <!-- Functional -->
+                        <xs:enumeration value=")=("/> <!-- map operation -->
+                        <xs:enumeration value="(=)"/> <!-- reduce operation -->
+                        
+                        <!-- Array -->
+                        <xs:enumeration value="[]"/> <!-- array access -->
+                        
+                        <!-- Pointer -->
+                        <xs:enumeration value="@"/> <!-- Address of -->
+                        <xs:enumeration value="#"/> <!-- Value of -->
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Assignment statement. Contains LHS and RHS  -->
+    <xs:element name="assign">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- lhs can be referred using scope -->
+                <xs:element minOccurs="0" ref="scope"/>
+                <xs:choice>
+                    <!-- lhs can be one of the array entry. To access it, 'operator' element is needed. -->
+                    <xs:element ref="operator"/>
+                    <!-- else, lhs could be a simple variable -->
+                    <xs:element ref="variable"/>
+                    <!-- it could also be a field variable -->
+                    <xs:element ref="field"/>
+                </xs:choice>
+                <!-- rhs can be referred using scope -->
+                <xs:element minOccurs="0" ref="scope"/>
+                <!-- rhs can be either of the below choice -->
+                <xs:choice>
+                    <!-- variable -->
+                    <xs:element ref="variable"/>
+                    <!-- constant -->
+                    <xs:element ref="constant"/>
+                    <!-- expression -->
+                    <xs:element ref="operator"/>
+                    <!-- Function call -->
+                    <xs:element ref="call"/>
+                    <!-- it could also be a field variable -->
+                    <xs:element ref="field"/>
+                    <!-- constant array -->
+                    <xs:element ref="array"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Variable -->
+    <xs:element name="variable">
+        <xs:complexType>
+            <xs:attribute name="name" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Constant -->
+    <xs:element name="constant">
+        <xs:complexType>
+            <xs:attribute name="type" type="xs:NCName" use="required"/>
+            <xs:attribute name="value" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- For loop -->
+    <xs:element name="for-loop">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="from"/>
+                <xs:element ref="till"/>
+                <xs:element ref="step"/>
+                <xs:element ref="block"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="from">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="assign"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element> 
+    
+    <xs:element name="step">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="assign"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element> 
+    
+    <!-- do-while or while-do -->
+    <xs:element name="iterate">
+        <xs:complexType>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="block"/>
+                    <xs:element ref="till"/>    
+                </xs:sequence>
+                <xs:sequence>
+                    <xs:element ref="till"/>
+                    <xs:element ref="block"/>
+                </xs:sequence>
+                
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="till">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="operator"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Function definition.  -->
+    <xs:element name="function">
+        <xs:complexType>
+            <!-- Each function contains only 1 block -->
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="automatic-Var"/>
+                <!-- If there is no returns element that means function doesn't return anything -->
+                <xs:element minOccurs="0" ref="returns"/>
+                <xs:element minOccurs="1" ref="block"/>
+            </xs:sequence>
+            <!-- Name can be optional, while specifying lambda function -->
+            <xs:attribute name="name" type="xs:string" />
+            <xs:attribute name="type" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Constructor definition -->
+    <xs:element name="constructor">
+        <xs:complexType>
+            <!-- Each Constructor contains only 1 block -->
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="automatic-Var"/>
+                <xs:element maxOccurs="1" ref="block"/>
+            </xs:sequence>
+            <!-- Some languages do have annonymous contructors -->
+            <xs:attribute name="name" use="optional" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Print the result of expression  -->
+    <xs:element name="print">
+        <xs:complexType>
+            <!-- Print the list -->
+            <xs:choice maxOccurs="unbounded">
+                <!-- value of a variable -->
+                <xs:element ref="variable"/>
+                <!-- value of a constant -->
+                <xs:element ref="constant"/>
+                <!-- result of an expression -->
+                <xs:element ref="operator"/>
+                <!-- result returned by the function call -->
+                <xs:element ref="call"/>
+				<!-- field element in OO language -->
+                <xs:element ref="field"/>
+                <!-- actual array -->
+                <xs:element ref="array"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Print the result of expression on a new line -->
+    <xs:element name="println">
+        <xs:complexType>
+            <!-- Print the list -->
+            <xs:choice maxOccurs="unbounded">
+                <!-- value of a variable -->
+                <xs:element ref="variable"/>
+                <!-- value of a constant -->
+                <xs:element ref="constant"/>
+                <!-- result of an expression -->
+                <xs:element ref="operator"/>
+                <!-- result returned by the function call -->
+                <xs:element ref="call"/>
+				<!-- field element in OO language -->
+                <xs:element ref="field"/>
+                <!-- actual array -->
+                <xs:element ref="array"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Defines a function type -->
+    <xs:element name="function-type">
+        <xs:complexType>
+             <xs:sequence>
+                <xs:element minOccurs="0" ref="automatic-Var"/>
+                <!-- If there is no returns element that means function doesn't return anything -->
+                <xs:element minOccurs="0" ref="returns"/>
+             </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="returns">
+        <xs:complexType>
+            <xs:attribute name="type" use="required" type="xs:string"/>
+            <!-- 
+            	'value' attribute is required only if value of 'type' attribute is 'function'. In such
+            	cases 'value' attribute represents the function signature. 
+             
+            <xs:attribute name="value" type="xs:NCName"/> -->
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Member variable will be part of block only if block is a direct descendant of a <class-type> node -->
+    <xs:element name="member-Var">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element minOccurs="0"  maxOccurs="unbounded" ref="var"/>
+                    <!-- Complex type definition can be part of member variable definition.  -->
+                    <xs:element minOccurs="0" ref="function-type"/>
+                    <xs:element minOccurs="0" ref="array-type"/>
+                    <xs:element minOccurs="0" ref="pointer-type"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--  If automatic-Var element's parent i.e. block element is a direct descendent of 'function' or 'Constructor' and if a 
+    language is OO or poly is true, then there should be 1 variable inside 'automatic-Var' and that will hold the value of 'this' of type 'classname'.
+    -->
+    <xs:element name="automatic-Var">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element minOccurs="0"  maxOccurs="unbounded" ref="var"/>
+                    <!-- Complex type definition can be part of automatic variable definition.  -->
+                    <xs:element minOccurs="0" ref="function-type"/>
+                    <xs:element minOccurs="0" ref="array-type"/>
+                    <xs:element minOccurs="0" ref="pointer-type"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Global variable will be part of block only if block is a direct descendant of a <class-type> or <uXML> node -->
+    <xs:element name="global-Var">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                <xs:element minOccurs="0"  maxOccurs="unbounded" ref="var"/>
+                <!-- Complex type definition can be part of global variable definition.  -->
+                <xs:element minOccurs="0" ref="function-type"/>
+                <xs:element minOccurs="0" ref="array-type"/>
+                <xs:element minOccurs="0" ref="pointer-type"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Variable Declaration -->
+    <xs:element name="var">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="scope"/>
+               <!-- Assigns one of the following value -->
+            	<xs:choice minOccurs="0">
+                	<!-- value of a variable -->
+                	<xs:element ref="variable"/>
+                	<!-- value of a constant -->
+                	<xs:element ref="constant"/>
+                	<!-- result of an expression -->
+                	<xs:element ref="operator"/>
+                	<!-- result returned by the function call -->
+                	<xs:element ref="call"/>
+            	    <!-- result returned by the type-cast -->
+            	    <xs:element ref="cast"/>
+            	    <!-- actual array -->
+            	    <xs:element ref="array"/>
+            	</xs:choice>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+            <xs:attribute name="type" use="required" type="xs:string"/>
+            
+            <xs:attribute name="mutable" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+
+            <xs:attribute name="mode" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ref"/>
+                        <xs:enumeration value="value"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            
+            <xs:attribute name="ptrMutable" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            
+            <xs:attribute name="valueMutable" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Array type -->
+    <xs:element name="array-type">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="dim"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="dim">
+        <xs:complexType>
+            <xs:attribute name="size" use="required" type="xs:integer"/>
+            <!-- startIndex = 0 if not present -->
+            <xs:attribute name="startIndex" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+	
+	<!-- Represents the actual array with elements -->
+	<xs:element name="array">
+	    <xs:complexType>
+	        <xs:sequence maxOccurs="unbounded">
+	            <xs:choice>
+	                <!-- Array value can be represented by a constant -->
+	                <xs:element ref="constant"/>    
+	                <!-- Array value can be represented by a variable -->
+	                <xs:element ref="variable"/>
+	                <!-- Array value can be represented by the result of an operation -->
+	                <xs:element ref="operator"/>
+	                <!-- Array value can be represented by another array -->
+	                <xs:element ref="array"/>
+	            </xs:choice>
+	        </xs:sequence>
+	        <!-- Represents the data-type of array elements 
+	        <xs:attribute name="type" use="required" type="xs:string"/>
+	        -->
+	    </xs:complexType>
+	</xs:element>
+
+    <!-- Enum type -->
+    <xs:element name="enum-type">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="enum-constant"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="enum-constant">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="value" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Hash Map -->
+    <xs:element name="map-type">
+        <xs:complexType>
+            <xs:attribute name="keyType" use="required" type="xs:NCName"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="valueType" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Pointer type -->
+    <xs:element name="pointer-type">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+            <xs:attribute name="refType" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Class type -->
+    <xs:element name="class-type">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="scope"/>
+                <xs:element minOccurs="0" ref="inherits"/>
+                <!-- 
+                Class contains only 1 block
+                (Commented since if block is present, it will be possible to have normal code
+                statements like iteration loops, assignments, call statements directly in the class
+                body, which is not correct. Class body should only contain scope, inherits, member-Var,
+                static-Var (if any), list of constructors and functions.
+                
+                <xs:element ref="block"/>
+                -->
+
+				<!-- Member variables  -->
+				<xs:element ref="member-Var"/>
+				
+				<!--  We can also add declaration of array-type, pointer-type and function-type, if needed  -->                
+                <!-- type-def elements -->
+                <xs:element minOccurs="0" ref="function-type"/>
+                <xs:element minOccurs="0" ref="array-type"/>
+                <xs:element minOccurs="0" ref="enum-type"/>
+                <xs:element minOccurs="0" ref="map-type"/>
+                <xs:element minOccurs="0" ref="pointer-type"/>
+                <xs:element minOccurs="0" ref="class-type"/>
+                
+                <!-- 0 or more Constructor -->
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="constructor"/>
+                
+                <!-- 
+                0 or more Functions - function name is required in this case  
+                -->
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="function"/>
+                   
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Inheritance -->
+    <xs:element name="inherits">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Expr will simply contain class names from where the current class inherits
+                Commented, since needs an initialized variable that is already present in the symtab. 
+                <xs:element maxOccurs="unbounded" ref="constant"/>
+                -->
+                <!-- Variable will simply represent the class name -->
+                <xs:element maxOccurs="unbounded" ref="variable"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Used to access field variables of an object  -->
+    <xs:element name="field">
+    	<xs:complexType>
+    		<xs:sequence>
+    			<xs:choice>
+	    			<!-- Variable will simply represent the object whose variable needs to be accessed -->
+	                <xs:element ref="variable"/>
+	                <!-- Operator will return an object whose variable needs to be accessed -->
+	                <xs:element ref="operator"/>
+	                <!-- Call the function that returns an object whose variable needs to be accessed -->
+	                <xs:element ref="call"/>
+    			</xs:choice>
+    		</xs:sequence>
+    	    <xs:attribute name="name" use="required" type="xs:NCName"/>
+    	</xs:complexType>
+    </xs:element>
+
+</xs:schema>

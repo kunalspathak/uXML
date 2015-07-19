@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+This version introduces the <variable> and <constant> element to access the variable/constant.
+      
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../overall.xsd">
+    <block>
+    <!-- i = j -->
+    <assign>
+        <variable name="i"/> 
+        <variable name="j"/>
+    </assign>
+        
+    <!-- 
+        i = j
+        where j is defined as a integer constant
+    -->
+    <assign>
+        <variable name="i"/>
+        <variable name="j"/>
+    </assign>
+
+    <!-- i = 5 -->
+    <assign>
+        <variable name="i"/>
+        <constant type="int" value="5"/>
+    </assign>
+
+    <!-- i = (float) j  
+      In order to perform typecast on rhs, call function #cast# that takes 
+      two parameters. 1st parameter is data-type while 2nd parameter is 
+      actual rhs expression
+    -->
+    <assign>
+        <variable name="i"/>
+        <call>
+            <variable name="#cast#"/> <!-- call to function '#cast#' -->
+            <constant type="datatype" value="float"/>
+            <variable name="j"/>
+        </call>
+    </assign>
+
+    <!-- i = (int) 5.0 -->
+    <assign>
+        <variable name="i"/>
+        <call>
+            <variable name="#cast#"/>
+            <constant type="datatype" value="int"/>
+            <constant type="float" value="5.0"/>
+        </call>
+    </assign>
+
+    <!-- i = "kunal" + "3" -->
+    <assign>
+        <variable name="i"/>
+        <operator value="+">
+            <constant type="string" value="kunal"/>
+            <constant type="string" value="3"/>
+        </operator>
+    </assign>
+
+    <!-- i = (int) (j / 3) -->
+    <assign>
+        <variable name="i"/>
+        <call>
+            <variable name="#cast#"/>
+            <constant type="datatype" value="int"/>
+            <operator value="/">
+                <variable name="j"/>
+                <constant type="int"  value="3"/>
+            </operator>
+        </call>
+    </assign>
+
+    <!--  int *i,j;  i = &j; -->
+    <assign>
+        <variable name="i"/>
+        <operator value="@">
+            <variable name="j"/>
+        </operator>
+    </assign>
+
+    <!-- 
+        HelloWorld hello = new HelloWorld("jeh");
+        
+        Here 'this' is the constant that is passed as first argument to the HelloWorld constructor. 
+        This constant is accessed by specifying the class-type in the 'type' attribute of <constant> element. 
+    
+    -->
+    <assign>
+        <variable name="hello"/>
+        <call>
+            <!--<variable name="#new#"/>
+            <constant type="class-type" value="this" />
+            <constant type="string" value="jeh"/>
+        -->
+        	<variable name="#new#"/>	
+        	<variable name="class-type"/>
+        	<constant type="string" value="jeh"/>
+        </call>
+    </assign>
+    
+    <!-- To call the parent's constructor i.e. super("jeh") -->
+    <call>	
+    	<variable name="super"/>
+    	<!-- 
+    	Alike other function calls, this will call the super of 'class-type' i.e. matching constructor
+    	of the 'class-type' that is mentioned below.  
+    	-->
+    	<variable name="class-type"/>  
+    	<constant type="string" value="jeh"/>
+    </call>
+    
+
+    <!-- HelloWorld hello = (HiWorld) generateObject("jeh",5); -->
+    <assign>
+        <variable name="hello"/>
+        <call>
+            <variable name="#cast#"/>
+            <constant type="datatype" value="HiWorld"/>
+            <call>
+                <variable name="generateObject"/>
+                <constant type="string" value="jeh"/>
+                <constant type="int" value="5"/>
+            </call>
+        </call>
+    </assign>
+
+    <!-- 
+        function funny = &func;
+    -->
+    <assign>
+        <variable name="funny"/>
+        <operator value="@">
+            <variable name="func"/>
+        </operator>
+    </assign>
+
+    <!-- 
+        funny(5,j);
+        <call> element's first child element will always be 
+        a variable specifying the name of the function to be called or an expression
+        that returns the function to be called. See the example following this 
+        example.
+    -->
+    <call>
+        <variable name="funny"/>
+        <constant type="int" value="5"/>
+        <variable name="j"/>
+    </call>
+        
+        
+   <!-- (*funcArr1[k + 2])(12, "a") -->
+        
+    <call>
+        <!-- Get the appropriate function from the array  -->
+        <operator value="[]">
+            <variable name="funcArr1"/>
+            <operator value="+">
+                <variable name="k"/>
+                <constant type="int" value="2"/>
+            </operator>
+        </operator>
+        
+        <constant type="int" value="12"/>
+        <constant type="string" value="a"/>
+    </call>
+
+    <!-- hello.sayHi("jeh"); -->
+    <!--
+        If HelloWorld is part of package com.edu.rit.uXML, then this scope information is 1st child node.
+        If the class 'HelloWorld' is present in default package then <scope> element won't be present.
+        
+        As discussed above, the second variable element specifies the method name to be called.
+        
+        Since this is a method call (for OO language), the third child (first argument to the function) argument will be the object whose method is
+        getting called i.e. 'hello'. This won't be present for non-OO programming language. 
+    -->
+    <call>   
+        <scope> 
+            <trace>com
+                <trace>edu
+                    <trace>rit
+                        <trace>uXML</trace>
+                    </trace>  
+                </trace>
+            </trace>  
+        </scope>
+        <variable name="sayHi"/>
+        <variable name="hello"/>  
+        <constant type="string" value="jeh"/>
+    </call>
+        
+        
+    <!-- 
+        arrObj[k + 5].func(arrArgsObject[10],"Hello")
+        The code access the method 'func' of an object that is at position 'k + 5' of array 'arrObj'.
+        The argument passed to the function 'func' is the 10th object present in an array 'arrArgsObject'.
+    -->
+    <call>
+	    <!-- method name -->
+        <variable name="func"/>
+        <!-- 1st argument to the function is the appropriate object -->
+        <operator value="[]">
+            <variable name="arrObj"/>
+            <operator value="+">
+                <variable name="k"/>
+                <constant type="int" value="5"/>
+            </operator>
+        </operator>
+        <!-- arg#1 -->
+        <operator value="[]">
+            <variable name="arrArgsObject"/>
+            <constant type="int" value="10"/>
+        </operator>
+        <!-- arg#2 -->
+        <constant type="string" value="Hello"/> 
+    </call>
+
+    <!-- In OO languages like C++, where it is possible to have function pointers.
+    Calling the appropriate function from appropriate object can be done using above uXML code 
+    
+    arrObj[5].(*funcArr1[k + 2])("args1", "args#2")
+    
+    -->
+        
+    <call>
+	    <!-- Access appropriate function -->
+        <operator value="[]">
+            <variable name="funcArr1"/>
+            <operator value="+">
+                <variable name="k"/>
+                <constant type="int" value="2"/>
+            </operator>
+        </operator>
+        <!-- 1st argument to the function is the appropriate object -->
+        <operator value="[]">
+            <variable name="arrObj"/>
+            <constant type="int" value="5"/>
+        </operator>
+
+        <!-- arg#1 -->
+        <constant type="string" value="args#1"/>
+        <!-- arg#2 -->
+        <constant type="string" value="args#2"/> 
+        
+    </call>
+        
+    <!--
+        Call a function that returns a function pointer which is then called by
+        passing arguments present in second parenthesis
+        returnFunc(5)(10) 
+    -->
+    <call>
+        <call>
+            <variable name="returnFunc"/>
+            <constant type="int" value="5"/>
+        </call>
+        <constant type="int" value="10"/>
+    </call>
+        
+    <!-- If arr1 is a 2D integer array, i = arr1[4][5] -->
+    <assign>
+        <variable name="i"/>
+        <operator value="[]">
+            <operator value="[]">
+                <variable name="arr1"/>
+                <constant type="int" value="4"/>
+            </operator>
+            <constant type="int" value="5"/>
+        </operator>
+    </assign>
+
+    <!-- If arr1 is a 2D integer array, i = arr1[k + 2][5] -->
+    <assign>
+        <variable name="i"/>
+        <operator value="[]">
+            <operator value="[]">
+                <variable name="arr1"/>
+                <operator value="+">
+                    <variable name="k"/>
+                    <constant type="int" value="2"/>
+                </operator>
+            </operator>
+            <constant type="int" value="5"/>
+        </operator>
+    </assign>
+
+    <!-- 
+        If arr1 is a 2D integer array and i is a 1D array, i = arr1[4]
+    -->
+    <assign>
+        <variable name="i"/>
+        <operator value="[]">
+            <variable name="arr1"/>
+            <constant type="int" value="4"/>
+        </operator>
+    </assign> 
+
+    <!-- If arr1 is a 2D integer array, arr1[4][5] = i -->
+    <assign>
+        <operator value="[]">
+            <operator value="[]">
+                <variable name="arr1"/>
+                <constant type="int" value="4"/>
+            </operator>
+            <constant type="int" value="5"/>
+        </operator>
+        <variable name="i"/>
+    </assign>
+
+    <!-- If arr1 is a 2D integer array and i is a 1D array, arr1[4] = i -->
+    <assign>
+        <operator value="[]">
+            <variable name="arr1"/>
+            <constant type="int" value="4"/>
+        </operator>
+        <variable name="i"/>
+    </assign>
+    </block>
+</uXML>

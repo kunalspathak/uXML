@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--  This program is the same version of 5.xml. However here function is defined
+	earlier and function name is being used in 'map' operator. -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+		<function name="concat">
+			<automatic-Var>
+				<var name="num" type="string" mutable="no" />
+			</automatic-Var>
+			<returns type="string" />
+			<block>
+				<return>
+					<operator value="+">
+						<variable name="num" />
+						<constant type="string" value=" - brahmastra" />
+					</operator>
+				</return>
+			</block>
+		</function>
+		<print>
+			<operator value=")=(">
+				<!-- concat function -->
+				<variable name="concat" />
+				<constant type="string" value="one" />
+				<constant type="string" value="two" />
+				<constant type="string" value="three" />
+				<constant type="string" value="four" />
+				<constant type="string" value="five" />
+			</operator>
+		</print>
+	</block>
+</uXML>

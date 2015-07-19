@@ -1,0 +1,16 @@
+; a normal 'calc' function.
+(
+defun calc (n) 
+	( +
+		(+ n 1)
+		(* n 1)
+	)
+)
+
+(calc 5)
+
+; (let (
+ ; (x 32)
+ ; (y "ab")
+ ; ))
+ 

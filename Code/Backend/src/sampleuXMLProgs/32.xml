@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program demonstrates basic class declaration and calling a method.
+ -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static" poly="yes">
+<block>
+<class-type name="HelloWorld">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes"/>
+		<var name="j" type="string" mutable="yes"/>
+	</member-Var>
+	
+	
+	<function name="sayHi">
+		<block>	
+			<println>
+				<constant type="string" value="Hello World"/>
+			</println>
+		</block>
+	</function>
+	
+</class-type>
+
+<!-- HelloWorld obj = new HelloWorld() -->
+<var name="obj" type="HelloWorld" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="HelloWorld"/>
+ 	</call>
+</var>
+
+<!-- obj.sayHi() -->
+<call>
+	<variable name="sayHi"/>
+	<variable name="obj"/>
+</call>
+</block>
+</uXML>
+<!--
+Output :
+Hello World
+-->

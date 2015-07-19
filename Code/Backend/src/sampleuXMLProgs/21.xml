@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates returning function pointers and then executing them - Part 2
+
+int sum(int var, int var2) {
+	return var1 + var2;
+}
+
+int diff(int var, int var2) {
+	return var1 - var2;
+}
+
+typedef int (*funcPointer)(int,int);
+
+funcPointer i;
+
+int (*getFuncPointer(int choice))(int,int) {
+	i = (choice == 1)?&sum : &diff;
+	return i;
+}
+
+main() {
+	getFuncPointer(1)(2,3);
+}
+
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<function-type name="twoToOne">
+		<automatic-Var>
+			<var name="var1" type="int" mutable="yes"/>
+			<var name="var2" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+	
+
+	<!-- int sum(num1, num2) -->
+	<function name="sum" type="twoToOne">
+	<automatic-Var>
+			<var name="var1" type="int" mutable="yes"/>
+			<var name="var2" type="int" mutable="yes"/>
+		</automatic-Var>
+		<block>
+			<return>
+				<operator value="+">
+					<variable name="var1"/>
+					<variable name="var2"/>
+				</operator>
+			</return>
+		</block>
+	</function>
+	
+	<!-- int diff(num1, num2) -->
+	<function name="diff" type="twoToOne">
+		<block>
+			<return>
+				<operator value="-">
+					<variable name="var1"/>
+					<variable name="var2"/>
+				</operator>
+			</return>
+		</block>
+	</function>
+	
+	<!-- typedef int (*funcPointer)(int,int) -->
+	<pointer-type name="funcPointer" refType="twoToOne"/>
+	
+	<!-- funcPointer i -->
+	<var name="i" type="funcPointer" mutable="yes"/>
+	
+	<!-- int (*getFuncPointer())(int,int) -->
+	<function name="getFuncPointer">
+		<automatic-Var>
+			<var name="choice" type="int"/>
+		</automatic-Var>
+		<returns type="funcPointer" />
+		<block>
+			<!-- i = (choice == 1)? &sum : &diff -->
+			<assign>
+				<variable name="i"/>
+				<operator value="==">
+					<variable name="choice"/>
+					<constant type="int" value="1"/>
+					<block>
+						<operator value="@">
+							<variable name="sum"/>
+						</operator>
+					</block>
+					<block>
+						<operator value="@">
+							<variable name="diff"/>
+						</operator>
+					</block>
+				</operator>
+			</assign>
+			<return>
+				<variable name="i"/>
+			</return>
+		</block>
+	</function>
+	
+	<!-- getFuncPointer()(2,3)  -->
+	<print>
+	<call>
+		<operator value="#">
+			<call>
+				<variable name="getFuncPointer"/>
+				<constant type="int" value="1"/>
+			</call>
+		</operator>
+		<constant type="int" value="2"/>
+		<constant type="int" value="3"/>
+	</call>
+	</print>
+	</block>
+</uXML>
+<!--
+ Output :
+ 5
+-->

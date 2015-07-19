@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<global-Var>
+			<var mutable="yes" name="i" type="int" />
+			<var mutable="yes" name="j" type="int" />
+			<array-type name="[int][int]1..3,1..3" type="int">
+				<dim size="3" startIndex="1" />
+				<dim size="3" startIndex="1" />
+			</array-type>
+			<var mutable="yes" name="a" type="[int][int]1..3,1..3" />
+		</global-Var>
+		<function name="printer">
+			<automatic-Var>
+				<var mutable="yes" name="arr" type="[int][int]1..3,1..3" />
+			</automatic-Var>
+			<returns type="[int][int]1..3,1..3" />
+			<block>
+				<for-loop>
+					<from>
+						<assign>
+							<variable name="i" />
+							<constant type="int" value="1" />
+						</assign>
+					</from>
+					<till>
+						<operator value="(=">
+							<variable name="i" />
+							<constant type="int" value="3" />
+						</operator>
+					</till>
+					<step>
+						<assign>
+							<variable name="i" />
+							<operator value="+">
+								<variable name="i" />
+								<constant type="int" value="1" />
+							</operator>
+						</assign>
+					</step>
+					<block>
+						<print>
+							<operator value="[]">
+								<operator value="[]">
+									<variable name="arr" />
+									<variable name="i" />
+								</operator>
+								<constant type="int" value="1" />
+							</operator>
+							<operator value="[]">
+								<operator value="[]">
+									<variable name="arr" />
+									<variable name="i" />
+								</operator>
+								<constant type="int" value="2" />
+							</operator>
+							<operator value="[]">
+								<operator value="[]">
+									<variable name="arr" />
+									<variable name="i" />
+								</operator>
+								<constant type="int" value="3" />
+							</operator>
+						</print>
+						<assign>
+							<operator value="[]">
+								<operator value="[]">
+									<variable name="arr" />
+									<variable name="i" />
+								</operator>
+								<variable name="i" />
+							</operator>
+							<operator value="+">
+								<variable name="i" />
+								<constant type="int" value="5" />
+							</operator>
+						</assign>
+					</block>
+				</for-loop>
+				<return>
+					<variable name="arr" />
+				</return>
+			</block>
+		</function>
+		<for-loop>
+			<from>
+				<assign>
+					<variable name="i" />
+					<constant type="int" value="1" />
+				</assign>
+			</from>
+			<till>
+				<operator value="(=">
+					<variable name="i" />
+					<constant type="int" value="3" />
+				</operator>
+			</till>
+			<step>
+				<assign>
+					<variable name="i" />
+					<operator value="+">
+						<variable name="i" />
+						<constant type="int" value="1" />
+					</operator>
+				</assign>
+			</step>
+			<block>
+				<for-loop>
+					<from>
+						<assign>
+							<variable name="j" />
+							<constant type="int" value="1" />
+						</assign>
+					</from>
+					<till>
+						<operator value="(=">
+							<variable name="j" />
+							<constant type="int" value="3" />
+						</operator>
+					</till>
+					<step>
+						<assign>
+							<variable name="j" />
+							<operator value="+">
+								<variable name="j" />
+								<constant type="int" value="1" />
+							</operator>
+						</assign>
+					</step>
+					<block>
+						<assign>
+							<operator value="[]">
+								<operator value="[]">
+									<variable name="a" />
+									<variable name="i" />
+								</operator>
+								<variable name="j" />
+							</operator>
+							<operator value="+">
+								<variable name="i" />
+								<variable name="j" />
+							</operator>
+						</assign>
+					</block>
+				</for-loop>
+			</block>
+		</for-loop>
+		<call>
+			<variable name="printer" />
+			<variable name="a" />
+		</call>
+		<call>
+			<variable name="printer" />
+			<variable name="a" />
+		</call>
+	</block>
+</uXML>

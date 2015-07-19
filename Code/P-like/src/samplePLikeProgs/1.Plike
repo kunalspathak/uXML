@@ -1,0 +1,62 @@
+PROGRAM a;
+	const
+		a := 5;
+	var
+		a,b : int;
+		c : float := 5.0;
+		d : char := 'a';
+		i : int;
+		
+	// Procedure definition
+	procedure a ({a,b : int; d : array [1..4] of float}a : int) : array[1..4] of float; { Procedure a }
+		var
+			a : int;
+		procedure a (
+			a : int;   					{ 1st parameter of type int }
+			procedure b(a : int); 		{ 2nd parameter of type procedure }
+			c : char					{ 3rd parameter of type char }
+		) : int; 						{ procedure returns 'int' }
+		var
+			a : int;
+		begin
+			for i := 1 to 10 do
+			begin
+				i := 1;
+			end
+		end
+		
+		
+	begin
+		for i := 1 to 10 do
+		begin
+			i := 1;
+			while i = 2 do
+			begin
+				write("a");
+			end
+			
+			if i = 2 then
+			begin
+				i := 3;
+			end
+			else
+			begin 
+				i := 6;
+			end
+			
+			do 
+			begin
+				i := 1;
+			end
+			while i = 2 and i < 3;
+			
+		end
+	end
+
+begin
+	for i := 1 to 10 do
+	begin
+		i := 1;
+		//call a('a');
+	end
+end

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Desc : Root element
+    Attr : var
+            - Specify if variable declaration is present in the language or not. If this is 'no' then <Variables> element won't be present.
+    Attr : language
+            - Specify the language that the uXML is representing. This would help back-end in determining
+              the type of binding, polymorphism and other language-specific information at the time of execution.
+            
+-->
+<main var="yes" language="java">
+     
+    <!--
+        Desc : Block element denoted by 'code'
+                - All the code is present inside 'Block' element. So in class/function definition, iteration loops, 
+                  contructor definition or within a 'Block' element.
+                  
+    -->
+    <block>
+        <Variables>...</Variables> 
+        <!-- class declaration -->
+        <class-type name="className">
+            <!-- block start -->
+            <block>
+                <!-- Variable declaration at the start of block -->
+                <member-Vars>...</member-Vars>
+                
+                <!-- code -->
+                
+            </block>
+        </class-type>
+        
+    </block>
+</main>

@@ -1,0 +1,14 @@
+# This program demonstrates the factorial of a program
+def fun(n)
+{
+	if n == 1
+	{
+		return 1
+	}
+	else
+	{
+		return  n * call fun(n - 1)
+	}
+}
+
+print call fun(5)

@@ -1,0 +1,32 @@
+// This program test the function call
+PROGRAM func_call;
+
+
+const
+	bas := 5;
+	c := 'a';
+{
+var
+	//a : array [1..5, 0..2] of int;
+	main_i : int;
+	}
+	
+	procedure take(procedure func(k : int));
+	begin
+		write("take");
+		call func(bas); // Should be undefined symbol if 'k' is used. Use 'bas' instead.
+	end
+	
+	procedure add(i : int);
+	begin
+		write("add",i,c); 
+	end
+		
+
+begin
+	call take(add);	
+end
+
+// Output
+// take 
+// add 5 a 

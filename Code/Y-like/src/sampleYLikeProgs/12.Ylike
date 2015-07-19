@@ -1,0 +1,19 @@
+# Demonstrates the map function
+def square(a)
+{	
+	return a * a
+}
+x = map(square, [1,2,3])
+print x
+
+def concat(a)
+{
+	return a + "-brahmastra"
+}
+
+x = map(concat, ["one", "two", "three", 4, 5])
+print x
+
+# Output
+# [1,4,9] 
+# [one-brahmastra,two-brahmastra,three-brahmastra,4-brahmastra,5-brahmastra] 

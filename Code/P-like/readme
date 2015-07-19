@@ -1,0 +1,25 @@
+***   P-like (Pascal-like) Language   ***
+1. Constants : numeric, character, float, boolean, string
+2. Variables : numeric, character, float, boolean, string
+3. Assignment statements : :=
+4. Arithmetic operations : +, -, *, /, %, ^, |, &, ~
+5. Logical operations : &&, ||, !
+6. Conditional operations : ==, !=, <, >, <=, =>
+7. Conditional statements : If-else, elseif
+8. Iteration loops : for, do-while, while-do
+9. Procedures
+10. Arrays
+11. Advanced Variables - typedef
+12. Advanced Procedures - nested procedure, passing procedure to procedure
+
+__________________________________________________________________________________________________________________
+TODO:
+1. Test for assignment especially for compound data-types like assigning char to pointer to int, function pointer, etc.
+2. record, if time permits
+3. typedef
+4. TEST : casting/coersion
+5. TEST : Passing 2 procedures to another procedure.
+__________________________________________________________________________________________________________________
+Notes :
+1. While passing parameters to a procedure, the order should be const, var and then procedure.
+2. If 2 procedures are passed as parameters In order to 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    Desc : List of functions definition
+            - Function may or may not be present in class in which <Functions> element is added. 
+              The membership of function is only determined if poly='true' and object-type of 
+              first parameter to the function.
+--> 
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../overall.xsd">
+        <block>
+    <!-- 
+        Desc : Function definition (one or more) 
+        Attr : name
+                - Name of the function. If name is '-' then, this is an annonymous (lambda) function
+        Attr : type
+                - Function-type of a function. Function-type might not be this function specific but a generic one.
+        Attr : poly
+                - true for OO language, for all others it's value is 'false'.
+    --> 
+
+                <function name="fun1" type="sigOfFun1" poly="true">
+                        <!-- Since formal parameters act like local variables, a block will have list of automatic variables -->
+                        <automatic-Var>
+                                <!-- 
+                                        Desc : Parameter names and type that is passed.
+                                        Attr : name
+                                        - Name of the formal parameter
+                                        Attr : type
+                                        - Data-type of the parameter
+                                        Attr : signature (required)
+                                        - Specify the signature (arguments, return type) of a function                
+                                        Attr : mode (required)
+                                        - Specify the mode of variables.  
+                                        value - Pass by value.
+                                        ref   - Pass by reference. 
+                                        
+                                        Java - Everything will be 'io' for objects and 'i' for primitive
+                                        C++  - Depends if the call is by value or by reference
+                                        
+                                        There will be atleast 1 parameter (current instance of the class to which the function belongs to) that is passed 
+                                        to a function. This will establish a relation between class and member-functions.
+                                        The parameter will be present only if 'poly' attribute of <function> element is true.
+                                        
+                                        Other parameters are optional. Data-type could be anything defined in variableDeclaration.xml
+                                        Data-type should adhere to the rules of programming language whose source code the uXML is representating.
+                                        eg. Java can't pass a parameter of type function, but C,C++, LISP, Python can do that.
+                                -->
+                                <var name="this" type="className"/>
+                                <var name="var1" type="int" mode="value"/>
+                                
+                                <!-- Receiving any function as a parameter whose signature is similar to one defined in signature element -->
+                                <var name="var2" type="function-type" mode="ref"/>
+                                <var name="var3" type="string" mode="ref"/>
+                                <var name="var4" type="arrayA1" mode="value"/>
+                                
+                        </automatic-Var>
+                        <block>
+                                <!--
+                                    Rest of the code follows here. It con contain anything valid mentioned in code.xml.
+                                    That means the body of function can also contain other function.
+                    
+                                    <function></function>
+                                    <function></function>
+                                -->
+                        </block>
+                </function>
+        </block>
+</uXML>

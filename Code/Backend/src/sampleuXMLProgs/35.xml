@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program demonstrates assigning 2 classes, B inherited from A
+and the assignments.  -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static" poly="yes">
+<block>
+<class-type name="A">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="23"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India A.sayHi()"/>
+			</println>
+		
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+</class-type>
+
+
+<class-type name="B">
+
+	<inherits>
+		<variable name="A"/>
+	</inherits>
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="5"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India B.sayHi()"/>
+			</println>
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+</class-type>
+
+<!--  object instantiation -->
+<!-- objA = new A() -->
+<var name="objA1" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+<!-- objA2 = new A() -->
+<var name="objA2" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+
+<!-- objB = new B() -->
+<var name="objB" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+
+<!-- objA1 = objA2 
+<assign>
+	<variable name="objA1"/>
+	<variable name="objA2"/>
+</assign>
+-->
+
+<!--
+	1. objA1 = objB
+	   A a; B extends A b; 
+	   a = b; should work fine without any error 
+
+<assign>
+	<variable name="objA1"/>
+	<variable name="objB"/>
+</assign>
+-->
+
+<!--
+	2. objB = objA1
+	   A a; B extends A b; 
+	   b = a ; should give error 
+
+<assign>
+	<variable name="objB"/>
+	<variable name="objA1"/>
+</assign>
+-->
+
+ 
+	3. A a; B extends A b;
+   	   a = new B();
+   	   b = (B) a;
+
+<assign>
+	<variable name="objB"/>
+	<cast type="B">
+		<variable name="objA1"/>				
+	</cast>
+</assign>
+ 
+
+<call>
+	<variable name="sayHi"/>
+	<variable name="objA2"/>
+	<constant type="string" value="World"/>
+</call>
+<println>
+	<constant type="string" value="______________________"/>
+</println>
+<call>
+	<variable name="sayHi"/>
+	<variable name="objB"/>
+	<constant type="string" value="World"/>
+</call>
+</block>
+</uXML>
+<!--  
+Output :
+India A.sayHi()
+Hello  World 23 
+______________________
+
+India A.sayHi()
+Hello  World 23 
+ -->

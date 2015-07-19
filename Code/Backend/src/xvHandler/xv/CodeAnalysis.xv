@@ -1,0 +1,400 @@
+package xvHandler;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.Collection;
+import java.util.Set;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import compiler.util.Constants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import org.xml.sax.SAXException;
+import java.io.IOException;
+
+
+
+public class CodeAnalysis {
+	
+	// Prints information based on value of varDetailsToPrint
+	// 1 : name
+	// 2 : type
+	private int varDetailsToPrint = 1;
+	private int mcc = 1; 
+	private String lined = "____________________________________________";
+	private String dashed = "--------------------------------------------";
+	private int callCount = 0;
+	private boolean isFunctionCall = true;
+	private int nestedForCount = 0;
+	private int nestedIterationCount = 0;
+	// Helstead Metrics related variables
+	private int N1, n1, N2, n2 = 0;
+	private int loc,N,n = 0;
+	double V,D, L, E, T, B, MI, MCC = 0;
+	HashMap<String,Integer> overridenFunction = new HashMap<String, Integer>();
+	// Operator collection for Helstead Metric 
+	HashMap<String,Integer> hmOperator = new HashMap<String, Integer>();
+	// Operand collection for Helstead Metric
+	HashMap<String,Integer> hmOperand = new HashMap<String, Integer>();
+	
+	protected final 
+	%%
+		NodeList children = '*';
+		Double childrenCount = 'count(*)';
+		
+		// List of nodes
+		NodeList functions = 'descendant::function';
+		NodeList functionParams = 'descendant::automatic-Var[1]/var';
+		String functionReturnType = 'descendant::returns/@type';
+		NodeList functionCalls = 'descendant::call';
+		NodeList variablesDef = 'descendant::var';
+		NodeList constantsUsed = 'descendant::constant';
+		NodeList mccCount_1 = 'descendant::operator';
+		NodeList mccCount_2 = 'descendant::for-loop';
+		NodeList mccCount_3 = 'descendant::iterate';
+		NodeList classes = 'descendant::class-type';
+		NodeList constructors = 'descendant::constructor';
+		NodeList assignment = 'descendant::assign';
+		NodeList returnStmt = 'descendant::return';
+		NodeList castStmt = 'descendant::cast';
+		NodeList variables = 'descendant::variable';
+		NodeList ooFields = 'descendant::field';
+		Double nestedForLoop = 'count(descendant-or-self::for-loop)';
+		Double nestedIteration = 'count(descendant-or-self::iterate)';
+	
+		// Attributes of nodes
+		String functionName = './variable/@name';
+		String name = './@name';
+		String type = './@type';
+		String value = './@value';
+		String myName = 'name()'; 
+		
+	%%
+	
+	private void visit(Node node) {
+		int nodeListSize, index, functionsOverriden = 0;
+		%%
+		"uXML" :
+		{
+			varDetailsToPrint = 2;
+			printInformation($functions,"Function defined : ",lined);
+			
+			isFunctionCall = true;
+			printInformation($functionCalls,"Function calls : ",lined);
+			
+			varDetailsToPrint = 3;
+			printInformation($variablesDef,"Variables defined : ",lined);
+			
+			printInformation($constantsUsed,"Constants used: ",lined);
+			
+			calcMCC($mccCount_1, $mccCount_2.getLength(),$mccCount_3.getLength(),"McCabe Cyclomatic Complexity : ");
+			
+			printInformation($classes,"Classes defined : ",lined);
+			
+			StringBuffer functionOverridenInfo = new StringBuffer("\n");
+			for(String nameOfFunction : overridenFunction.keySet())
+				if(overridenFunction.get(nameOfFunction) > 1) {
+					functionsOverriden++;
+					functionOverridenInfo.append(nameOfFunction + "\n");
+				}
+			System.out.println("Functions overriden : " + functionsOverriden
+					+ functionOverridenInfo.toString());
+			
+			nodeListSize = $mccCount_2.getLength();
+			for(index = 0; index < nodeListSize; index++) {
+				visit($mccCount_2.item(index));
+			}
+			nodeListSize = $mccCount_3.getLength();
+			for(index = 0; index < nodeListSize; index++) {
+				visit($mccCount_3.item(index));
+			}
+			System.out.println(lined);
+			System.out.println("Nested Block Depth : " + (nestedForCount > nestedIterationCount ? nestedForCount : nestedIterationCount));
+			
+			System.out.println(lined);
+			visitNodesInList($assignment); visitNodesInList($returnStmt); visitNodesInList($castStmt);
+			visitNodesInList($variables); visitNodesInList($ooFields);
+			countHelsteadParams();
+			System.out.println("Helstead Metrics :");
+//			System.out.println(hmOperator);
+//			System.out.println(hmOperand);
+			System.out.println("N1 = " + N1 + ", n1 = " + n1 + ", N2 = " + N2 + ", n2 = " + n2);
+			
+			N = N1 + N2;
+			System.out.println("Program Length N => N1 + N2 = " + N);
+			n = n1 + n2;
+			System.out.println("Voculbary Size n => n1 + n2 = " + n);
+			V = N * Math.log((double)n)/Math.log(2);
+			System.out.println("Program Volume V => N * log2(n) = " + V);
+			D = ((double)n1 / 2.0) * ((double)N2 / (double)n2);
+			System.out.println("Difficulty Level D => (n1 / 2) * (N2 / n2) = " + D);
+			L = 1/D;
+			System.out.println("Program Level L => 1/D = " + L);
+			E = V * D;
+			System.out.println("Effort to implement E => V*D = " + E);
+			T = E / 18;
+			System.out.println("Time to implement T = E/18 = " + T);
+			B = Math.pow(E, (2/3))/3000;
+			System.out.println("No. of bugs delivered B => E^(2/3)/3000 = " + B);
+			
+			System.out.println(lined);
+			MI = 171.0 - 5.2 * Math.log(V) - 0.23 * MCC - 16.2 * Math.log(loc);
+			System.out.println("Maintainibility Index M => 171 - 5.2 * ln(V) -0.23 * MCC -16.2 * ln(LOC) = " +  MI);
+//			aveV = average Halstead Volume (CMT++/CMTJava s V) per module
+//	        aveG = average extended cyclomatic complexity (CMT++/CMTJava s v(G) ) per module
+//	        aveLOC = average count of lines (CMT++/CMTJava s LOCphy) per module
+ 
+		};
+		
+		"for-loop" :
+		{
+			if(nestedForCount < $nestedForLoop.intValue())
+				nestedForCount = $nestedForLoop.intValue();
+			countOperator($myName);
+		};
+		
+		"iterate" :
+		{
+			if(nestedIterationCount < $nestedIteration.intValue())
+				nestedIterationCount = $nestedIteration.intValue();
+			countOperator($myName);
+		};
+		
+		"function" :
+		{
+			String nameOfFunction = $name.trim().length() == 0? Constants.LAMBDA : $name;
+			System.out.print(($functionReturnType.trim().length() == 0? Constants.VOID : $functionReturnType) + " ");
+			System.out.print(nameOfFunction + "(");
+			// Add the function in hashmap or if it is repeated, then increase the count.
+			if(overridenFunction.containsKey(nameOfFunction))
+				overridenFunction.put(nameOfFunction, overridenFunction.get(nameOfFunction) + 1);
+			else
+				overridenFunction.put(nameOfFunction, 1);
+			
+			nodeListSize = $functionParams.getLength();
+			
+			for(index = 0; index < nodeListSize; index++) {
+				visit($functionParams.item(index));
+				if(nodeListSize - index > 1)
+					System.out.print(",");
+			}
+			countOperand(nameOfFunction);
+			System.out.println(")");
+		};
+		
+		"call" :
+		{
+			String calledFunction = Constants.CONSTRUCTOR.equals($functionName)? "Constructor()" : $functionName;
+			calledFunction = calledFunction.trim().length() == 0? "Call_Through_Operator" : calledFunction;
+			countOperator($functionName);
+			System.out.println(calledFunction);
+		};
+		
+		"var" :
+		{
+			if(varDetailsToPrint == 3)
+				System.out.println($name + " : " + $type);
+			else
+				System.out.print(varDetailsToPrint == 1? $name : $type);
+		};
+		
+		"variable" :
+		{
+			countOperand($name);
+		};
+		
+		"constant" :
+		{
+			System.out.println($type + " : " + $value);
+			countOperand($value);
+		};
+		
+		"field" : 
+		{
+			countOperand($name);
+		};
+		
+		"operator" :  
+		{
+			if(
+				$value.equals("(") || $value.equals("(=") || $value.equals(")") ||
+		        $value.equals(")=") || $value.equals("==") || $value.equals("!=") ||
+		        $value.equals("$$") || $value.equals("||") || $value.equals("!")
+		       ) mcc++;
+				
+			countOperator($value);
+		};
+		
+		"assign" :
+		{
+			countOperator($myName);
+		};
+		
+		"return" :
+		{
+			countOperator($myName);
+		};
+		
+		"cast" :
+		{
+			countOperator($myName);
+		};
+		
+		"class-type" :
+		{
+			System.out.println("Class name : " + $name);
+			System.out.println();
+			
+			varDetailsToPrint = 3;
+			printInformation($variablesDef,"Variables defined : ",dashed);
+			
+			varDetailsToPrint = 2;
+			printInformation($functions,"Function defined : ",dashed);
+			
+			printInformation($constructors,"Constructors defined : ",lined);
+		};
+		
+		"constructor" :
+		{
+			System.out.print($name + "(");
+			nodeListSize = $functionParams.getLength();
+			
+			for(index = 0; index < nodeListSize; index++) {
+				visit($functionParams.item(index));
+				if(nodeListSize - index > 1)
+					System.out.print(",");
+			}
+			System.out.println(")");
+			countOperand($name);
+		};
+		
+		// Do nothing if found any other nodes
+		'*' : '*' {};
+		%%
+	}
+	
+	/**
+	 * Prints the information
+	 */
+	private void printInformation(NodeList nodeList, String msg, String terminator) {
+		int nodeListSize = nodeList.getLength();
+		System.out.println(msg + nodeListSize);
+		for(int index = 0; index < nodeListSize; index++) {
+			visit(nodeList.item(index));
+		}
+		System.out.println(terminator);
+	}
+	
+	private void visitNodesInList(NodeList nodeList) {
+		int nodeListSize = nodeList.getLength();
+		for(int index = 0; index < nodeListSize; index++) {
+			visit(nodeList.item(index));
+		}
+	}
+	
+	private void calcNestedBlockDepth(NodeList forLoopList, NodeList iterationList, 
+			NodeList nestedFor, NodeList nestedIteration, String msg) {
+		int maxDepth = 0;
+	}
+	
+	/**
+	 * Calculates the Mccabe Cyclomatic Complexity
+	 */
+	private void calcMCC(NodeList nodeList, int for_loop, int iterate_loop, String msg) {
+		int nodeListSize = nodeList.getLength();
+		System.out.print(msg);
+		for(int index = 0; index < nodeListSize; index++) {
+			visit(nodeList.item(index));
+		}
+		MCC = mcc + for_loop + iterate_loop;
+		System.out.println((mcc + for_loop + iterate_loop));
+		System.out.println("____________________________________________");
+	}
+	
+	
+	/**
+	 * Counts the operator by adding it in hashmap if doesn't exist
+	 */
+	private void countOperator(String operator) {
+		Integer count = hmOperator.get(operator);
+		hmOperator.put(operator,(count == null?1 : count + 1));
+	}
+	
+	/**
+	 * Counts the operand by adding it in hashmap if doesn't exist
+	 */
+	private void countOperand(String operand) {
+		Integer count = hmOperand.get(operand);
+		hmOperand.put(operand,(count == null?1 : count + 1));
+	}
+	
+	/**
+	 * Counts the values N1, n1, N2, n2 required to calculate Helstead Metrics.
+	 */
+	private void countHelsteadParams() {
+		n1 = hmOperator.size(); n2 = hmOperand.size();
+		Set<String> keys = hmOperator.keySet();
+		for(String operator : keys) {
+			N1 += hmOperator.get(operator);
+		}
+		keys = hmOperand.keySet();
+		for(String operand : keys) {
+			N2 += hmOperand.get(operand);
+		}
+	}
+	
+	/**
+	 * Currently passing loc as the 2nd argument. A method can be introduced that will be a wrapper to take this parameter.
+	 */
+	public static void main(String args[], int loc) {
+		CodeAnalysis codeAnalysis = new CodeAnalysis();
+		codeAnalysis.loc = loc;
+	        
+        // get document
+        Document document = null;
+        String fileName = null;
+        try {
+            if(args.length == 0) {
+            	Scanner in = new Scanner(System.in);
+            	System.out.print("Enter the file name @ src/sampleuXMLProgs/");
+            	fileName = in.nextLine();
+            }
+            else {
+                fileName = args[0];   
+            }
+            
+            fileName = "src" + File.separator + "sampleuXMLProgs" + File.separator + fileName + ".xml";
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(fileName);
+            
+            // remove trivial text nodes
+            NodeList list = (NodeList)codeAnalysis.xv.xpath.compile("//text()[not(normalize-space(.))]").evaluate(document, XPathConstants.NODESET);    
+            for (int n = list.getLength(); --n >= 0; )
+              list.item(n).getParentNode().removeChild(list.item(n));
+        
+            // remove trivial comments nodes
+            list = (NodeList)codeAnalysis.xv.xpath.compile("//comment()").evaluate(document, XPathConstants.NODESET);
+            for (int n = list.getLength(); --n >= 0; )
+              list.item(n).getParentNode().removeChild(list.item(n));
+            
+            
+            // Start visiting each node of uXML
+            codeAnalysis.visit(document.getDocumentElement());
+        
+        } catch (SAXException e) { 
+			System.err.println("Problem parsing file " + args[0]);
+		} catch (IOException e) {
+			System.err.println("Problem opening file " + args[0]);
+		} catch (ParserConfigurationException e) {
+			System.err.println("Problem with the parser configuration, while parsing file " + args[0]);
+		} catch (XPathExpressionException e) {
+			System.err.println("Problem in xPath expression.");
+		} catch (Exception e) {
+			System.err.println("Please fix the compilation errors.\n" + e.getMessage());
+		} 
+	}
+}

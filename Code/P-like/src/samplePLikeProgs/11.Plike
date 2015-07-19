@@ -1,0 +1,34 @@
+{
+ Factorial of a number
+}
+
+PROGRAM procedure_call;
+	var 
+		i : int;
+		a : array[3..4] of int;
+
+begin
+	for i := 3 to 4 do
+	begin
+		a[i] := i * i;
+	end
+	for i := 3 to 4 do
+	begin
+		write(a[i]);
+	end
+end
+
+{
+Calling function... 
+sum 
+15 
+Calling function... 
+diff 
+5 
+Calling function... 
+prdt 
+50 
+Calling function... 
+div 
+2 
+}

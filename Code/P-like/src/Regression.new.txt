@@ -1,0 +1,61 @@
+Inside b_b_c 
+Inside b_b 
+
+<-- src/sampleuXMLProgs/2.xml -->
+5 
+
+<-- src/sampleuXMLProgs/4.xml -->
+5 
+
+<-- src/sampleuXMLProgs/5.xml -->
+5 
+
+<-- src/sampleuXMLProgs/6.xml -->
+5 
+4 
+3 
+2 
+1 
+
+<-- src/sampleuXMLProgs/7.xml -->
+inside main 5 
+inside square 5 
+25 
+inside main 5 
+
+<-- src/sampleuXMLProgs/8.xml -->
+6 
+
+<-- src/sampleuXMLProgs/9.xml -->
+Calling function... 
+sum 
+15 
+Calling function... 
+diff 
+5 
+Calling function... 
+prdt 
+50 
+Calling function... 
+div 
+2 
+
+<-- src/sampleuXMLProgs/10.xml -->
+9 
+16 
+
+<-- src/sampleuXMLProgs/11.xml -->
+2 3 4 
+3 4 5 
+4 5 6 
+2 3 4 
+3 4 5 
+4 5 6 
+
+<-- src/sampleuXMLProgs/12.xml -->
+0 
+
+<-- src/sampleuXMLProgs/13.xml -->
+equal 
+
+<-- src/sampleuXMLProgs/14.xml -->

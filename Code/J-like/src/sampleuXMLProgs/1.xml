@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<uXML language="Jlike" poly="yes" scope="static">
+	<block>
+		<global-Var>
+			<array-type name="[int]2" type="int">
+				<dim size="2" />
+			</array-type>
+			<array-type name="[A]5" type="A">
+				<dim size="5" />
+			</array-type>
+			<array-type name="[A]2" type="A">
+				<dim size="2" />
+			</array-type>
+		</global-Var>
+		<class-type name="A">
+			<member-Var>
+				<var mutable="yes" name="c" type="[int]2" />
+				<var mutable="yes" name="j" type="int">
+					<constant type="int" value="23" />
+				</var>
+				<var mutable="yes" name="b" type="[A]5" />
+			</member-Var>
+			<constructor name="A">
+				<automatic-Var />
+				<block>
+					<var mutable="yes" name="i" type="int">
+						<constant type="int" value="5" />
+					</var>
+				</block>
+			</constructor>
+			<function name="fun2">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="i" type="int">
+						<constant type="int" value="5" />
+					</var>
+				</block>
+			</function>
+			<function name="fun1">
+				<automatic-Var>
+					<var mutable="yes" name="inta" type="int" />
+				</automatic-Var>
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="a" type="[A]2" />
+					<assign>
+						<operator value="[]">
+							<field name="c">
+								<operator value="[]">
+									<field name="b">
+										<operator value="[]">
+											<variable name="a" />
+											<constant type="int" value="1" />
+										</operator>
+									</field>
+									<constant type="int" value="2" />
+								</operator>
+							</field>
+							<constant type="int" value="0" />
+						</operator>
+						<constant type="int" value="5" />
+					</assign>
+					<call>
+						<variable name="fun2" />
+						<operator value="[]">
+							<variable name="a" />
+							<constant type="int" value="1" />
+						</operator>
+					</call>
+				</block>
+			</function>
+		</class-type>
+	</block>
+</uXML>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<global-Var>
+			<var mutable="yes" name="b" type="int" />
+			<var mutable="yes" name="x" type="int">
+				<constant type="int" value="100" />
+			</var>
+		</global-Var>
+		<function name="foo">
+			<automatic-Var>
+				<var mutable="yes" name="x" type="int" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<assign>
+					<variable name="x" />
+					<constant type="int" value="3" />
+				</assign>
+				<return>
+					<variable name="x" />
+				</return>
+			</block>
+		</function>
+		<print>
+			<operator value="+">
+				<constant type="int" value="2" />
+				<call>
+					<variable name="foo" />
+					<variable name="b" />
+				</call>
+			</operator>
+		</print>
+	</block>
+</uXML>

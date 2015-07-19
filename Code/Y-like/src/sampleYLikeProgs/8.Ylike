@@ -1,0 +1,10 @@
+# This program demonstrates passing array to a function
+
+def fun(a)
+{
+	print a[0]
+}
+
+call fun([5])
+
+call fun([["Shri Gajanan Maharaj"],5])

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<pointer-type name="int*" refType="int" />
+		<var name="i" ptrMutable="yes" type="int*" valueMutable="yes" />
+		<var mutable="yes" name="j" type="int" />
+		<var mutable="yes" name="m" type="int" />
+		
+		<pointer-type name="int**" refType="int*" />
+		<var name="k" ptrMutable="yes" type="int**" valueMutable="yes" />
+		
+		<pointer-type name="int***" refType="int**" />
+		<var name="l" ptrMutable="yes" type="int***" valueMutable="yes" />
+		<assign>
+			<operator value="#">
+				<variable name="l" />
+			</operator>
+			<operator value="@">
+				<variable name="i" />
+			</operator>
+		</assign>
+	</block>
+</uXML>

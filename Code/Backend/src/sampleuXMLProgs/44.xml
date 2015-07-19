@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates setting the string as array of characters -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<print>
+		<operator value="))">
+			<constant type="int" value="7"/>
+			<constant type="int" value="1"/>
+		</operator>
+	</print>
+	 
+</block>
+</uXML>

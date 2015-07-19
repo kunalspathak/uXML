@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no">
+	<block>
+		<for-loop>
+			<from>
+				<assign>
+					<variable name="i" />
+					<constant type="int" value="1" />
+				</assign>
+			</from>
+			<till>
+				<operator value="(=">
+					<variable name="i" />
+					<constant type="int" value="10" />
+				</operator>
+			</till>
+			<step>
+				<assign>
+					<variable name="i" />
+					<operator value="+">
+						<variable name="i" />
+						<constant type="int" value="1" />
+					</operator>
+				</assign>
+			</step>
+			<block>
+				<for-loop>
+					<from>
+						<assign>
+							<variable name="j" />
+							<constant type="int" value="1" />
+						</assign>
+					</from>
+					<till>
+						<operator value="(=">
+							<variable name="j" />
+							<constant type="int" value="5" />
+						</operator>
+					</till>
+					<step>
+						<assign>
+							<variable name="j" />
+							<operator value="+">
+								<variable name="j" />
+								<constant type="int" value="1" />
+							</operator>
+						</assign>
+					</step>
+					<block>
+						<for-loop>
+							<from>
+								<assign>
+									<variable name="k" />
+									<constant type="int" value="5" />
+								</assign>
+							</from>
+							<till>
+								<operator value="(=">
+									<variable name="k" />
+									<constant type="int" value="7" />
+								</operator>
+							</till>
+							<step>
+								<assign>
+									<variable name="k" />
+									<operator value="+">
+										<variable name="k" />
+										<constant type="int" value="1" />
+									</operator>
+								</assign>
+							</step>
+							<block />
+						</for-loop>
+					</block>
+				</for-loop>
+			</block>
+		</for-loop>
+		<for-loop>
+			<from>
+				<assign>
+					<variable name="j" />
+					<constant type="int" value="1" />
+				</assign>
+			</from>
+			<till>
+				<operator value="(=">
+					<variable name="j" />
+					<constant type="int" value="5" />
+				</operator>
+			</till>
+			<step>
+				<assign>
+					<variable name="j" />
+					<operator value="+">
+						<variable name="j" />
+						<constant type="int" value="1" />
+					</operator>
+				</assign>
+			</step>
+			<block>
+				<for-loop>
+					<from>
+						<assign>
+							<variable name="k" />
+							<constant type="int" value="5" />
+						</assign>
+					</from>
+					<till>
+						<operator value="(=">
+							<variable name="k" />
+							<constant type="int" value="7" />
+						</operator>
+					</till>
+					<step>
+						<assign>
+							<variable name="k" />
+							<operator value="+">
+								<variable name="k" />
+								<constant type="int" value="1" />
+							</operator>
+						</assign>
+					</step>
+					<block />
+				</for-loop>
+			</block>
+		</for-loop>
+		<iterate>
+			<till>
+				<operator value=")">
+					<variable name="i" />
+					<constant type="int" value="0" />
+				</operator>
+			</till>
+			<block>
+				<print>
+					<variable name="i" />
+				</print>
+				<assign>
+					<variable name="i" />
+					<operator value="-">
+						<variable name="i" />
+						<constant type="int" value="1" />
+					</operator>
+				</assign>
+				<iterate>
+					<till>
+						<operator value=")">
+							<variable name="i" />
+							<constant type="int" value="0" />
+						</operator>
+					</till>
+					<block>
+						<print>
+							<variable name="i" />
+						</print>
+						<assign>
+							<variable name="i" />
+							<operator value="-">
+								<variable name="i" />
+								<constant type="int" value="1" />
+							</operator>
+						</assign>
+						<iterate>
+							<till>
+								<operator value=")">
+									<variable name="i" />
+									<constant type="int" value="0" />
+								</operator>
+							</till>
+							<block>
+								<print>
+									<variable name="i" />
+								</print>
+								<assign>
+									<variable name="i" />
+									<operator value="-">
+										<variable name="i" />
+										<constant type="int" value="1" />
+									</operator>
+								</assign>
+								<iterate>
+									<till>
+										<operator value=")">
+											<variable name="i" />
+											<constant type="int" value="0" />
+										</operator>
+									</till>
+									<block>
+										<print>
+											<variable name="i" />
+										</print>
+										<assign>
+											<variable name="i" />
+											<operator value="-">
+												<variable name="i" />
+												<constant type="int" value="1" />
+											</operator>
+										</assign>
+									</block>
+								</iterate>
+							</block>
+						</iterate>
+					</block>
+				</iterate>
+			</block>
+		</iterate>
+	</block>
+</uXML>

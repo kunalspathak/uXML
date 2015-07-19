@@ -1,0 +1,22 @@
+/**
+ * This program test the type cast
+ * 
+ */
+
+/*
+ * Main function
+ */
+function void main() {
+//	int i = {int} 5.0;
+//	print(i);
+	
+	int j, *i = &j;
+	j = 5;
+	print(*i);
+}
+
+/*
+Output :
+5 
+
+*/

@@ -1,0 +1,22 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT Constructor (block)>
+<!ATTLIST Constructor
+  xmlns CDATA #FIXED ''
+  xmlns:xsi CDATA #FIXED 'http://www.w3.org/2001/XMLSchema-instance'
+  name NMTOKEN #REQUIRED
+  xsi:noNamespaceSchemaLocation NMTOKEN #REQUIRED>
+
+<!ELEMENT block (member-Var)>
+<!ATTLIST block
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT member-Var (var)+>
+<!ATTLIST member-Var
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT var EMPTY>
+<!ATTLIST var
+  xmlns CDATA #FIXED ''
+  name NMTOKEN #REQUIRED
+  type NMTOKEN #REQUIRED>

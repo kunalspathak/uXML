@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<uXML language="Jlike" poly="yes" scope="static">
+	<block>
+		<global-Var />
+		<class-type name="A">
+			<member-Var>
+				<var mutable="yes" name="i" type="int" />
+			</member-Var>
+			<constructor name="A">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="string" />
+				</automatic-Var>
+				<block>
+					<print>
+						<constant type="string" value="A(string)" />
+					</print>
+				</block>
+			</constructor>
+			
+			<function name="fun2">
+				<automatic-Var>
+					<var mutable="yes" name="j" type="int" />
+				</automatic-Var>
+				<returns type="void" />
+				<block>
+					<print>
+						<constant type="string" value="Inside fun2" />
+						<variable name="j" />
+					</print>
+				</block>
+			</function>
+		</class-type>
+		
+		<class-type name="B">
+			<inherits>
+				<variable name="A" />
+			</inherits>
+			<member-Var />
+			<constructor name="B">
+				<automatic-Var />
+				<block>
+					<call>
+						<variable name="super" />
+						<variable name="this" />
+						<constant type="string" value="kunal" />
+					</call>
+					<print>
+						<constant type="string" value="B()" />
+					</print>
+				</block>
+			</constructor>
+			
+			<constructor name="B">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="string" />
+				</automatic-Var>
+				<block>
+					<print>
+						<constant type="string" value="B(string)" />
+						<variable name="str" />
+					</print>
+				</block>
+			</constructor>
+		</class-type>
+		<class-type name="C">
+			<member-Var />
+			<function name="main">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="objB" type="B">
+						<call>
+							<variable name="#new#"/>
+							<variable name="B"/>
+						</call>
+					</var>
+					
+					<call>
+						<variable name="fun2"/>
+						<variable name="objB"/>
+						<constant type="int" value="5"/>
+					</call>
+					
+				</block>
+			</function>
+		</class-type>
+		<call>
+			<variable name="main" />
+			<call>
+				<variable name="#new#" />
+				<variable name="C" />
+			</call>
+		</call>
+	</block>
+</uXML>

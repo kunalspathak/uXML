@@ -1,0 +1,20 @@
+# Demonstrates the map/reduce function with lambda 
+
+x = map(lambda z: z * z, [1,2,3])
+print x
+
+x = reduce(lambda x,y: x * y, [1,2,3,4,5])
+print x
+
+x = map(lambda z : "Hello-" + z, ["A","B"])
+print x
+
+# array containing map
+x = [1, map(lambda z : "Hello-" + z, ["A","B"]), 2]
+print x
+
+# Output
+# [1,4,9] 
+# 120 
+# [Hello-A,Hello-B] 
+# [1,[Hello-A,Hello-B],2] 

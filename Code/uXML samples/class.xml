@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    Desc : Class definition
+-->
+ 
+<class-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="overall.xsd"
+ name="HelloWorld">
+    <!-- 
+        Desc : Defines the package information 
+    -->
+    <scope>  
+        <trace>com 
+            <trace>edu
+                <trace>rit
+                    <trace>uXML</trace>
+                </trace>  
+            </trace>
+        </trace>  
+    </scope>
+
+    <!-- 
+        Desc : Specifies the inheritance relation of this class with other concrete/abstract classes/interface
+    -->
+    <inherits>
+        <!-- 
+            Desc : Specifies the name of parent class(s)/interface(s) from which this class is inheriting.
+                   In case a programming language has any restriction of number of classes certain class can inherit (eg. Java)
+                   then that will be checked by the Front-End compiler. 
+                   <inherits> will simply show the final list of class/interface from where this class in inheriting.
+                   
+                   Not valid for struct. 
+        -->
+        <!-- Option 1 
+	        <constant type="Hello1" value="this"/>
+	        <constant type="Hello2" value="this"/>
+	        <constant type="Hello3" value="this"/>
+        -->
+        
+        <!-- Option 2 -->
+        <variable name="Hello1"/>
+        <variable name="Hello2"/> 
+        <variable name="Hello3"/>
+
+    </inherits>
+    <!-- scope start  
+    <block>
+    -->
+
+        <!-- Declares static variables. Not present for struct.
+        Commented as of now 
+        <global-Var>
+            <var name="staticVar1" type="arrayA1"/>
+        </global-Var>
+        -->
+
+        <!-- List of class level variables. This element is optional. -->
+        <!-- Declares member variables  -->
+        <member-Var> 
+            <var name="var1" type="arrayA2"/> 
+        </member-Var>
+
+        <!-- 
+            List of Constructors 
+        -->
+         <!--Constructor with 0 arguments is not present for struct -->
+        <Constructor name="HelloWorld">
+	        <automatic-Var>
+	            <var name="this" type="className"/>
+	        </automatic-Var>
+            <block>
+
+                <!--Code contents-->
+            </block>
+        </Constructor> 
+
+        <Constructor name="HelloWorld">
+			<automatic-Var>
+	           <var name="this" type="classname"/>
+	           <var name="var1" type="int"/>
+	       	</automatic-Var>
+            <block>  
+                <!--Code contents-->
+            </block>
+        </Constructor>
+
+        <Constructor name="HelloWorld">
+        	<automatic-Var>
+                 <var name="this" type="classname"/>
+                 <var name="var1" type="int"/>
+                 <var name="var2" type="string"/>
+            </automatic-Var>
+            <block>
+                <!--Code contents-->
+            </block>
+        </Constructor>
+        
+        <!-- List of member functions. This element is optional. For details see function.xml 
+
+        <Functions>...</Functions>
+        -->
+    <!--</block>
+--></class-type>

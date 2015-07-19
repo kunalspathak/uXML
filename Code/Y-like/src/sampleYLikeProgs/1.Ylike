@@ -1,0 +1,20 @@
+# Dynamic-typing. Try changing the arguments to fun1 function from fun to fun2
+
+def fun(a,b) # ,b
+{
+	print a,b
+	# print a + b
+}
+
+def fun2(a,b)
+{
+	print "here", a, b
+}
+
+def fun1(a,b,c)
+{
+	call a(b,c)
+}
+
+
+call fun1(fun2,23,"Hello")

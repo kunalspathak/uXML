@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program demonstrates a function that returns an array of pointers -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	
+	<block>
+	<!-- typdef int *intPtr -->
+	<pointer-type name="intPtr" refType="int"/>
+
+	<!--  typedef intPtr arrayOfPtr[3] ;-->
+	<array-type name="arrayOfPtr" type="intPtr">
+		<dim size="3"/>
+	</array-type>
+	
+	<var name="local" type="int" mutable="yes">
+		<constant type="int" value="5"/>
+	</var>
+	
+	<!-- Function that returns an array of int pointers (arrayOfPtr type)-->
+	<function name="getArrayOfPtr">
+		<returns type="arrayOfPtr"/>
+		<block>
+			<!-- arrayOfPtr arrayToReturn  -->
+			<var name="arrayToReturn" type="arrayOfPtr" mutable="yes"/>
+			
+			<var name="var0" type="int" mutable="yes">
+				<constant type="int" value="32"/>
+			</var>
+			
+			<var name="var2" type="int" mutable="yes">
+				<constant type="int" value="23"/>
+			</var>
+			
+			
+			<!-- arrayToReturn[0] = &var0 -->
+			<assign>
+				<operator value="[]">	
+					<variable name="arrayToReturn"/>
+					<constant type="int" value="0"/>
+				</operator>
+				<operator value="@">
+					<variable name="var0"/>
+				</operator>
+			</assign>
+			
+			<!-- arrayToReturn[1] = &local -->
+			<assign>
+				<operator value="[]">	
+					<variable name="arrayToReturn"/>
+					<constant type="int" value="1"/>
+				</operator>
+				<operator value="@">
+					<variable name="local"/>
+				</operator>
+			</assign>
+			
+			<!-- arrayToReturn[2] = &var2 -->
+			<assign>
+				<operator value="[]">	
+					<variable name="arrayToReturn"/>
+					<constant type="int" value="2"/>
+				</operator>
+				<operator value="@">
+					<variable name="var2"/>
+				</operator>
+			</assign>
+			
+			<return>
+				<variable name="arrayToReturn"/>
+			</return>
+		</block>
+	</function>
+	
+	<!-- arrayOfPtr answer -->
+	<var name="answer" type="arrayOfPtr" mutable="yes"/>
+	
+	<!-- answer = getArrayOfPtr() -->
+	<assign>
+		<variable name="answer"/>
+		<call>
+			<variable name="getArrayOfPtr"/>
+		</call>
+	</assign>
+	
+	<println>
+		<variable name="answer"/>
+	</println>
+	
+	<!-- print(*answer[0]) -->
+	<print>
+		<operator value="#">
+			<operator value="[]">
+				<variable name="answer"/>
+				<constant type="int" value="0"/>
+			</operator>
+		</operator>
+	</print>
+	
+	
+	<!-- local = 50 -->
+	<assign>
+		<variable name="local"/>
+		<constant type="int" value="50"/>
+	</assign>
+	
+	<!-- 
+		print(*answer[1])
+		This should now print '50' that is assigned in above statement 
+	-->
+	<print>
+		<operator value="#">
+			<operator value="[]">
+				<variable name="answer"/>
+				<constant type="int" value="1"/>
+			</operator>
+		</operator>
+	</print>
+	
+	
+	<!-- print(*answer[2]) -->
+	<print>
+		<operator value="#">
+			<operator value="[]">
+				<variable name="answer"/>
+				<constant type="int" value="2"/>
+			</operator>
+		</operator>
+	</print>
+	</block>
+</uXML>
+<!--
+ Output :
+[[32],[5],[23]]
+32 50 23 
+-->

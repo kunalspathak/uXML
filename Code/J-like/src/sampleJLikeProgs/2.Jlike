@@ -1,0 +1,35 @@
+/**
+* This program demonstrates default constructor definition. 
+* There is a system generated default constructor with no parameters. 
+* So if no constructor is present and an object is instantiated, it will get
+* the instance with no problem. However if a constructor with 1 parameter is 
+* defined by user, the default constructor is deleted. 
+*
+*/
+PROGRAM A; // Name of main class 'A'
+
+class A {
+
+	int i;
+
+	/*constructor A() {
+		print("Inside constructor A");
+	}
+
+	constructor A(string str) {
+		print("Inside constructor A",str);
+	}*/
+	
+	function void fun2(int j) {
+		print("Inside fun2",j);
+	}
+	
+	function void main() {
+		class A objA;
+		objA = new A(void);
+		print("Inside main");
+		call objA.fun2(5);
+	}
+	// In-built call " new A().main() "
+}
+

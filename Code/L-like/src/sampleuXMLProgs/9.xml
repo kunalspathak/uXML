@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<uXML language="Llike" scope="static">
+	<block>
+		<print>
+			<call>
+				<variable name="reduce" />
+				<function name="#lambda#">
+					<automatic-Var>
+						<var mutable="yes" name="x" type="int" />
+						<var mutable="yes" name="y" type="int" />
+					</automatic-Var>
+					<block>
+						<call>
+							<variable name="*" />
+							<variable name="x" />
+							<variable name="y" />
+						</call>
+					</block>
+				</function>
+				<constant type="int" value="1" />
+				<constant type="int" value="2" />
+				<constant type="int" value="3" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</call>
+		</print>
+	</block>
+</uXML>

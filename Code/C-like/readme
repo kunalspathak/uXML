@@ -1,0 +1,53 @@
+***   C-like Language   ***
+1. Constants : numeric, character, float, boolean
+2. Variables : numeric, character, float, boolean
+3. Assignment statements : =
+4. Arithmetic operations : +, -, *, /, %, ^, |, &, ~
+5. Logical operations : &&, ||, !
+6. Conditional operations : ==, !=, <, >, <=, =>
+7. Conditional statements : If-else, elseif
+8. Iteration loops : for, do-while, while-do
+9. Functions
+10. Arrays
+11. Advanced Constants - pointer, struct
+12. Advanced Variables - pointer, struct, const, typedef
+13. Advanced assignment - casting/coersion
+14. Advanced Functions - pass/return pointers, function pointers, arrays
+15. Advanced Arrays - pass/return array pointer
+__________________________________________________________________________________________________________________
+TODO:
+1. Test for assignment especially for compound data-types like assigning char to pointer to int, function pointer, etc.
+2. struct, if time permits
+__________________________________________________________________________________________________________________
+Not doing : 
+1. Function pointer : Pointer to a function that takes an array of int or that returns an array of int
+Eg : funcptr (int[3](int[3], int)) *fun;
+
+2. Pointer to array 
+Eg. int *(a[2]);
+
+__________________________________________________________________________________________________________________
+Notes : 
+1. Function definition should start with keyword 'function'
+eg. function func(int a) { }
+
+2. Function call should start with keyword 'call' 
+eg. call func(1)
+
+3. For functions that doesn't take parameter, 'void' is passed. 
+eg. call func(void)
+
+4. Type-casting can be done only for int, char, boolean, float by enclosing these data-types
+   in curley braces
+eg. int i = {int} 5.0;
+
+5. Function pointer are defined by keyword 'funcptr'
+eg1. funcptr (int(int, int)) *fun;
+eg2. function func(funcptr fun a)
+
+6. Function saved in function pointer is called using *
+eg. funcptr fun a;
+    a  = &sum;
+	call *a(10);
+	
+7. Constant pointer and pointer to a constant variable

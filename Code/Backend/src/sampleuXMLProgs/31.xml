@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+Testing runtime allocation of functions to arrays - Part 2
+Tiny version of 27.xml 
+This program defines overloaded function 'mod', one taking 2 ints, while other taking 1 int and 1 decimal.
+An array is defined that takes function that takes 2 ints. So while allocating the address of 'mod' to one of the entry,
+correct version of function is allocated to the array. 
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+	<function-type name="twoToOne">
+		<automatic-Var>	
+			<var name="var1" type="int" mutable="yes"/>
+			<var name="var2" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+	
+	<array-type name="arrayOfFunc" type="twoToOne">
+		<dim size="3"/>
+	</array-type>
+	
+	<!-- decimal mod (int, decimal) -->
+	<function name="mod">
+		<automatic-Var>
+			<var name="v1" type="int" mutable="no"/>
+			<var name="v2" type="float" mutable="no"/>
+		</automatic-Var>
+		<returns type="float"/>
+		<block>
+			<return>
+				<cast type="float">
+					<operator value="%">
+						<variable name="v1"/>
+						<variable name="v2"/>
+					</operator>
+				</cast>
+			</return>
+		</block>
+	</function>
+	
+	<!-- int mod(int, int) -->
+	<function name="mod" type="twoToOne">
+		<block>
+			<return>
+				<operator value="%">
+					<variable name="var1"/>
+					<variable name="var2"/>
+				</operator>
+			</return>
+		</block>
+	</function>
+	
+	<!-- function that takes an array of function and execute all the functions one at a time -->
+	<function name="func">
+		<automatic-Var>
+			<var name="inputFuncs" type="arrayOfFunc" mutable="yes"/>
+		</automatic-Var>
+		<block>
+			<var name="i" type="int" mutable="yes"/>
+			<for-loop>
+				<from>
+					<assign>
+						<variable name="i"/>
+						<constant type="int" value="0"/>
+					</assign>
+				</from>
+				<till>
+					<operator value="(">
+						<variable name="i"/>
+						<constant type="int" value="3"/>
+					</operator>
+				</till>
+				<step>
+					<assign>
+						<variable name="i"/>
+						<operator value="+">
+							<variable name="i"/>
+							<constant type="int" value="1"/>
+						</operator>
+					</assign>
+				</step>
+				<block>
+					<print>
+						<call>
+							<operator value="[]">
+								<variable name="inputFuncs"/>
+								<variable name="i"/>
+							</operator>
+							<constant type="int" value="10"/>
+							<constant type="int" value="6"/>
+						</call>
+					</print>
+				</block>
+			</for-loop>
+		</block>
+	</function>
+	
+	<var name="funcs" type="arrayOfFunc" mutable="yes"/>
+
+		
+	<!-- funcs[0] = mod -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="0"/>
+		</operator>
+		<variable name="mod"/>
+	</assign>
+	
+	<!-- funcs[1] = prdt -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="1"/>
+		</operator>
+		<function type="twoToOne">
+			<block>
+				<return>
+					<operator value="*">
+						<variable name="var1"/>
+						<variable name="var2"/>
+					</operator>
+				</return>
+			</block>
+		</function>
+	</assign>
+		
+	<!-- funcs[2] = sum -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="2"/>
+		</operator>
+		<function type="twoToOne">
+			<block>
+				<return>
+					<operator value="+">
+						<variable name="var1"/>
+						<variable name="var2"/>
+					</operator>
+				</return>
+			</block>
+		</function>
+	</assign>
+	
+	<println>
+		<constant type="string" value="Assignment done"/>
+	</println>
+
+	<call>
+		<variable name="func"/>
+		<variable name="funcs"/>
+	</call>
+	</block>
+</uXML>
+<!--
+Output :
+Assignment done
+4 60 16 
+-->

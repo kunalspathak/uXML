@@ -1,0 +1,33 @@
+/**
+ * Arrays - Passing array of pointers to the function
+ */
+
+int *sample[3];
+int as[3];
+
+function void func(int *a[3]) {
+	int i;
+	for(i = 0; i < 3;i=i+1) {
+		//print(*a[i]);
+		*a[i] = i + 5;
+	}
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int i = 1,j = 2,k = 3;
+	int *b[3];
+	b[0] = &i;
+	b[1] = &j;
+	b[2] = &k;
+	call func(b);
+	print(i,j,k);
+}
+
+/*
+Output :
+
+5 6 7 
+*/

@@ -1,0 +1,9 @@
+; Factorial of a program by 'defun' 
+; 
+(defun factorial (n)
+   (if (<= n 1)
+       n
+       (* n (factorial (- n 1)))))
+(factorial 5)
+
+; prints 120

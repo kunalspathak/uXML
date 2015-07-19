@@ -1,0 +1,52 @@
+/**
+ * Arrays - Passing array of function pointers to function
+ * See 19.Clike - Returning array of function pointer from a function
+ * See 21.Clike - Passing/returning array of function pointer from a function 
+ */
+
+funcptr (void(int,int)) *fun;
+funcptr fun sample[2];
+
+/*
+ * Executor
+ */
+function void executor(funcptr fun opr[2]) {
+	int i ;
+	for(i = 0; i < 2; i=i+1) {
+		call *opr[i](10,5);	
+	}
+	
+}
+
+/*
+ * Sum
+ */
+function void sum(int var1, int var2) {
+	print(var1,"+",var2,"=", (var1 + var2));
+}
+
+/*
+ * Difference
+ */
+
+function void diff(int var1, int var2) {
+	print(var1,"-",var2,"=", (var1 - var2));
+}
+
+
+/*
+ * Main function
+ */
+function void main() {
+	funcptr fun a[2];
+	a[0] = &sum;
+	a[1] = &diff;
+	
+	call executor(a);
+}
+
+/*
+Output :
+10 + 5 = 15 
+10 - 5 = 5 
+*/

@@ -1,0 +1,84 @@
+/**
+* This program demonstrates super call to parent class's constructor. 
+*/
+
+PROGRAM D; // Name of main class 'A'
+
+class A {
+	int i = 0;
+	constructor A() {
+		print("A()");
+	}
+	
+	constructor A(string str) {
+		print("A(string)");
+	}
+	
+	function void fun(int str) {
+		i = str;
+		print("A.fun(",str,")");
+	}
+}
+
+class B inherits A {
+	int n = 5;
+	constructor B() {
+		print("B()");
+	} 
+	
+	/*constructor B(string str) {
+		super(str);
+		print("B(string)",str);
+	}*/
+	
+	function void fun(int str) {
+		i = str;
+		print("B.fun(",str,")");
+	}
+}
+
+class C inherits B {
+	
+	constructor C() {
+		super("kunal");
+		print("C()");
+	} 
+	
+	constructor C(string str) {
+		print("C(string)",str);
+	}
+	
+	function void fun1(int str) {
+		i = str;
+		print("C.fun(",str,")");
+	}
+}
+	
+class D {
+	
+	function void main() {
+		class C c = new C("A");
+		class B b = new B(void);
+		b = c;   				
+		// If the above assignment is commented, then below function call to 'fun1' will be 
+		// compilation error.
+		call b.fun1(b.n);
+//		call fun1(5); //Gives error since fun1 should be associated to an object
+	} 
+}
+
+/*
+ * In-built call new D().main() 
+ */
+
+/* 
+ * Output :
+	A() 
+	B() 
+	C(string) A 
+	A() 
+	B() 
+	C.fun( 5 ) 
+ * 
+ */
+

@@ -1,0 +1,13 @@
+/*
+ * Constant pointer and Pointer to constant variables 
+ * Tested by the examples that tried in Backend\uXMLExamples\16.xml
+ */
+
+function void main() {
+	int k,j;
+	const int *i = &j;
+	// int * const i ;  /* pointer to a constant variable */
+	j = 23;
+	i = &k;
+	print(i);
+}

@@ -1,0 +1,52 @@
+/**
+* This program demonstrates the inheritance of function 'fun2' from parent
+* class A into subclass B.
+*
+*/
+PROGRAM C; // Name of main class 'A'
+
+class A {
+
+//	int i;
+
+	constructor A() {
+		print("Inside constructor A");
+	}
+	/*
+	constructor A(string str) {
+		print("Inside constructor A",str);
+	}*/
+	
+	function void fun2(int j) {
+		print("Inside fun2",j);
+	}
+	
+}
+
+class B inherits A {
+	int b = 5;
+//	function void fun1() {
+//		class B b = new B(void);
+//		call b.fun2(5);
+//    }
+}
+	
+class C {
+	function void main() {
+		class B objB;
+		objB = new B(void);
+		call objB.fun2(objB.b);
+	} 
+
+}
+
+
+/*
+ * In-built call new A().main() 
+ */
+
+/*
+ * Output
+ * Inside constructor A
+ * Inside fun2 5  
+ */

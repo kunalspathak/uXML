@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uXML language="PLike" scope="static">
+	<!-- uXML nodes -->
+</uXML> 
+
+	<!-- int i -->
+	<var name="i" type="int" 
+	mutable="yes"/>
+    
+    <!-- i -->
+    <variable name="i"/>
+    
+    <!-- 5.0 -->
+    <constant type="float"
+    	value="5.0"/>
+    
+    <!-- i = 23 -->
+    <assign>
+    	<variable name="i"/>
+    	<constant type="int"
+    		value="23"/>
+    </assign>
+    
+    <!-- i = i + j -->
+    <assign>
+    	<variable type="i"/>
+    	<operator type="+">
+    		<variable type="i"/>
+    		<variable type="j"/>
+    	</operator>
+    </assign>
+    
+    <!-- int func(const char ch) {
+    		...
+    		return 1;
+         }  
+     -->
+    <function name="func">	
+    	<automatic-Var>	
+    		<var name="ch" type="char" 
+    		mutable="no"/>
+    	</automatic-Var>
+    	<returns type="int"/>
+    	<block>
+    		<!-- uXML nodes -->
+    		<return>
+    			<constant type="int"
+    			value="1"/>
+    		</return>
+    	</block>
+    </function>
+    
+    <!-- func('a') -->
+    <call>
+    	<variable name="func"/>
+    	<constant type="char" 
+    		value="a"/>
+    </call>
+    
+    <!-- for(i = 0; i < 5;i++) {
+    		...
+         } 
+    -->
+    <for-loop>
+    	<!-- i = 0 -->
+    	<from>
+    		<assign>	
+    			<variable name="i"/>
+    			<constant type="int"
+    				value="0"/>
+    		</assign>
+    	</from>
+    	<!-- i < 5 -->
+    	<till>
+    		<operator value="(">
+    			<variable name="i"/>
+    			<constant type="int" 
+    				value="5"/>
+    		</operator>
+    	</till>
+    	<!-- i++ -->
+    	<step>
+	    	<assign>
+		    	<variable type="i"/>
+		    	<operator type="+">
+		    	   <variable type="i"/>
+		    	   <variable type="j"/>
+		    	</operator>
+	    	</assign>
+    	</step>
+    	<block>
+    		<!-- uXML nodes -->
+    	</block>
+    </for-loop>
+    
+    <!-- while(i < 5) { ... } -->
+    <iterate>
+    	<till>
+    		<operator value="(">
+    			<variable name="i"/>
+    			<constant type="int" 
+    				value="5"/>
+    		</operator>
+    	</till>
+    	<block>	
+    		<!-- uXML nodes -->
+    	</block>	
+    </iterate>
+    
+    <!-- do { ... } while(i < 5); -->
+    <iterate>
+    	<block>	
+    		<!-- uXML nodes -->
+    	</block>	
+    	<till>
+    		<operator value="(">
+    			<variable name="i"/>
+    			<constant type="int" 
+    				value="5"/>
+    		</operator>
+    	</till>
+    </iterate>
+    
+    <!-- (int)5.23; -->
+    <cast type="int">
+    	<constant type="float" 
+    				value="5.23"/>
+    </cast>
+   
+    
+    <!-- int i[][] -->
+    <array-type name="twoD" type="int">
+		<dim size="3" startIndex="-1" />
+		<dim size="3" />
+	</array-type>
+	<var name="i" type="twoD" 
+		mutable="yes"/>
+		
+	<!-- typedef int *intPtr -->
+	<pointer-type name="intPtr" 
+		refType="int"/>
+    <!--  intPtr k -->
+    <var name="k" type="intPtr" 
+    ptrMutable="yes" valueMutable="yes"/>
+    
+    <!-- int twoToOne(int var1, int var2) -->
+    <function-type name="twoToOne">
+		<automatic-Var>	
+			<var name="var1" type="int" 
+				mutable="yes"/>
+			<var name="var2" type="int" 
+				mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+	<!-- lambda function having signature of 
+		'twoToOne' -->
+	<function type="twoToOne">
+		<block>
+			<!-- uXML nodes -->
+		</block>
+	</function>
+	
+	<!-- class A {
+			int i;
+			a() { ... }
+			b() { ... }
+	 -->
+	<class-type name="A">
+		<!-- member variable -->
+		<member-Var>
+			<var name="i" type="int"
+				mutable="yes"/> 
+		</member-Var>
+		<!-- member functions -->
+		<function name="a">
+			<!-- uXML nodes -->
+		</function>
+		<function name="b">
+			<!-- uXML nodes -->
+		</function>
+	</class-type>
+	
+	<!-- class B {
+			B(int i) {...}
+		 } 
+	 -->
+	 <class-type name="A">
+		<!-- Constructor -->
+		<constructor name="A">
+			<automatic-Var>
+				<var name="i" type="int"
+					mutable="yes"/>
+			</automatic-Var>
+			<block>
+				<!-- uXML nodes -->
+			</block>
+		</constructor>
+	</class-type>
+	
+	<!-- Class A objA = new A()
+		objA.i  // Field access
+	 --> 
+	<field name="i">
+		<variable name="objA"/>
+	</field>
+	
+	<!-- class A extends B {
+	     } 
+	-->
+	<class-type name="A">
+		<inherits>
+			<variable name="B" />
+		</inherits>
+		<!-- uXML nodes -->
+	</class-type>
+    	
+</uXML>

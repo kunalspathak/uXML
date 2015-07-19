@@ -1,0 +1,16 @@
+// This program test the non-local acccess
+{
+	statements in zab can't access statements declared in baz1 or zab1.
+	try replacing x := y + z with x := y1 + z
+}
+PROGRAM for_loop;
+
+	var i: int;
+	
+begin { main }
+	for i := 5 downto 1 do
+	begin
+		write(i);
+	end
+end
+	

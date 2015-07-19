@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<var name="i" type="int" mutable="yes" />
+		<!--  i = 2 + 3 OR
+			(= i (+ 2 3)) 
+		-->
+			<print>
+				<call>
+					<variable name="+" />
+					<constant type="int" value="2" />
+					<constant type="int" value="3" />
+				</call>
+
+			</print>
+	</block>
+</uXML>

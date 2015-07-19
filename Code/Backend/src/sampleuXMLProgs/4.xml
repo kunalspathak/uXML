@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--  This program demonstrates the map function (int) -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+		<!-- Variable in main method -->
+		<var name="m" type="int" mutable="no" />
+
+		<print>
+			<operator value=")=(">
+				<!-- square calculator -->
+				<function name="square">
+					<automatic-Var>
+						<var name="num" type="int" mutable="no" />
+					</automatic-Var>
+					<returns type="int" />
+					<block>
+						<return>
+							<operator value="*">
+								<variable name="num" />
+								<variable name="num" />
+							</operator>
+						</return>
+					</block>
+				</function>
+				<constant type="int" value="-1" />
+				<constant type="int" value="-2" />
+				<constant type="int" value="3" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</operator>
+		</print>
+	</block>
+</uXML>
+

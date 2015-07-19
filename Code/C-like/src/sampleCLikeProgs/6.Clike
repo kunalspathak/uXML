@@ -1,0 +1,74 @@
+/**
+ * This program defines function pointer whose definition contains another function pointer.
+ * In this example, function pointer is used in return type construct of a function pointer that is defined.
+ * 
+ * See 22.Clike for function pointer contained in arguments field of function pointer definition
+ */
+
+/*
+Pointer to a function that takes 2 float and return
+int. Pointer variable is fun1 
+*/
+funcptr (int (int)) *fun1;
+
+/*
+ * Pointer to a function that takes no parameter and return
+ * a function pointer of type 'fun1'. Pointer variable is fun2
+ */
+funcptr ( funcptr fun1 () ) *fun2;
+
+function void abc(funcptr fun1 a) {
+	call *a(5);
+}
+
+
+
+/*
+Pointer to a function that takes 1st argument as a pointer to 
+a function that takes 2 float and return an int and 2nd argument 
+as int and returns a pointer to a function that takes 2 float
+and return an int. Pointer variable are fun3
+
+funcptr (fun1 (fun2, int)) *fun3;
+*/
+
+function int fun(int j) {
+	print("Inside fun", j);
+	return j;
+}
+
+function int funny(int j) {
+	print("Inside funny", j);
+	return j;
+}
+
+
+function funcptr fun1 def() {
+	return &funny;
+}
+
+
+/*
+ * Main function
+ */
+function void main() {
+	funcptr fun1 b, _c;
+	funcptr fun2 c;
+	c = &def;
+	_c = call *c(void);
+	call *_c(23);
+	print("Inside main");
+	call abc(&fun);
+	b = call def(void);
+	call *b(5);
+}
+
+/*
+Output :
+
+Inside funny 23 
+Inside main 
+Inside fun 5 
+Inside funny 5 
+
+*/

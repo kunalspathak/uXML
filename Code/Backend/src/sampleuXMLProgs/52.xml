@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program test the optional var-declaration feature of uXML.
+		This feature can be turned on by setting the value of 'var-declaration'
+		to 'no'. If turned on, variables don't have to be declared but they need to 
+		be initialized before using.
+		Try changing the value of 'var-declaration'. 
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	var-declaration="no">
+	<block>
+	
+		<!-- int i -->
+		<var name="i" type="int" mutable="yes" />
+		
+		<!--  x = 5 -->
+		<assign>
+			<variable name="x" />
+			<constant type="int" value="5" />
+		</assign>
+		
+		<!-- i = x -->
+		<assign>
+			<variable name="i" />
+			<variable name="x" />
+		</assign>
+
+		<!--  print x -->
+		<print>
+			<variable name="x" />
+		</print>
+		
+		<assign>
+			<variable name="x" />
+			<constant type="string" value="kunal" />
+		</assign>
+		
+		<print>
+			<operator value="+">
+				<variable name="x" />
+				<constant type="string" value=" Pathak"/>
+			</operator>
+			
+		</print>
+
+	</block>
+</uXML>
+

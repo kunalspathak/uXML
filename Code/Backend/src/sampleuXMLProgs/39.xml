@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- 
+		This program defines 3 classes A,B and C, C inherits from B inherits A.
+		Try commenting various constructors and see the effect on instantiating the object of C  
+	-->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	poly="yes">
+<block>
+	<class-type name="A">
+	 
+		<!--<constructor name="A">
+			<block>
+				<println>
+					<constant type="string" value="A()" />
+				</println>
+			</block>
+		</constructor>
+
+
+		<constructor name="A">
+			<automatic-Var>
+				<var name="i" type="int" mutable="yes" />
+			</automatic-Var>
+			<block>
+				<print>
+					<constant type="string" value="A(int)" />
+					<variable name="i" />
+				</print>
+
+				<println />
+			</block>
+		</constructor>
+		 
+		 -->
+		<function name="_a">
+			<block>	
+				<print>	
+					<constant type="string" value="A._a()"/>
+				</print>
+			</block>	
+		</function>
+		
+	</class-type>
+
+	<class-type name="B">
+		<inherits>
+			<variable name="A" />
+		</inherits><!--
+
+
+		<constructor name="B">
+			<block>
+				<println>
+					<constant type="string" value="B()" />
+				</println>
+			</block>
+		</constructor>
+
+  
+		--><constructor name="B">
+			<automatic-Var>
+				<var name="i" type="int" mutable="yes" />
+			</automatic-Var>
+			<block>
+				<!--<call>
+					<variable name="super" />
+					<variable name="this" />
+					<constant type="int" value="23" />
+				</call>
+				--><print>
+					<constant type="string" value="B(int)" />
+					<variable name="i" />
+				</print>
+				<println />
+			</block>
+		</constructor>
+		 
+
+	</class-type>
+
+	<class-type name="C">
+		<inherits>
+			<variable name="B" />
+		</inherits>
+		<constructor name="C">
+		<automatic-Var>
+				<var name="i" type="int" mutable="yes" />
+			</automatic-Var>
+			<block><!--
+
+				super(5) If super is called with int argument, B's constructor that
+				takes an int will be called If B doesn't contain such constructor
+				then A's constructor that takes an int will be called, if exist. If
+				call to super is not present, default construction call super() i.e 
+				will automatically be invoked.
+				
+				<call>
+					<variable name="super" />
+					<variable name="this" />
+					<constant type="int" value="5" />
+				</call>
+				
+
+				--><println>
+					<constant type="string" value="C()" />
+				</println>
+			</block>
+		</constructor>
+		
+		<!-- 
+		<constructor name="C">
+			<automatic-Var>	
+				<var name="i" type="int" mutable="yes"/>
+				<var name="j" type="int" mutable="yes"/>
+			</automatic-Var>
+			
+			<block>
+				<println>
+					<constant type="string" value="C()" />
+				</println>
+			</block>
+		</constructor>
+		 -->
+	</class-type>
+
+	 <!--   new C()._a()  -->
+	<call>
+		<variable name="_a"/>
+		<!-- Below C() should call A, B and C's constructor in order -->
+		<call>
+			<variable name="#new#" />
+			<variable name="C" />
+			<constant type="int" value="5"/>
+		</call>
+		
+	</call>
+
+</block>
+</uXML>
+<!--
+Output :
+A()
+B(int) 5 
+
+C()
+A._a() 
+ 
+ -->

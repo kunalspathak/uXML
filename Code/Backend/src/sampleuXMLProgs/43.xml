@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates setting the string as array of characters -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<array-type name="charArray" type="char">
+		<dim size="5"/>
+	</array-type>
+	
+	<var name="a" type="charArray" mutable="yes">
+		<constant type="string" value="Hello"/>
+	</var>
+	
+	<print>	
+		<operator value="[]">
+			<variable name="a"/>
+			<constant type="int" value="0"/>
+		</operator>
+		<operator value="[]">
+			<variable name="a"/>
+			<constant type="int" value="1"/>
+		</operator>
+		<operator value="[]">
+			<variable name="a"/>
+			<constant type="int" value="2"/>
+		</operator>
+	</print>
+	
+</block>
+</uXML>

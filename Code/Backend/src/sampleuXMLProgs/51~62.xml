@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<uXML language="Llike" scope="static">
+	<block>
+		<block>
+			<var mutable="yes" name="x" type="int">
+				<constant type="int" value="23" />
+			</var>
+			<block>
+				<function name="calc">
+					<automatic-Var>
+						<var mutable="yes" name="n" type="int" />
+					</automatic-Var>
+					<block>
+						<call>
+							<variable name="*" />
+							<call>
+								<function name="#lambda#">
+									<automatic-Var>
+										<var mutable="yes" name="x" type="int" />
+									</automatic-Var>
+									<block>
+										<call>
+											<variable name="*" />
+											<variable name="x" />
+											<variable name="x" />
+										</call>
+									</block>
+								</function>
+								<call>
+									<variable name="+" />
+									<variable name="n" />
+									<constant type="int" value="1" />
+								</call>
+							</call>
+							<constant type="int" value="7" />
+						</call>
+					</block>
+				</function>
+				<print>
+					<call>
+						<function name="#lambda#">
+							<automatic-Var>
+								<var mutable="yes" name="x" type="int" />
+							</automatic-Var>
+							<block>
+								<call>
+									<variable name="+" />
+									<variable name="x" />
+									<constant type="int" value="1" />
+								</call>
+							</block>
+						</function>
+
+						<call>
+							<variable name="calc" />
+							<constant type="int" value="3" />
+						</call>
+
+					</call>
+				</print>
+			</block>
+		</block>
+	</block>
+</uXML>

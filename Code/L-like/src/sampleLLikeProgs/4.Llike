@@ -1,0 +1,10 @@
+; defining factorial function in the scope of 'let' 
+; an example of closure
+; The uXML equivalent that prints the result is in Backend\src\sampleuXMLProgs\51~4.xml
+(let ((x 5))
+(defun factorial (n)
+   (if (<= n 1)
+       n
+       (* n (factorial (- n 1)))))
+(factorial x)	   
+)

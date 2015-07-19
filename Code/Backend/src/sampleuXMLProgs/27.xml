@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates passing array of function pointers to a function -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+	<function-type name="twoToOne">
+		<automatic-Var>	
+			<var name="var1" type="int" mutable="yes"/>
+			<var name="var2" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+	
+	<!-- pointer to function that has signature 'twoToOne' -->
+	<pointer-type name="ptrToFunc" refType="twoToOne"/>
+	
+	<!--  Array of pointer to function that has signature 'twoToOne' -->
+	<array-type name="arrayOfFunc" type="ptrToFunc">
+		<dim size="5"/>
+	</array-type>
+	
+	<!--  function 'mod' of type 'twoToOne' -->
+	<function name="mod" type="twoToOne">
+		<block>
+			<return>
+				<operator value="%">
+					<variable name="var1"/>
+					<variable name="var2"/>
+				</operator>
+			</return>
+		</block>
+	</function>
+	
+	<!-- Function that gets an array of function pointers. This function extract the
+	functions stored in the array and execute them -->
+	<function name="func">
+		<automatic-Var>
+			<var name="inputFuncs" type="arrayOfFunc" mutable="yes"/>
+		</automatic-Var>
+		<block>
+			<var name="i" type="int" mutable="yes"/>
+			<for-loop>
+				<from>
+					<assign>
+						<variable name="i"/>
+						<constant type="int" value="0"/>
+					</assign>
+				</from>
+				<till>
+					<operator value="(">
+						<variable name="i"/>
+						<constant type="int" value="5"/>
+					</operator>
+				</till>
+				<step>
+					<assign>
+						<variable name="i"/>
+						<operator value="+">
+							<variable name="i"/>
+							<constant type="int" value="1"/>
+						</operator>
+					</assign>
+				</step>
+				<block>
+					<print>
+						<call>
+							<operator value="#">
+								<operator value="[]">
+									<variable name="inputFuncs"/>
+									<variable name="i"/>
+								</operator>
+							</operator>
+							<constant type="int" value="10"/>
+							<constant type="int" value="5"/>
+						</call>
+					</print>
+				</block>
+			</for-loop>
+		</block>
+	</function>
+	
+	<var name="funcs" type="arrayOfFunc" mutable="yes"/>
+	
+	<!-- funcs[0] = &sum -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="0"/>
+		</operator>
+		<operator value="@">
+			<function type="twoToOne">
+				<block>
+					<return>
+						<operator value="+">
+							<variable name="var1"/>
+							<variable name="var2"/>
+						</operator>
+					</return>
+				</block>
+			</function>
+		</operator>
+		
+	</assign>
+	
+	<!-- funcs[1] = &product -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="1"/>
+		</operator>
+		<operator value="@">
+			<function type="twoToOne">
+				<block>
+					<return>
+						<operator value="*">
+							<variable name="var1"/>
+							<variable name="var2"/>
+						</operator>
+					</return>
+				</block>
+			</function>
+		</operator>
+	</assign>
+	
+	<!-- funcs[2] = &difference -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="2"/>
+		</operator>
+		<operator value="@">
+			<function type="twoToOne">
+				<block>
+					<return>
+						<operator value="-">
+							<variable name="var1"/>
+							<variable name="var2"/>
+						</operator>
+					</return>
+				</block>
+			</function>
+		</operator>
+	</assign>
+	
+	<!-- funcs[3] = &division -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="3"/>
+		</operator>
+		<operator value="@">
+			<function type="twoToOne">
+				<block>
+					<return>
+						<operator value="/">
+							<variable name="var1"/>
+							<variable name="var2"/>
+						</operator>
+					</return>
+				</block>
+			</function>
+		</operator>
+	</assign>
+	
+	<!-- funcs[4] = &mod -->
+	<assign>
+		<operator value="[]">
+			<variable name="funcs"/>
+			<constant type="int" value="4"/>
+		</operator>
+		<operator value="@">
+			<variable name="mod"/>
+		</operator>
+	</assign>
+
+	<!-- func(funcs) -->
+	<call>
+		<variable name="func"/>
+		<variable name="funcs"/>
+	</call>
+	</block>
+</uXML>
+<!--
+Output : 
+15 50 5 2 0 
+-->

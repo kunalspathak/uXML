@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		This program demonstrates function pointers and function-type features - Part 1
+		
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<pointer-type name="ptr1" refType="int"/>
+	<pointer-type name="ptr2" refType="ptr1"/>
+	
+	
+	<function name="printer">
+		<block>
+			<print>
+				<variable name="i"/>
+				<variable name="j"/>
+				<variable name="k"/>
+				<constant type="string" value="__________________________________"/>
+			</print>
+		</block>
+	</function>
+	
+	<!-- int i  -->
+	<var name="i" type="int" mutable="yes"/>
+	<var name="n" type="int" mutable="yes"/>
+	
+	<!-- int *j  -->
+	<var name="j" type="ptr1" ptrMutable="no" valueMutable="no"/>
+	<!-- int **m  -->
+	<var name="k" type="ptr2" ptrMutable="no" valueMutable="no"/>
+	<var name="m" type="ptr2" ptrMutable="no" valueMutable="no"/>
+	
+	<!-- i = 5 -->
+	<assign>
+		<variable name="i"/>
+		<constant type="int" value="5"/>
+	</assign>
+	
+	<!-- n = 23 --> 
+	<assign>
+		<variable name="n"/>
+		<constant type="int" value="23"/>
+	</assign>
+	
+	
+	<!-- j = @i -->
+	<assign>
+		<variable name="j"/>
+		<operator value="@">
+			<variable name="i"/>
+		</operator>
+	</assign>
+	
+	<!-- k = @j -->
+	<assign>
+		<variable name="k"/>
+		<operator value="@">
+			<variable name="j"/>
+		</operator>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	<!-- i = 32 -->
+	<assign>
+		<variable name="i"/>
+		<constant type="int" value="32"/>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	<print>
+		<constant type="string" value="Before, n = "/>
+		<variable name="n"/>
+	</print>
+	
+	<!-- n = *j -->
+	<assign>
+		<variable name="n"/>
+		<operator value="#">
+			<variable name="j"/>
+		</operator>
+	</assign>
+	
+	<print>
+		<constant type="string" value="After, n = "/>
+		<variable name="n"/>
+	</print>
+	
+	<!-- n = 14 -->
+	<assign>
+		<variable name="n"/>
+		<constant type="int" value="14"/>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	<!-- **k = n -->
+	<assign>
+		<operator value="#">
+			<operator value="#">
+				<variable name="k"/>
+			</operator>
+		</operator>
+		<variable name="n"/>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	<!-- m = &j -->
+	<assign>
+		<variable name="m"/>
+		<operator value="@">
+			<variable name="j"/>
+		</operator>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	<!-- **m = 50 -->
+	<assign>
+		<operator value="#">
+			<operator value="#">
+				<variable name="m"/>
+			</operator>
+		</operator>
+		<constant type="int" value="50"/>
+	</assign>
+	
+	<!-- print -->
+	<call>
+		<variable name="printer"/>
+	</call>
+
+	<print>
+		<constant type="string" value="Before, m = "/>
+		<variable name="m"/>
+	</print>
+
+
+	<!-- i = 14 -->
+	<assign>
+		<variable name="i"/>
+		<constant type="int" value="14"/>
+	</assign>	
+	
+	<print>
+		<constant type="string" value="After, m = "/>
+		<variable name="m"/>
+	</print>
+	
+	</block>
+</uXML>

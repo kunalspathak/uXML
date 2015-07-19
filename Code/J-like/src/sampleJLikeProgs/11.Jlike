@@ -1,0 +1,42 @@
+/**
+* This program demonstrates passing arrays to a function. 
+*/
+
+PROGRAM PASS_ARRAY; // Name of main class 'A'
+
+class A {
+	
+	constructor A() {
+		print("A()");
+	}
+	
+	function void func(int[3] a) {
+		int i;
+		for(i = 0; i < 3;i=i+1) {
+			print(a[i]);
+		}
+	}
+}
+
+class PASS_ARRAY {
+	
+
+	/*
+	 * Main function
+	 */
+	function void main() {
+		int i;
+		int[3] b;
+		class A a = new A(void);
+		for(i = 0; i < 3;i=i+1) {
+			b[i] = i * i;
+		}
+		
+		call a.func(b);
+	}
+}
+
+/*
+ * In-built call new PASS_ARRAY().main() 
+ */
+

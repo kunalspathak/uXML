@@ -1,0 +1,26 @@
+/**
+* This program demonstrates array of object 
+*/
+
+PROGRAM SCOPE; // Name of main class 'A'
+
+class A {
+	function void a() {
+		print("Inside A.a");
+	}
+}
+
+class SCOPE {
+	
+	function void main() {
+		class A[5] arr;
+		arr[0] = new A(void);
+		call arr[0].a(void);
+//		call arr[1].a(void); // Gives compilation error as arr[1] is not initialized.
+	}
+}
+
+/*
+ * Output
+ * Inside A.a
+*/

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program demonstrates the reduce/map function (int) using
+		function-type and specifying function-type in <returns> tag.
+		
+		Also checks if a value assigned to a variable having same name remains only in the function scope
+		
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<var name="variable" type="int" mutable="yes"/>
+	
+	<!-- Function type 1 - int reduce1(int,int) -->
+	<function-type name="reduce1">
+		<automatic-Var>
+			<var name="num1" type="int" mutable="no" />
+			<var name="num2" type="int" mutable="no" />
+		</automatic-Var>
+		<returns type="int" />
+	</function-type>
+	
+	<!-- Function type 1 - int reduce2(float,float) -->
+	<function-type name="reduce2">
+		<automatic-Var>
+			<var name="num1" type="float" mutable="no" />
+			<var name="num2" type="float" mutable="no" />
+		</automatic-Var>
+		<returns type="float" />
+	</function-type>
+	
+	<!-- Function demo1 that returns a function of type reduce1 -->
+	<function name="demo1">
+		<returns type="reduce1"/> <!--  <returns type="function" value="reduce1"/>  -->
+		<block>
+			<var name="variable" type="int" mutable="no">
+				<constant type="int" value="23"/>
+			</var>
+			<print>
+				<constant type="string" value="Inside demo1()"/>
+				<variable name="variable"/>
+			</print>
+			<return>
+				<function type="reduce1">
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="num1" />
+								<variable name="num2" />
+							</operator>
+						</return>
+					</block>
+				</function>
+			</return>
+		</block>
+	</function>
+	
+	<!-- Function demo2 that returns a function of type reduce2 -->	
+	<function name="demo2">
+		<returns type="reduce2"/> <!--  <returns type="function" value="reduce2"/> -->
+		<block>
+			<var name="variable" type="int" mutable="no">
+				<constant type="int" value="32"/>
+			</var>
+			<print>
+				<constant type="string" value="Inside demo2()"/>
+				<variable name="variable"/>
+			</print>
+			<return>
+				<function>
+					<automatic-Var>
+						<var name="num1" type="float" mutable="no" />
+						<var name="num2" type="float" mutable="no" />
+					</automatic-Var>
+					<returns type="float" />
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="num1" />
+								<variable name="num2" />
+							</operator>
+						</return>
+					</block>
+				</function>
+			</return>
+		</block>
+	</function>
+	
+	<assign>
+		<variable name="variable"/>
+		<constant type="int" value="14"/>
+	</assign>
+	
+	<print>
+		<constant type="string" value="Before call : "/>
+		<variable name="variable"/>
+	</print>
+	
+	<println/>
+						
+	<print>
+		<call>
+			<call>
+				<variable name="demo1"/>
+			</call>
+			<cast type="int">
+				<constant type="float" value="2.0"/>
+			</cast>
+			<constant type="int" value="3"/>
+		</call>
+	</print>
+	
+	<print>
+		<constant type="string" value="After demo1() call : "/>
+		<variable name="variable"/>
+	</print>
+	
+	<print>
+		<call>
+			<call>
+				<variable name="demo2"/>
+			</call>
+			<constant type="float" value="2.0"/>
+			<constant type="float" value="3.0"/>
+		</call>
+	</print>
+	
+	<print>
+		<constant type="string" value="After demo2() call : "/>
+		<variable name="variable"/>
+	</print>
+</block>
+</uXML>

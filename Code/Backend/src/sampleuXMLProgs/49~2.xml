@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<var mutable="yes" name="global" type="int">
+			<constant type="int" value="1" />
+		</var>
+		<function name="func">
+			<automatic-Var>
+				<var mutable="yes" name="j" type="int" />
+				<var mutable="no" name="f" type="float" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<assign>
+					<variable name="j" />
+					<constant type="int" value="6" />
+				</assign>
+				<print>
+					<variable name="global" />
+				</print>
+				<return>
+					<constant type="int" value="0" />
+				</return>
+			</block>
+		</function>
+		<function name="func2">
+			<returns type="int" />
+			<block>
+				<return>
+					<constant type="int" value="1" />
+				</return>
+			</block>
+		</function>
+		<function name="main">
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="i" type="int">
+					<constant type="int" value="0" />
+				</var>
+				<print>
+					<constant type="string" value="Inside level 0 :" />
+					<variable name="i" />
+				</print>
+				<operator value="==">
+					<call>
+						<variable name="func2" />
+					</call>
+					<block>
+						<var mutable="yes" name="i" type="int">
+							<constant type="int" value="1" />
+						</var>
+						<print>
+							<constant type="string" value="Inside level 1 :" />
+							<variable name="i" />
+						</print>
+						<operator value="==">
+							<variable name="i" />
+							<constant type="int" value="1" />
+							<block>
+								<var mutable="yes" name="i" type="int">
+									<constant type="int" value="2" />
+								</var>
+								<print>
+									<constant type="string" value="Inside level 2 :" />
+									<variable name="i" />
+								</print>
+							</block>
+						</operator>
+						<print>
+							<constant type="string" value="Inside level 1 :" />
+							<variable name="i" />
+						</print>
+					</block>
+				</operator>
+				<print>
+					<constant type="string" value="Inside level 0 :" />
+					<variable name="i" />
+				</print>
+			</block>
+		</function>
+		<call>
+			<variable name="main" />
+		</call>
+	</block>
+</uXML>

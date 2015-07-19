@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<uXML language="Llike" scope="static">
+	<block>
+		<function name="factorial">
+			<automatic-Var>
+				<var mutable="yes" name="n" type="int" />
+			</automatic-Var>
+			<block>
+				<call>
+					<variable name="(=" />
+					<variable name="n" />
+					<constant type="int" value="1" />
+					<block>
+						<return>
+							<variable name="n" />
+						</return>
+					</block>
+					<block>
+						<return>
+							<call>
+								<variable name="*" />
+								<variable name="n" />
+								<call>
+									<variable name="factorial" />
+									<call>
+										<variable name="-" />
+										<variable name="n" />
+										<constant type="int" value="1" />
+									</call>
+								</call>
+							</call>
+						</return>
+					</block>
+				</call>
+			</block>
+		</function>
+		<print>
+			<call>
+				<variable name="factorial" />
+				<constant type="int" value="5" />
+			</call>
+		</print>
+	</block>
+</uXML>

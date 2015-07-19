@@ -1,0 +1,26 @@
+/**
+ * Pointers
+ */
+
+int *k;
+
+function void func(int *i) {
+	*i = 23;
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int j = 5;
+	print("Before call j =",j);
+	call func(&j);
+	print("After call j =",j);
+}
+
+/*
+Output :
+
+Before call j = 5 
+After call j = 23 
+*/

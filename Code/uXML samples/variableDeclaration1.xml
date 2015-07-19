@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This represents variable declaration in uXML 
+Approach 1 : Declare each variable seperately
+
+-->
+<!--  
+    Desc : List of variable declaration  
+    
+            - All variables will be present in either <automatic> , <static> , <field>. 
+              <global-Var> : Local Variables and formal parameters to the function
+              <global-Var>    : Global Variables
+              <field-Var>     : Class/Struct members. Field will have a required attribute 'access' that will have either
+                            public or private access specifier.
+               
+               All these three elements will be enclosed inside <Variables> element. Also, <Variables> will be present at the
+               start of block. See main.xml for more details.
+             
+            - Present only if 'explicit' attribute of xyz is yes. Otherwise uXML is representing python or javascript-like 
+              language where variable declaration is not mandatory.
+              
+            - Variables will be initialized to the default value depending on the type of variable.
+              eg. int = 0, float = 0.0, char = ' ', string = null, object = null and so forth.
+              
+            - 'type' attribute will contain any valid string specifying language-defined/user-defined datatype.
+              In most of below declarations, language-defined datatypes are used in 'type' attribute. But we can also reuse type declaration
+              of already defined variables. See example of declaration of pointer to pointer to integer.
+            
+            - Very often an expression value is assigned to the variable. Something like int i = k + 5; uXML would divide the 
+              process in two steps. In step#1, it would simply declare the variable of given type, while in step#2 it will
+              actually generate a code that assigns the value of expression to the variable defined.  
+              
+            - Lastly, there are elements through which user can declare the complex data-type like pointer, array, enum, struct, class.
+              The name given at the time of definition of these elements (data-types) can be used in 'type' attribute for <var> elements.
+              See examples below.
+            
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../overall.xsd">
+        <block>
+                <global-Var>
+                        <!-- 
+        Desc : Integer 
+        Attr : default (optional)
+                - Initialize the variable with a value that adhere to the data-type        
+        Attr : mutable (required)
+                - Specify if variable is a constant or not                
+        -->
+
+                        <var name="var1" type="int" mutable="yes"/>
+                </global-Var>
+
+
+                <global-Var>
+                        <!-- 
+        Desc : Unsigned Integer
+        -->
+                        <var name="var2" type="uint" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+                        <!--  
+        Desc : Decimal
+        -->
+                        <var name="var3" type="decimal" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+                        <!-- 
+        Desc : Unsigned Decimal
+        -->
+                        <var name="var4" type="udecimal" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+                        <!-- 
+        Desc : String
+        -->
+                        <var name="var3" type="string" mutable="yes"/> 
+                </global-Var>
+                <global-Var>
+                        <!-- 
+        Desc : Character 
+        -->
+                        <var name="var4" type="char" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+                        <!-- 
+        Desc : Boolean
+        -->
+                        <var name="var5" type="boolean" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+
+                        <!-- 
+        Desc : Object
+        Attr : default (optional)       
+                - For more details see description for Struct declaration
+        
+        Chil : <scope> contains the package information.
+        -->
+                        <var name="var5" type="className" mutable="yes">
+                                <scope> 
+                                        <trace>com
+                                                <trace>edu
+                                                        <trace>rit
+                                                                <trace>uXML</trace>
+                                                        </trace>  
+                                                </trace>
+                                        </trace>  
+                                </scope>
+                        </var>
+                </global-Var>
+
+                <global-Var>
+                        <!-- 
+        Desc : Struct
+        Attr : default (optional)
+                - In case of languages like C++, value could be NULL. But for C# it can't be NULL unless var5 is not 
+                  declared as Nullable data-type. This is taken care by front-end and hence here the default value of
+                  C# struct could be NULL. However as mentioned at the top, if the variable intialization is happening in the same line
+                  of code, the source code line will be broken in 2 parts. In step#1, variable will simply declared and in step#2, 
+                  assignment will take place, where left side is a variable name and right side is a call to the structure constructor. 
+               
+        -->
+                        <var name="var5" type="structName" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+                        <!--  
+                Desc : void 
+                - Contains data of any of the above mentioned data-type. Used for weakly-typed languages.
+                Attr : mutable (required)
+                - Specify if variable is a constant or not                
+        -->
+                        <var name="var11" type="_uXML_any_" mutable="yes"/>
+                </global-Var>
+
+                <global-Var>
+
+                        <!--  
+                Desc : function 
+                - Contains a function pointer (or function reference)
+                By this, functions can be treated as first-class values
+                Attr : mutable (required)
+                - Specify if variable is a constant or not                
+        -->
+                        <var name="var12" type="function-type" mutable="yes"/>
+                </global-Var>
+
+
+                <!--
+        Desc : pointer-type
+        Attr : refType (required) 
+                - The defined pointer-type will store the address of variable having data-type specified in this field.
+                  Value of this field can be any valid simple/complex type. Complex type means name of complex data-type 
+                  defined by user. 
+                
+        For demonstration purpose, I am declaring a pointer to a pointer to a variable holding data of 'integer' type.
+                
+        -->
+                <pointer-type name="ptrP1" refType="int"/>
+                <pointer-type name="ptrP2" refType="ptrP1"/>
+                <global-Var>
+                        <var name="var6" type="ptrP2" ptrMutable="yes" valueMutable="yes"/>
+                </global-Var>
+
+                <!-- 
+        Desc : array-type
+        Attr : type (required)
+                - As mentioned in pointer-type, this defines the complex type 'Array'. The name can be used in variable 
+                definition. 
+        -->
+                <array-type name="arrayA1" type="className"> 
+                        <!-- 
+                Desc : dim (atleast 1)
+                Attr : size (required)
+                        - Represents the size of dimension 1 of an array        
+                Attr : startIndex (optional)
+                        - Represents the starting value of an index. For languages like Modula-2 where negative
+                        numbers can be used as index. By default the value is zero.
+                -->
+                        <dim size="5" startIndex="0"/>
+                        <dim size="3" startIndex="-3"/>
+                </array-type>
+                <global-Var>
+                        <var name="var7" type="arrayA1"/>
+                </global-Var>
+
+                <!-- 
+                If user wants to define a single-dimensional array such that each element is a 2D array of above type.
+                Indirectly, we are trying to define a 3D array
+        -->
+                <array-type name="arrayA2" type="arrayA1">
+                        <dim size="10" startIndex="0"/>
+                </array-type>
+                <global-Var>
+                        <var name="var8" type="arrayA2"/>
+                </global-Var>
+
+
+                <!-- 
+        Desc : Map-type
+                - Defines the map-type (hashmap)
+        Attr : keyType (required)
+                - Represents the type of index value used for accessing the contents. Useful for representing hashmap.
+                
+        Attr : valueType (required)
+                - Represents the type of value that will be stored in an array    
+        -->
+                <map-type name="mapM1" keyType="string" valueType="className"/>
+                <global-Var>
+                        <var name="var9" type="mapM1"/>
+                </global-Var>
+
+
+
+                <!--  
+        Desc : Enum 
+        -->
+                <enum-type name="enumE1" type="TAG_NAME">
+                        <!--  
+            Desc : enum-contant (atleast 1)
+            Attr : name (required)
+                    - Name of the value of enumeration set
+            Attr : value (optional)
+                    - By default 1st enum-constant will get value = 0, unless enumerator specify a default value 'x'. 
+                      The next enumerator will get value of 'x + 1'.
+        -->
+                        <enum-constant name="sunday" value=""/>
+                        <enum-constant name="monday" value="0"/>
+                        <enum-constant name="tuesday" value=""/>
+                        <enum-constant name="wednesday" value=""/>
+                        <enum-constant name="thursday" value=""/>
+                        <enum-constant name="friday" value=""/>
+                        <enum-constant name="saturday" value=""/>
+                </enum-type>
+                <global-Var>
+                        <var name="var10" type="enumE1"/>
+                </global-Var>
+        </block>
+</uXML>

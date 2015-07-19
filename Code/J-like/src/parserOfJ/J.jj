@@ -1,0 +1,1752 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.6";
+}
+PARSER_BEGIN(J)  
+package parserOfJ; 
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader; 
+import java.io.LineNumberReader;
+import java.util.HashMap;
+import java.util.ArrayList; 
+import java.util.Scanner;
+
+import compiler.components.*;
+import compiler.dataTypes.*;
+import compiler.exceptions.*;
+import compiler.operator.*;
+import compiler.util.*;
+import compiler.util.Constants.DATA_TYPE;
+import compiler.uXMLGenerator.*;
+
+import xvHandler.Executor;
+import xvHandler.CodeAnalysis;
+import xvHandler.ProcedureCallSeq;
+
+import parserOfJ.exceptions.*;
+  
+public class J { 
+	
+	private static UXMLElement currentNode = null;
+	private static UXMLElement globalScopeNode = null;
+	private static UXMLElement classMemberScopeNode = null;
+	private static String mainClassName = null;
+	private static String currentClassName = null;
+	private static ClassType currentClass = null;
+	private static String currentProcedureName = null;
+	private static FunctionType currentProcedure = null;
+    private static boolean isReturnStmtPresent = false;
+    private static boolean isMemberVarDeclaration = false;
+    // Used to check if parent constructor of same signature is present or not.
+    // If not present, call to super is checked and if that is not present then error is thrown
+    // if(!present(ancestor_Constructor(args))) isParentConstructorPresent = false;
+    // if(!present(super_call) && !isParentConstructorPresent) throw error;
+    private static boolean isParentConstructorPresent = false;
+    private static FunctionType deferedConstructor = null;
+    private static int nestedLevelOfProcedure = 0; // Represents the nested level of a procedure
+    //private static OOVariableAccess ooVariableAccess = new OOVariableAccess(null,null);
+	
+	public static void main(String args[]) throws ParseException {
+		FileInputStream io = null; 
+		String codeAnalysisFlag = null;
+		LineNumberReader loc = null;
+     
+		String fileName = null;
+		String filePath = null;
+	    if(args.length == 0) {
+	    	Scanner in = new Scanner(System.in);
+	    	System.out.print("Enter the file name @ src/sampleJLikeProgs/");
+	    	fileName = in.nextLine();
+	    	while(fileName.trim().length() == 0)
+	    		fileName = in.nextLine();
+	    	codeAnalysisFlag = in.nextLine();
+	    	args = new String[1];
+	    	args[0] = fileName;
+	    }
+	    else { 
+	        fileName = args[0];
+	        if(args.length > 1)
+	        	codeAnalysisFlag = args[1];
+	    }
+	    
+	    try {
+	    	filePath = "src" + File.separator + "sampleJLikeProgs" + File.separator + fileName + ".Jlike"; 
+	    	io = new FileInputStream(filePath);
+	    	J parser = new J(io);
+	    	
+	    	// Initialize the environment with ignore dynamic variable flag
+	    	Environment.initialize(new ProcedureCallSeq(), true);
+	    	// Initialize the uXMLDocument generator
+	    	currentNode = UXMLElementFactory.initialize("Jlike", Constants.STATIC);
+	    	currentNode.setAttributeValue("poly", Constants.YES);
+	    		        
+	        Environment.currentActivationRecord.enterTheBlock();
+	        parser.JLike();
+	        Environment.currentActivationRecord.leaveTheBlock();
+	        
+	        // Save the uXML document
+	        UXMLElementFactory.done(fileName);
+	        
+	        if("-analysis".equals(codeAnalysisFlag)) {
+	        	loc = new LineNumberReader(new FileReader(filePath));
+	        	while (loc.readLine() != null) {}
+	        	CodeAnalysis.main(args, loc.getLineNumber()); 
+	        }
+	        else
+	        	Executor.main(args);
+        
+	    } catch (FileNotFoundException fe) {
+	    	System.err.println("File '" + fileName + "' not found.");
+	    	System.exit(1);
+	    } catch(IOException ie) {
+	    	System.err.println("Error reading file '" + fileName + "'.");
+	    	System.exit(1);
+	    } catch(ParseException e) {
+	        String message = e.getMessage();
+	        int startIndex = message.indexOf("line ") + 5;
+	        int endIndex = message.indexOf(",");
+	        String lineNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("column ") + 7;
+	        endIndex = message.indexOf(".");
+	        String columnNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("\"") + 1;
+	        endIndex = message.lastIndexOf("\" at line");
+	        String keyword = message.substring(startIndex, endIndex).replaceAll("\"","").trim();
+	        
+	        System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	        StringBuffer expectedTokens = new StringBuffer("Expected tokens : ");
+	        String tokenValue = null;
+	        tokenValue = tokenImage[e.expectedTokenSequences[0][0]]; 
+	    	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	    	expectedTokens.append(tokenValue);
+	        for(int tokenId = 1; tokenId < e.expectedTokenSequences.length;tokenId++) {
+	        	tokenValue = tokenImage[e.expectedTokenSequences[tokenId][0]];
+	        	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	        	expectedTokens.append(", ")
+	        		.append(tokenValue);
+	        }
+	    	System.err.println(expectedTokens.toString());
+	    } catch(TokenMgrError e) {
+	    	String message = e.getMessage();
+			int startIndex = message.indexOf("line ") + 5;
+			int endIndex = message.indexOf(",");
+			String lineNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("column ") + 7;
+			endIndex = message.indexOf(".");
+			String columnNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("\"") + 1;
+			endIndex = message.indexOf("\"",startIndex);
+			String keyword = message.substring(startIndex, endIndex).trim();
+			
+			System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	    }
+	    catch(CompilationException e) {
+	    	System.err.println(e.getMessage());
+	    }
+  }
+	
+  /**
+   * Class that returns class used to access the variable
+   */
+  private static class OOVariableAccess {
+	  private ClassType classUsed = null;
+	  private UXMLElement variableElement = null;
+	  
+	  public OOVariableAccess(ClassType classUsed, UXMLElement variableElement) {
+		this.classUsed = classUsed;
+		this.variableElement = variableElement;
+	  }
+	  
+	  public ClassType getClassUsed() {
+		  return classUsed;
+	  }
+	  
+	  public void setClassUsed(ClassType classUsed) {
+		  this.classUsed = classUsed;
+	  }
+	  
+	  public UXMLElement getVariableElement() {
+		  return variableElement;
+	  }
+	  
+	  public void setVariableElement(UXMLElement variableElement) {
+		  this.variableElement = variableElement;
+	  }
+  }
+
+}  
+PARSER_END(J)
+
+SKIP : { " " | "\r" | "\t" | "\n" }
+
+/* Constants */
+TOKEN: { < INT_CONSTANT : ( < DIGIT > ) + > }
+TOKEN: { < FLOAT_CONSTANT : ( < DIGIT > ) + "." ( < DIGIT > ) + > }
+TOKEN: { < STRING_CONSTANT : "\"" (~["\""])+ "\"" > }
+TOKEN: { < BOOL_CONSTANT : "true" | "false" > }
+TOKEN: { < CHAR_CONSTANT : "'" ~["'"] "'" > }
+
+/* Comments */
+//Cited from : http://en.wikibooks.org/wiki/Compiler_Construction
+SPECIAL_TOKEN : {<"/*"> : InsideComment}
+<InsideComment> SPECIAL_TOKEN :
+{
+	<"*/"> : DEFAULT
+}
+<InsideComment> MORE: {<~[]>}
+
+SPECIAL_TOKEN : {<"//"> : InsideNewComment}
+<InsideNewComment> SPECIAL_TOKEN :
+{
+	<"\n" | "\r"> : DEFAULT
+}
+<InsideNewComment> MORE: {<~[]>}
+
+/* OPERATORS */
+TOKEN : { < PLUS: "+" > }	
+TOKEN : { < MINUS: "-" > }
+TOKEN : { < ASTERISK: "*" > }
+TOKEN : { < DIVIDE: "/" > } 
+TOKEN : { <MOD: "%" > }
+TOKEN : { < AMPERSAND : "&" > }
+TOKEN : { < BIT_OR : "|" > } 
+TOKEN : { < BIT_XOR : "^" > }
+TOKEN : { < BIT_COMPLEMENT : "~" > }
+
+/* Logical Operators */
+TOKEN: { < AND : "&&" > }
+TOKEN: { < OR : "||" > }
+TOKEN: { < NOT: "!" > }
+
+/* Conditional Operators */
+TOKEN: { < EQ : "==" > }
+TOKEN: { < NT_EQ : "!=" > }
+TOKEN: { < LT: "<" > }
+TOKEN: { < LT_EQ : "<=" > }
+TOKEN: { < GT_EQ : ">=" > }
+TOKEN: { < GT: ">" > }
+
+/* Keywords */
+TOKEN : { < PROGRAM : "PROGRAM" > } 
+TOKEN : { < IF : "if" > } 
+TOKEN : { < THEN : "then" > }
+TOKEN : { < ELSE : "else" > } 
+//TOKEN : { < ELSEIF : "elseif" > } 
+TOKEN : { < DO : "do" > } 
+TOKEN : { < WHILE : "while" > } 
+TOKEN : { < FOR : "for" > }
+TOKEN : { <CALL : "call" > }
+TOKEN : { <PRINT: "print"> }
+TOKEN : { <PRINTLN : "println"> }
+TOKEN : { <FINAL : "final"> }
+TOKEN : { <CLASS : "class"> }
+TOKEN : { <INHERITS : "inherits"> }
+TOKEN : { <CONSTRUCTOR: "constructor"> }
+TOKEN : { <SUPER_CALL: "super"> }
+TOKEN : { <NEW: "new"> }
+TOKEN : { <FUNCTION: "function"> }
+TOKEN : { <RETURN : "return"> }
+TOKEN : { < BLOCK_START : "{" > } 
+TOKEN : { < BLOCK_END : "}" > }
+TOKEN : { < SQUARE_START : "[" > } 
+TOKEN : { < SQUARE_END : "]" > } 
+TOKEN : { < ROUND_START : "(" > } 
+TOKEN : { < ROUND_END : ")" > }
+TOKEN : { < ASSIGN : "=" > } 
+TOKEN : { < COMMA : "," >} 
+TOKEN : { < STMT_TERMINATOR : ";" > }
+TOKEN : { < PERIOD : "." > }
+
+/* Data types */
+TOKEN : { < INT : "int" > } 
+TOKEN : { < FLOAT : "float" > } 
+TOKEN : { < CHAR : "char" > } 
+TOKEN : { < BOOL : "boolean" >  }
+TOKEN : { < STRING : "string" >  }
+//TOKEN : { < STRUCT : "struct" > }
+TOKEN : { < VOID : "void" > }
+TOKEN : { < ARRAY : "array" > } 
+//TOKEN : { < FUNC_PTR : "funcptr"> }
+TOKEN : { <ID : ("_" | <ALPHA>)("_" | <DIGIT> | <ALPHA>)* > }
+
+TOKEN : {<ALPHA : ["a" - "z"] | ["A" - "Z"]>}
+TOKEN : {<DIGIT : ["0" - "9"]>}
+
+
+// Possible allowable constants
+Symbol Constants() throws CompilationException : {Token t = null;}
+{
+	try {
+		(t = < INT_CONSTANT > { return new ConstantValue(Constants.INT,t.image);} 
+		| t = < FLOAT_CONSTANT > { return new ConstantValue(Constants.FLOAT,t.image);}
+		| t = < CHAR_CONSTANT > 
+		{
+			String ch = t.image.substring(1,2);
+			return new ConstantValue(Constants.CHAR,ch);
+		}
+		| t = < STRING_CONSTANT > 
+		{ 
+			String str = t.image;
+			str = str.substring(1, str.length() - 1);
+			return new ConstantValue(Constants.STRING,str);
+		}
+		| t = < BOOL_CONSTANT >{ return new ConstantValue(Constants.BOOLEAN,t.image);}
+		)
+	} catch(IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	}
+}
+
+// Possible allowable data-types
+String DataType() throws CompilationException :
+{
+	String dataType = null;
+	Token t = null;
+}
+{
+	( 
+		(t = < INT > | t = < FLOAT > | t = < CHAR > | t = < BOOL > | t = < STRING> | <CLASS> t = <ID>) { dataType = t.image;} 
+		dataType = CreateArray(dataType)
+    ) 
+    {return dataType;}
+	
+}
+
+String CreateArray(String dataType) throws CompilationException :
+{
+	Token t = null;
+	StringBuffer dimSizeType = new StringBuffer();
+	ArrayList<Integer> dimSize = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	UXMLElement arrayNodeElement = null;
+	int currentDimSize = -1;
+	boolean isPrimitiveArray = (Constants.INT.equals(dataType) || Constants.FLOAT.equals(dataType) || Constants.CHAR.equals(dataType)
+	 || Constants.BOOLEAN.equals(dataType) || Constants.STRING.equals(dataType));
+}
+{
+	(
+		{
+			if(dimSize == null) {
+				dimSize = new ArrayList<Integer>();
+	    		// Create an array-type having blank name and type. Update it once with appropriate name/type. 
+	    		attributes.put(Constants.NAME, Constants.BLANK);
+	    		attributes.put(Constants.TYPE, Constants.BLANK);
+	    		arrayNodeElement = UXMLElementFactory.generateElement(Constants.ARRAY_TYPE, attributes, null);
+			}
+		}
+		<SQUARE_START> 
+		t = <INT_CONSTANT> 
+		{
+			currentDimSize = Integer.parseInt(t.image); dimSize.add(currentDimSize);
+			dimSizeType.append(t.image);
+    		// Append 'dim'
+    		attributes.clear();
+    		attributes.put(Constants.SIZE, String.valueOf(currentDimSize));
+    		arrayNodeElement.appendChild(UXMLElementFactory.generateElement(Constants.DIM, attributes, null));
+		} 
+		<SQUARE_END>
+	)*
+	{
+		try { 
+			
+			if(dimSize != null) {
+				Symbol baseElement = SymbolMachine.generate(Constants.BLANK, dataType, true);
+				ArrayType arrayType = (ArrayType)SymbolMachine.generate(Constants.BLANK, Constants.ARRAY, true);
+				arrayType.initializeArray(dimSize, null, baseElement);
+		
+				// Set the array element's base-type
+				arrayNodeElement.setAttributeValue(Constants.TYPE,dataType);
+				
+				dataType = DataTypeFinder.getDataType(arrayType) + dimSizeType;
+				arrayType.setName(dataType);
+				
+				// Set the Name of array-type
+				arrayNodeElement.setAttributeValue(Constants.NAME,dataType);
+				
+				// If not yet defined, then append it to currentNode
+				if(!Environment.isSymbolPresentInGlobalScope(dataType)) {
+					// If this is an array of class, append the array-type node in member-var node
+					// else append it in global scope node.
+					if(!isPrimitiveArray)
+						classMemberScopeNode.appendChild(arrayNodeElement);
+					else
+						globalScopeNode.appendChild(arrayNodeElement); 
+				
+					// Add the symbol in global scope
+					Environment.addGlobalSymbol(arrayType);
+				}
+			}
+			return dataType;
+		} catch(ImmutableSymbolException e) { throw new CompilationException(e.getMessage()); }
+		catch(SymbolNotDefinedException e) { throw new CompilationException(e.getMessage()); }
+		catch(IllegalSymbolValueException e) { throw new CompilationException(e.getMessage()); } 
+		catch(TypeMismatchException e) { throw new CompilationException(e.getMessage()); }
+	}
+}
+
+/**
+ * Array Access
+ *  ([ Expression() ])* 
+ */
+UXMLElement ArrayAccess(UXMLElement variableElement) throws CompilationException :
+{
+	Token t = null;
+	int index = 0;
+	HashMap<String, String> attributes = new HashMap<String, String> ();
+	attributes.put(Constants.VALUE, "[]");
+	UXMLElement operator = null, 
+	indexElement = null,returnElement = operator;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	Symbol arrayElementAtIndex = null;
+}
+{
+	try {
+		(<SQUARE_START> 
+		indexElement = Expression() 
+		{
+			operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, variableElement.getSymbol());
+			operator.appendChild(variableElement);
+			operator.appendChild(indexElement);
+			operands.clear();
+			operands.add(variableElement.getSymbol());
+			operands.add(indexElement.getSymbol());
+			arrayElementAtIndex = Operator.execute("[]", operands);
+			operator.setSymbol(arrayElementAtIndex);
+			variableElement = operator;
+		}
+		(<COMMA> 
+		indexElement = Expression()
+		{
+			operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, variableElement.getSymbol());
+			operator.appendChild(variableElement);
+			operator.appendChild(indexElement);
+			operands.clear();
+			operands.add(variableElement.getSymbol());
+			operands.add(indexElement.getSymbol());
+			arrayElementAtIndex = Operator.execute("[]", operands);
+			operator.setSymbol(arrayElementAtIndex);
+			variableElement = operator;
+		}
+		)*
+		<SQUARE_END>
+		)? {  return variableElement; }
+	} catch (IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	} catch(OperatorNotFoundException e) {
+		throw new CompilationException(e.getMessage());
+	}
+}
+
+void JLike() throws CompilationException : 
+{
+UXMLElement callToMain = null, callToConstructor = null;
+HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+	HeadingSection()
+	(ClassDefinition())+
+	{
+		callToMain = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+		attributes.put(Constants.NAME, "main");
+		callToMain.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		callToConstructor = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+		attributes.clear();
+		attributes.put(Constants.NAME, Constants.CONSTRUCTOR);
+		callToConstructor.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		attributes.clear();
+		attributes.put(Constants.NAME, mainClassName);
+		callToConstructor.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		callToMain.appendChild(callToConstructor);
+		currentNode.appendChild(callToMain);
+	}
+}
+
+void HeadingSection() :
+{
+	UXMLElement block = null; Token t = null;
+}
+{
+	<PROGRAM> t = <ID> {mainClassName = t.image;} <STMT_TERMINATOR>
+	{
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+		currentNode.appendChild(block);
+		currentNode = block;
+		globalScopeNode = UXMLElementFactory.generateElement(Constants.GLOBAL_VAR, null, null);
+		currentNode.appendChild(globalScopeNode);
+	}
+}
+
+// This method temporary instantiates the class
+// remove it once 'new' is developed.
+void ClassDefinition()throws CompilationException : 
+{
+	UXMLElement savedCurrentNode = currentNode, block = null, classElement = null, inheritsElement = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	Token t = null;
+}
+{
+	<CLASS> t = <ID> 
+	{ 
+		try {
+			currentClassName = t.image; 
+			currentClass = (ClassType)SymbolMachine.generate(currentClassName, Constants.CLASS, false);
+			currentClass.setClassName(currentClassName); // Set the class name
+			Environment.addGlobalSymbol(currentClass); // Add the class in current activation record
+			attributes.put(Constants.NAME,currentClassName);
+			classElement = UXMLElementFactory.generateElement(Constants.CLASS_TYPE, attributes, currentClass);
+			classMemberScopeNode = UXMLElementFactory.generateElement(Constants.MEMBER_VAR, null, null);
+			currentNode.appendChild(classElement);
+			isMemberVarDeclaration = true;
+		} catch(IllegalSymbolValueException e) { throw new CompilationException(e.getMessage()); } 
+	} 
+	(<INHERITS> 
+	{
+		inheritsElement = UXMLElementFactory.generateElement(Constants.INHERITS, null, null); 
+		classElement.appendChild(inheritsElement);
+	} 
+	t = <ID> 
+	{
+		attributes.clear(); attributes.put(Constants.NAME,t.image);
+		inheritsElement.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		try {
+			currentClass.addAncestor((ClassType)Environment.getSymbol(t.image)); // Add the ancestor
+		} catch(ClassCastException e) {throw new CompilationException("'" + t.image + "' is not a class.");}
+		catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+	} 
+	(<COMMA> 
+	t = <ID> 
+	{
+		attributes.clear(); attributes.put(Constants.NAME,t.image);
+		inheritsElement.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+	} 
+	)*)? 
+	{
+		classElement.appendChild(classMemberScopeNode);
+		currentNode = classMemberScopeNode;
+	}
+	ScopeStart() 
+	DeclarationSection() { currentNode = classElement; isMemberVarDeclaration = false;}
+	(FunctionDeclaration())*
+	ScopeEnd()
+	{
+		currentNode = savedCurrentNode;
+	}
+}
+
+void DeclarationSection() throws CompilationException : {}
+{
+	// Optional 
+	(ConstantDeclaration() | VariableDeclaration())*
+}
+
+// Constant declaration
+void ConstantDeclaration() throws CompilationException :
+{
+	String dataType = null;
+}
+{// Refer Pascal's constant declaration
+  < FINAL > dataType = DataType() InitializeVariable(dataType)  (<COMMA> InitializeVariable(dataType) )* <STMT_TERMINATOR>
+}
+
+// initialization of variables
+void InitializeVariable(String dataType) throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement savedCurrentNode = currentNode, constantElement = null, constantExprElement = null;
+	String paramName = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	Symbol constantVar = null, constantValue = null;
+}
+{
+	 t = < ID > { paramName = t.image; }  
+ 	  <ASSIGN > 
+ 	  constantExprElement = Expression()
+ 	  {
+ 		  try {
+	 		  constantValue = constantExprElement.getSymbol();
+	 		  constantVar = SymbolMachine.generate(paramName, dataType, true);
+	 		  constantVar.setValue(constantValue); // Set the constant value
+	 		  constantVar.setMutableStatus(true);
+	 		  attributes.clear();
+	 		  attributes.put(Constants.NAME, paramName);
+	 		  attributes.put(Constants.TYPE, dataType);
+	 		  attributes.put(Constants.MUTABLE, "no"); // Make it non-mutable
+	 		  constantElement = UXMLElementFactory.generateElement(Constants.VAR, attributes, constantVar);
+	 		  constantElement.appendChild(constantExprElement);
+	 		  
+	 		  // Add the symbol in member-var/local scope
+			  if(isMemberVarDeclaration) 
+				  currentClass.addSymbol(constantVar);
+			  else 
+				  Environment.currentActivationRecord.addSymbol(constantVar);
+			  currentNode.appendChild(constantElement); // Add in current node
+ 		  } catch (IllegalSymbolValueException e) {throw new CompilationException(e.getMessage());}
+ 		  catch(TypeMismatchException e) {throw new CompilationException(e.getMessage());}
+ 		  catch(ImmutableSymbolException e) {} // Exception won't come since the variable is mutable initially
+ 	  }
+}
+
+
+// Variable declaration
+void VariableDeclaration() throws CompilationException :
+{ String dataType = null;
+}
+{
+	dataType = DataType() OptionalInitializeVariable(dataType)  ( < COMMA > OptionalInitializeVariable(dataType)  )* <STMT_TERMINATOR>
+}
+
+// Optional initialization of variables
+void OptionalInitializeVariable(String dataType) throws CompilationException :
+{
+	Token t = null;
+	UXMLElement savedCurrentNode = currentNode, constantElement = null, constantExprElement = null;
+	String paramName = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	Symbol constantVar = null, constantValue = null;
+}
+{
+	t = < ID > { paramName = t.image; } 
+	( < ASSIGN > constantExprElement = Expression() )?
+	{
+		try {
+			constantVar = SymbolMachine.generate(paramName, dataType, true);
+			attributes.clear();
+			attributes.put(Constants.NAME, paramName);
+	 		attributes.put(Constants.TYPE, dataType);
+	 		attributes.put(Constants.MUTABLE, "yes"); // Make it mutable
+	 		constantElement = UXMLElementFactory.generateElement(Constants.VAR, attributes, constantVar);
+			if(constantExprElement != null) { // If assignment is present
+				constantValue = constantExprElement.getSymbol();
+				constantVar.setValue(constantValue); // Set the constant value
+				constantElement.appendChild(constantExprElement);
+			}
+			// Add the symbol in member-var/local scope
+			if(isMemberVarDeclaration) 
+				currentClass.addSymbol(constantVar);
+			else 
+				Environment.currentActivationRecord.addSymbol(constantVar);
+			currentNode.appendChild(constantElement); // Add in current node
+
+		} catch (IllegalSymbolValueException e) {throw new CompilationException(e.getMessage());}
+		  catch(TypeMismatchException e) {throw new CompilationException(e.getMessage());}
+	 	  catch(ImmutableSymbolException e) {} // Exception won't come since the variable is mutable
+	}
+}
+
+// Procedure Declaration
+void FunctionDeclaration() throws CompilationException : 
+{
+	UXMLElement savedCurrentNode = currentNode, block = null, procedureNode = null;
+	boolean isConstructor = false;
+}
+{
+	{
+		// Execute the calling sequence of a caller - 
+        Environment.callSequenceProcessor.callAction_caller(nestedLevelOfProcedure);
+        // There may be the case that arguments to the function are needed to add in symbol table, 
+        // for that the method call 'enterTheBlock()' is necessary so that symbol table will be created.
+        Environment.currentActivationRecord.enterTheBlock();
+	}
+	procedureNode = FunctionHeading()
+	{
+		if(Constants.CONSTRUCTOR_ELEMENT.equals(procedureNode.getElementName())) isConstructor = true;
+		currentNode = currentNode.appendChild(procedureNode);
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null); 
+		currentNode.appendChild(block);
+		currentNode = block;
+	}
+	FunctionBody(isConstructor)
+	{
+		// If function is defined to return a value and return statement is not present in function definition
+		// or if function is defined to return void and if return statement is present 
+		// then throw error
+		if(!isConstructor) {
+			if(!Constants.VOID.equals(currentProcedure.getReturnType()) && !isReturnStmtPresent)
+				throw new CompilationException("'" + currentProcedureName + "' should return a value of type '" 
+						+ currentProcedure.getReturnType() + "'.");
+			else if(Constants.VOID.equals(currentProcedure.getReturnType())&& isReturnStmtPresent )
+				throw new CompilationException("'" + currentProcedureName + "' declared as 'void' should not return a value.");
+			else
+				isReturnStmtPresent = false;
+		}
+
+		// Function done
+		Environment.callSequenceProcessor.returnAction_caller();
+		currentNode = savedCurrentNode;
+	}
+}
+
+void FunctionBody(boolean isConstructor) throws CompilationException : 
+{
+	boolean isSuperCallPresent = false;
+	UXMLElement superClassCallElement = null;
+}
+{
+	<BLOCK_START>
+	(superClassCallElement = SuperClassCall()
+	{
+		if(!isConstructor) {
+			throw new CompilationException("Call to super() is only allowed inside a constructor."); 
+		}
+		currentNode.appendChild(superClassCallElement);
+		isSuperCallPresent = true;
+	}
+	)?
+	{
+		// If this is a constructor call AND if there is NO parent class constructor matching this constructor's
+		// signature AND if there is NO super class call, then throw compilation exception.
+		if(isConstructor && !isParentConstructorPresent && !isSuperCallPresent) {
+			throw new CompilationException("No call to super class's constructor.");
+		}
+		
+		// If this is a constructor call AND if there is NO parent class constructor matching this constructor's
+		// signature (set 'false' in FunctionHeading() method) AND if this is a super class constructor then
+		// add the deferred constructor now....reason : it was not added earlier because parent class constructor 
+		// was not found.
+		if(isConstructor && !isParentConstructorPresent && isSuperCallPresent) {
+			currentClass.addSymbol(deferedConstructor);
+		}
+	}
+	DeclarationSection()
+	(Statement())* 
+	<BLOCK_END>
+}
+
+UXMLElement FunctionHeading() throws CompilationException :
+{
+	Token t = null;
+	UXMLElement savedCurrentNode = currentNode, procedureNode = null, automaticVarNode = null, procedureParamNode = null;
+	boolean isConstructor = false;
+	String returnType = Constants.VOID, nameOfHeading = null, paramType = null, paramName = null;
+	FunctionType functionType = null;
+	Symbol paramSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> paramList = new ArrayList<Symbol>();
+}
+{
+  (<CONSTRUCTOR> {isConstructor = true;} | < FUNCTION > (returnType = DataType() | <VOID>)) 
+  t = <ID> 
+  {
+	  nameOfHeading = t.image;
+	  if(isConstructor && !currentClassName.equals(nameOfHeading)) 
+	  {throw new CompilationException("Constructor name '" + nameOfHeading + "' is different from the class name '" + currentClassName + "'.");}
+	  else {
+		  functionType = new FunctionType(isConstructor? Constants.CONSTRUCTOR : nameOfHeading, true, returnType);
+		  functionType.setNestedLevel(0);
+		  try {
+			  functionType.setReturnValue(SymbolMachine.generate(Constants.BLANK, returnType, true));
+		  } catch(IllegalSymbolValueException e) { throw new CompilationException(e.getMessage()); }
+		  if(!isConstructor) {
+			  currentProcedureName = nameOfHeading; // Store the current procedure name
+			  currentProcedure = functionType;
+		  }
+		  attributes.clear();
+		  attributes.put(Constants.NAME, nameOfHeading);
+		  procedureNode = UXMLElementFactory.generateElement(isConstructor? Constants.CONSTRUCTOR_ELEMENT : Constants.FUNCTION, attributes, null);
+		  currentNode.appendChild(procedureNode);
+	  }
+  } 
+  try {
+  < ROUND_START > {currentNode = procedureNode.appendChild(UXMLElementFactory.generateElement(Constants.AUTOMATIC_VAR, null, null));}
+  (paramType = DataType() t = <ID> 
+  {
+	paramName = t.image;
+	paramSymbol = SymbolMachine.generate(paramName, paramType, true);
+	paramList.add(paramSymbol);
+	attributes.clear();
+	attributes.put(Constants.TYPE, paramType);
+	attributes.put(Constants.MUTABLE, "yes");
+	attributes.put(Constants.NAME, paramName);
+	currentNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+  }
+  (<COMMA> paramType = DataType() t = <ID> 
+  {
+	paramName = t.image;
+	paramSymbol = SymbolMachine.generate(paramName, paramType, true);
+	paramList.add(paramSymbol);
+	attributes.clear();
+	attributes.put(Constants.TYPE, paramType);
+	attributes.put(Constants.MUTABLE, "yes");
+	attributes.put(Constants.NAME, paramName);
+	currentNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+  }
+  
+  )*)?  <ROUND_END >
+  {
+	  // Add the formal parameters in function/activation record
+		for(int variableNo = 0; variableNo < paramList.size(); variableNo++) {
+			// Add the variables to current function
+			functionType.addSymbol(paramList.get(variableNo));
+			// Add the variables to current activation record
+			Environment.currentActivationRecord.addSymbol(paramList.get(variableNo));
+		}
+		if(!isConstructor) {
+			attributes.clear();
+			attributes.put(Constants.TYPE, returnType);
+			procedureNode.appendChild(UXMLElementFactory.generateElement(Constants.RETURNS, attributes, null));
+		}
+		currentNode = savedCurrentNode;
+		// Add current function/constructor in current class
+		if(isConstructor) {
+			try {
+				currentClass.addConstructor(functionType, paramList);
+				isParentConstructorPresent = true;
+			} catch (SymbolNotDefinedException s) { 
+				// Don't throw the error right now, but check if call to super is present or not.
+				// If !present or if present but there is no ancestor's constructor that matches super call's
+				// argument and if 'isParentConstructorPresent' os also false, then throw error.
+				isParentConstructorPresent = false;
+				// 
+				deferedConstructor = functionType;
+			}
+		}
+		else currentClass.addSymbol(functionType);
+		return procedureNode;
+  }
+  } catch (IllegalSymbolValueException e) {throw new CompilationException(e.getMessage());}
+}
+
+void Block()throws CompilationException :
+{
+	UXMLElement savedCurrentNode = currentNode, block = null;
+}
+{ 
+	ScopeStart()
+	{
+	  block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+	  currentNode.appendChild(block);
+	  currentNode = block;
+    }
+  	(
+  	  Statement()
+  	)*
+  	ScopeEnd()
+  	{
+	  currentNode = savedCurrentNode;
+  	}
+}
+
+/**
+ * Scope start
+ * {
+ */
+void ScopeStart() : {}
+{
+	<BLOCK_START>	
+	{
+		Environment.currentActivationRecord.enterTheBlock();
+	}
+}
+
+/**
+ * Scope end
+ * }
+ */
+void ScopeEnd() : {}
+{
+	<BLOCK_END>	
+	{
+		Environment.currentActivationRecord.leaveTheBlock();
+	}
+}
+
+void Statement() throws CompilationException:
+{
+	UXMLElement procCall = null;
+}
+{
+  Assignment() | IfElse() | ForLoop() | DoWhile() | WhileDo() | Print() | (procCall = FunctionCall() <STMT_TERMINATOR> ) {currentNode.appendChild(procCall);}
+  | Return() | <STMT_TERMINATOR>
+  
+}
+
+void Assignment() throws CompilationException :
+{
+	UXMLElement lhsElement = null, rhsElement = null, savedCurrentNode = currentNode, assignment = null;
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	OOVariableAccess ooVariableAccess = null;
+}
+{
+	ooVariableAccess = VariableAccess(false) { lhsElement = ooVariableAccess.getVariableElement(); }
+	<ASSIGN> 
+	rhsElement = Expression()
+	< STMT_TERMINATOR >
+	{
+		lhsSymbol = lhsElement.getSymbol();
+		rhsSymbol = rhsElement.getSymbol();
+		
+		try {
+			if(lhsSymbol instanceof ArrayType) 
+				((ArrayType)lhsSymbol).copyArray(rhsSymbol);	
+			else
+				lhsSymbol.setValue(rhsSymbol);
+		} catch(ImmutableSymbolException e) {
+			throw new CompilationException(e.getMessage());
+		} catch(TypeMismatchException e) { 
+			throw new CompilationException(e.getMessage());
+		} catch(IllegalSymbolValueException e) {
+			throw new CompilationException(e.getMessage());
+		} 
+		assignment = UXMLElementFactory.generateElement(Constants.ASSIGN, null ,null);
+		attributes.put(Constants.NAME, lhsSymbol.getName());
+		if(rhsElement.getElement() == null)
+			assignment.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,lhsSymbol));
+		else
+			assignment.appendChild(lhsElement);
+		assignment.appendChild(rhsElement);
+		currentNode.appendChild(assignment);
+	}
+}
+
+void IfElse() throws CompilationException :
+{
+	UXMLElement parentNode = currentNode;	
+}
+{
+  < IF > <ROUND_START> MultiConditions() <ROUND_END> 
+  Block()
+  (
+    < ELSE >
+    Block()
+  )?
+  { currentNode = parentNode; }
+}
+
+void MultiConditions() throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement parentNode = currentNode, savedCurrentNode = currentNode, not = null, condition = null, lhsCondition = null,rhsCondition = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	try {
+		lhsCondition = Condition()
+		((
+		t = <AND> {t.image = "$$";} 
+		| t = <OR> 
+		) 
+		{
+			operatorName = t.image;
+		}
+		rhsCondition = Condition()
+		{
+			lhsSymbol = lhsCondition.getSymbol();
+			rhsSymbol = rhsCondition.getSymbol(); 
+			attributes.clear();
+			attributes.put(Constants.VALUE, operatorName);
+			operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+			condition.appendChild(lhsCondition);
+			condition.appendChild(rhsCondition);
+			
+			currentNode = savedCurrentNode;
+			currentNode.appendChild(condition);
+			
+			savedCurrentNode = currentNode;
+			lhsCondition = condition;
+		}
+		)*
+		{
+			if(condition != null)
+				currentNode = condition;
+		}
+	} catch(IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	} catch(OperatorNotFoundException e) {
+		throw new CompilationException(e.getMessage());
+	}
+}
+
+UXMLElement Condition() throws CompilationException :
+{
+	Token t = null;
+	UXMLElement lhsExpression = null, rhsExpression = null, condition = null;
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	String operatorName = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+	lhsExpression = Expression() 
+	(( t = <EQ> | t = <NT_EQ> | t = <LT> {t.image = "(";} | t = <LT_EQ> {t.image = "(=";}| t = <GT> {t.image = ")";} | t = <GT_EQ>{t.image = ")=";} ) 
+	{ 
+		operatorName = t.image;
+	} 
+	rhsExpression = Expression())?
+	{
+		lhsSymbol = lhsExpression.getSymbol();
+		try {
+			// Unary operator
+			if(operatorName == null)
+			{
+				operatorName = "==";
+				attributes.clear();
+				attributes.put(Constants.VALUE, operatorName);
+				operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+				condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+				condition.appendChild(lhsExpression);
+				currentNode.appendChild(condition);
+				currentNode = condition;
+				return condition;
+			}
+			// Binary operator
+			else {
+				rhsSymbol = rhsExpression.getSymbol();
+				attributes.clear();
+				attributes.put(Constants.VALUE, operatorName);
+				operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+				operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+				condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+				condition.appendChild(lhsExpression);
+				condition.appendChild(rhsExpression);
+				currentNode.appendChild(condition);
+				currentNode = condition;
+				return condition;
+			}
+		} catch(IllegalSymbolValueException e) {
+			throw new CompilationException(e.getMessage());
+		} catch(OperatorNotFoundException e) {
+			throw new CompilationException(e.getMessage());
+		}
+	}
+}
+
+void ForLoop()throws CompilationException :
+{
+	UXMLElement parentNode = currentNode, for_loop = null, controllerNode = null, savedCurrentNode = null;
+	Symbol variableSymbol = null, variableValueSymbol = null;
+	UXMLElement variableSymbolElement = null, variableValueElement = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	OOVariableAccess ooVariableAccess = null;
+}
+{
+  < FOR > 
+  {
+	for_loop = UXMLElementFactory.generateElement(Constants.FOR_LOOP, null, null);
+	currentNode.appendChild(for_loop);
+	currentNode = for_loop;
+  }
+  <ROUND_START> 
+  {
+	controllerNode = UXMLElementFactory.generateElement(Constants.FROM, null, null);
+	currentNode.appendChild(controllerNode);
+	savedCurrentNode = currentNode;
+	currentNode = controllerNode;
+  }
+  Assignment()
+  {
+	currentNode = savedCurrentNode;
+	
+	controllerNode = UXMLElementFactory.generateElement(Constants.TILL, null, null);
+	currentNode.appendChild(controllerNode);
+	savedCurrentNode = currentNode;
+	currentNode = controllerNode;
+  }
+  MultiConditions()<STMT_TERMINATOR>
+  {
+	currentNode = savedCurrentNode;
+	
+	controllerNode = UXMLElementFactory.generateElement(Constants.STEP, null, null);
+	currentNode.appendChild(controllerNode);
+	
+	savedCurrentNode = currentNode;
+	currentNode = controllerNode;
+  }
+  ooVariableAccess = VariableAccess(false)
+  {
+	variableSymbolElement = ooVariableAccess.getVariableElement();
+	controllerNode = UXMLElementFactory.generateElement(Constants.ASSIGN, null, null);
+  }
+  <ASSIGN> variableValueElement = Expression() <ROUND_END>
+  {
+	variableSymbol = variableSymbolElement.getSymbol();
+	
+	variableValueSymbol = variableValueElement.getSymbol();
+	try {
+		variableSymbol.setValue(variableValueSymbol instanceof FunctionType? ((FunctionType)(variableValueSymbol)).getReturnValue() : variableValueSymbol);
+		attributes.put(Constants.NAME, variableSymbol.getName());
+		controllerNode.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,variableSymbol));
+		currentNode.appendChild(controllerNode);
+		
+		currentNode = controllerNode;
+		
+		currentNode.appendChild(variableValueElement);
+		currentNode = savedCurrentNode;
+	} catch(ImmutableSymbolException e) {
+		throw new CompilationException(e.getMessage());
+	} catch(TypeMismatchException e) { 
+		throw new CompilationException(e.getMessage());
+	} catch(IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	}
+  }
+  Block() { currentNode = parentNode; }
+}
+
+void DoWhile()throws CompilationException :
+{
+	UXMLElement parentNode = currentNode, iterate = null, till = null;
+}
+{
+	<DO>
+	{
+		iterate = UXMLElementFactory.generateElement(Constants.ITERATE, null, null);
+		currentNode.appendChild(iterate);
+		currentNode = iterate;
+	}
+  Block()
+  < WHILE > 
+  {
+	till = UXMLElementFactory.generateElement(Constants.TILL, null, null);
+	currentNode.appendChild(till);
+	currentNode = till;
+  }
+  <ROUND_START> MultiConditions() <ROUND_END> 
+  < STMT_TERMINATOR >  { currentNode = parentNode; }
+}
+
+void WhileDo() throws CompilationException:
+{
+	UXMLElement parentNode = currentNode, iterate = null, till = null;
+}
+{
+  < WHILE >
+  {
+	iterate = UXMLElementFactory.generateElement(Constants.ITERATE, null, null);
+	currentNode.appendChild(iterate);
+	currentNode = iterate;
+	
+	till = UXMLElementFactory.generateElement(Constants.TILL, null, null);
+	currentNode.appendChild(till);
+	currentNode = till;
+  }
+  <ROUND_START> MultiConditions() <ROUND_END>
+  {
+	 currentNode = iterate;
+  }
+  Block() { currentNode = parentNode; }
+}
+
+void Return() throws CompilationException :
+{
+	UXMLElement returnExpression = null, returnElement = null;
+	String requiredReturnType = null, foundReturnType = null;
+	Symbol returnSymbol = null;
+}
+{
+	<RETURN>
+	returnExpression = Expression()
+	{
+		returnElement = UXMLElementFactory.generateElement(Constants.RETURN, null, null);
+		returnSymbol = returnExpression.getSymbol();
+		returnSymbol = (returnSymbol instanceof FunctionType)? ((FunctionType)returnSymbol).getReturnValue():returnSymbol;
+		returnElement.appendChild(returnExpression);
+		currentNode.appendChild(returnElement);
+		
+		// Try to set the return symbol into the return value of currentfunction. 
+		// If the return-type is not compatible then error will be thrown
+		try {
+			requiredReturnType = DataTypeFinder.getDataType(currentProcedure.getReturnValue());
+			foundReturnType = DataTypeFinder.getDataType(returnSymbol);
+			if(requiredReturnType.equals(foundReturnType)) {
+				Symbol returnValue = currentProcedure.getReturnValue();
+				if(returnValue instanceof ArrayType)
+					((ArrayType) returnValue).copyArray(returnSymbol);
+			}
+			else
+				throw new TypeMismatchException(foundReturnType,requiredReturnType);
+			isReturnStmtPresent = true;
+		  } catch(TypeMismatchException e) {
+			  throw new CompilationException("Function '" + currentProcedure.getName()
+					  + "' should return '" + requiredReturnType + "' and not '"  + foundReturnType + "'.",e.getMessage());
+		  } catch(SymbolNotDefinedException e) {System.err.println(e.getMessage());}
+	}
+	<STMT_TERMINATOR>
+}
+
+void Print()throws CompilationException :
+{
+	Token t = null;
+	UXMLElement print, expression;
+}
+{
+	(t = <PRINT> | t = <PRINTLN>) 
+	{
+		print = UXMLElementFactory.generateElement(t.image, null, null);
+	}
+	<ROUND_START>
+		expression = Expression()
+		{
+			print.appendChild(expression);
+		}
+		(
+			<COMMA>
+			expression = Expression()
+			{
+				print.appendChild(expression);
+			}
+		)*
+	<ROUND_END>
+	<STMT_TERMINATOR>
+	{
+		currentNode.appendChild(print);
+	}
+}
+
+UXMLElement FunctionCall() throws CompilationException:
+{
+	UXMLElement argumentElement = null, functionElement = null, call = null, variableElement = null;
+	String functionElementName = null, functionName = null;
+	Symbol argumentSymbol = null, functionType = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> actualArgs = new ArrayList<Symbol>();
+	FunctionType functionSymbol = null;
+	ClassType classType = null, classAccessed = null;
+	boolean isConstructorCall = false;
+	OOVariableAccess ooVariableAccess = null;
+}
+{
+	{
+		call = UXMLElementFactory.generateElement(Constants.CALL, attributes, null);
+	}
+	(<CALL>  | <NEW> {isConstructorCall = true;} // Constructor call
+	)
+	ooVariableAccess = VariableAccess(true)
+	{
+		functionElement = ooVariableAccess.getVariableElement();
+		classAccessed = ooVariableAccess.getClassUsed();
+		functionElementName = functionElement.getElementName();
+		
+		// If constructor call, then function name would be '#new#'
+		if(isConstructorCall) {
+			try {
+			classType = (ClassType)functionElement.getSymbol();
+			functionName = Constants.CONSTRUCTOR;			// Set the method name to be '#new'
+			// If this is a constructor call, functionType contains an instance of class type
+			// Hence set it in functionElement.
+			functionElement.setSymbol(classType); 		
+			// Since functionType has to be a class-type, extract the constructor list from current class
+			
+			functionType = classType.getSymbol(Constants.CONSTRUCTOR);
+			} catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+			// If class-cast, it means function-type is not of class-type and hence throw compilation exception
+			catch(ClassCastException e) 
+			{throw new CompilationException("Constructor call is allowed for class-type and not '" + functionType.getType() +"'.");}
+			
+		} else {
+			functionType = functionElement.getSymbol();
+			functionType = functionElement.getSymbol();
+			functionName = functionType.getName();
+		}
+		// Normal function call
+		if(Constants.VARIABLE.equals(functionElementName)){
+			if(isConstructorCall) {
+				attributes.clear();
+				attributes.put(Constants.NAME,Constants.CONSTRUCTOR);
+				call.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+				call.appendChild(functionElement);
+			}
+			call.appendChild(functionElement);
+		}
+		// If array entry is present instead of function i.e. call a[1] is not allowed.
+		else if(Constants.OPERATOR.equals(functionElementName)) 
+		{throw new CompilationException("Expected function type, but received " + functionType.getType());}
+		// If this is field, then replace the outermost element with variable, since outermost element is actually function name.
+		else if(Constants.FIELD.equals(functionElementName)) {
+			attributes.clear();
+			attributes.put(Constants.NAME,functionElement.getAttributeValue(Constants.NAME));
+			variableElement = UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null);
+			call.appendChild(variableElement);
+			call.appendChild(functionElement.getFirstChild());
+		}
+	}
+	<ROUND_START> argumentElement = Expression() 
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		// Check if expression is void and if yes, then no-argument function call is made
+		if(!Constants.VOID.equals(argumentSymbol.getType())) {
+			actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+			call.appendChild(argumentElement);
+		}
+	} 
+	(<COMMA> 
+	argumentElement = Expression()
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+		call.appendChild(argumentElement);
+	}
+	
+	)* <ROUND_END>
+	{
+		try {
+			
+			// If this is the recursive call, then just extract the current Procedure
+			if(functionName.equals(currentProcedureName)) 
+				functionSymbol = currentProcedure;
+			else {
+				
+				if(!(functionType instanceof OverloadedFunctionType))
+					throw new CompilationException("Type mismatch \n Found    : '" + functionName + DataTypeFinder.getDataType(functionType) + "' \n Required : '" + functionName + "'");
+				
+				// Get the function - Old code
+				//functionSymbol = ((OverloadedFunctionType) functionType).getFunction(actualArgs);
+				
+				// Extract the correct function Type from class accessed
+				functionSymbol = classAccessed.lookupFunction(functionName,actualArgs);
+			}
+		} catch (SymbolNotDefinedException e) {
+			throw new CompilationException(e.getMessage());
+		}
+		if(isConstructorCall) call.setSymbol(classType);  
+		else call.setSymbol(functionSymbol);
+		return call;
+	}
+}
+
+UXMLElement SuperClassCall() throws CompilationException : 
+{
+	UXMLElement argumentElement = null, functionElement = null, call = null, variableElement = null;
+	String functionElementName = null, functionName = Constants.SUPER_CLASS;
+	Symbol argumentSymbol = null, functionType = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> actualArgs = new ArrayList<Symbol>();
+	FunctionType functionSymbol = null;
+	boolean isConstructorCall = false;
+}
+{
+	{
+		call = UXMLElementFactory.generateElement(Constants.CALL, attributes, null);
+	}
+	<SUPER_CALL> // If call to super
+	{
+		attributes.clear();
+		attributes.put(Constants.NAME,Constants.SUPER_CLASS);
+		call.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		attributes.clear();
+		attributes.put(Constants.NAME,Constants.THIS);
+		call.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE, attributes, null));
+		try {
+			functionType = currentClass.getSymbol(Constants.CONSTRUCTOR);
+		} catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+	}
+	<ROUND_START> argumentElement = Expression() 
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		// Check if expression is void and if yes, then no-argument function call is made
+		if(!Constants.VOID.equals(argumentSymbol.getType())) {
+			actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+			call.appendChild(argumentElement);
+		}
+	} 
+	(<COMMA> 
+	argumentElement = Expression()
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+		call.appendChild(argumentElement);
+	}
+	
+	)* <ROUND_END> <STMT_TERMINATOR>
+	{
+		try {
+			// If this is the recursive call, then just extract the current Procedure
+			if(functionName.equals(currentProcedureName)) 
+				functionSymbol = currentProcedure;
+			else {
+				
+				if(!(functionType instanceof OverloadedFunctionType))
+					throw new CompilationException("Type mismatch \n Found    : '" + functionName + DataTypeFinder.getDataType(functionType) + "' \n Required : '" + functionName + "'");
+				
+				// Get the function - Old code
+				//functionSymbol = ((OverloadedFunctionType) functionType).getFunction(actualArgs);
+				
+				// Extract the correct function Type from class accessed
+				functionSymbol = currentClass.lookupFunction(functionName,actualArgs);
+				
+			}
+		} catch (SymbolNotDefinedException e) {
+			throw new CompilationException(e.getMessage());
+		}
+		call.setSymbol(functionSymbol);
+		return call;
+	}
+}
+
+// isFunctionCall - If function call
+// Access Variable
+OOVariableAccess VariableAccess(boolean isFunctionCall) throws CompilationException :
+{
+	UXMLElement variableSymbolElement = null, fieldAccessElement = null, fieldElement = null;
+	String variableName = null;
+	Token t = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	Symbol variableSymbol = null,fieldAccessSymbol = null;
+	ArrayList<UXMLElement> fieldAccessList = new ArrayList<UXMLElement>();
+	ClassType classAccessed = currentClass;
+}
+{
+	t = <ID>
+	{
+		variableName = t.image;
+		// If this is a function call, then simply store the current procedure.
+		// This trick is to enable recursive calls. 
+		if(isFunctionCall && variableName.equals(currentProcedureName)) 
+			variableSymbol = currentProcedure;
+		// If the reference is 'this' then it means current class
+		else if(Constants.THIS.equals(variableName))
+			variableSymbol = currentClass;
+		else {
+			try {
+				variableSymbol = Environment.getSymbol(variableName);
+			} catch(SymbolNotDefinedException e) 
+			{
+				try { variableSymbol = classAccessed.getSymbol(variableName); } 
+				catch (SymbolNotDefinedException f) {throw new CompilationException(f.getMessage()); }
+			}
+		}
+		attributes.clear();
+		attributes.put(Constants.NAME, variableName);
+		variableSymbolElement = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,variableSymbol);
+	}
+	variableSymbolElement = ArrayAccess(variableSymbolElement)
+	{
+		fieldAccessList.add(variableSymbolElement);  
+		variableSymbol = variableSymbolElement.getSymbol();
+		// If this is a constructor call, then variableSymbol will contain the classtype
+		if(variableSymbol instanceof ClassType)
+			classAccessed = (ClassType)variableSymbol;
+	}
+	(<PERIOD> 
+	{ 
+		// If this is accessed using '.', it means variableSymbol accessed earlier was a class-type.
+		if(variableSymbol instanceof ClassType)
+			classAccessed = (ClassType)variableSymbol;
+		else
+			throw new CompilationException("Expected classType, but received " + variableSymbol.getType());
+		// Add the field access elements in the array list
+	} 
+	t = <ID>
+	{
+		variableName = t.image;
+		// If this is a function call, then simply store the current procedure.
+		// This trick is to enable recursive calls
+		if(isFunctionCall && variableName.equals(currentProcedureName)) 
+			variableSymbol = currentProcedure;
+		else {
+			try {
+				variableSymbol = Environment.getSymbol(variableName);
+			} catch(SymbolNotDefinedException e) 
+			{
+				try { variableSymbol = classAccessed.getSymbol(variableName); } 
+				catch (SymbolNotDefinedException f) {throw new CompilationException(f.getMessage()); }
+			}
+		}
+		attributes.clear();
+		attributes.put(Constants.NAME, variableName);
+		variableSymbolElement = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,variableSymbol);
+	}
+	variableSymbolElement = ArrayAccess(variableSymbolElement)
+	{
+		fieldAccessList.add(variableSymbolElement);
+		variableSymbol = variableSymbolElement.getSymbol();
+	}
+	)*
+	{ 
+		// If size of fieldAccessList > 1, it means that this is a field access
+		variableSymbolElement = fieldAccessList.get(0);
+		for(int fieldAccessNo = 1; fieldAccessNo < fieldAccessList.size(); fieldAccessNo++) {
+			fieldAccessElement = fieldAccessList.get(fieldAccessNo);
+			fieldAccessSymbol = fieldAccessElement.getSymbol();
+			attributes.clear();
+			
+			// If this is an operator, the 'variable' element by 'field
+			if(Constants.OPERATOR.equals(fieldAccessElement.getElementName())) {
+				UXMLElement operatorChild = fieldAccessElement.getFirstChild();
+				attributes.put(Constants.NAME,operatorChild.getAttributeValue(Constants.NAME));
+				fieldElement = UXMLElementFactory.generateElement(Constants.FIELD, attributes, fieldAccessSymbol);
+				fieldElement.appendChild(variableSymbolElement); // Append the variable to the current field element
+				// Replace the 'variable' element with 'field' element
+				fieldAccessElement.replaceChild(fieldElement,operatorChild);
+				variableSymbolElement = fieldAccessElement;
+			}
+			else {
+				attributes.put(Constants.NAME,fieldAccessElement.getAttributeValue(Constants.NAME));
+				fieldElement = UXMLElementFactory.generateElement(Constants.FIELD, attributes, fieldAccessSymbol);
+				fieldElement.appendChild(variableSymbolElement);
+				variableSymbolElement = fieldElement;
+			}
+		}
+//		ooVariableAccess.setClassUsed(classAccessed);
+//		ooVariableAccess.setVariableElement(variableSymbolElement);
+		return new OOVariableAccess(classAccessed,variableSymbolElement);//ooVariableAccess;
+	}
+}
+
+/**
+ * E -> T1 E_L
+ */
+UXMLElement Expression() throws CompilationException : 
+{
+	UXMLElement restOfExpression = null;
+}
+{
+	restOfExpression = Expression_Left(Term1())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * E_L -> (& | | | ^ ) T1 E_L
+ */
+UXMLElement Expression_Left(UXMLElement currentLHS)throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	[
+	 (t = <AMPERSAND> {t.image = "$";} | t = <BIT_OR> | t = <BIT_XOR> )
+	 {
+		 operatorName = t.image;
+	 }
+	 currentRHS = Term1() 
+	 {
+		 rhsSymbol = currentRHS.getSymbol();
+		 try {
+			 attributes.put(Constants.VALUE,operatorName);
+			 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+			 currentNode.appendChild(operator);
+			 operator.appendChild(currentLHS);
+			 operator.appendChild(currentRHS);
+			 currentLHS = operator;
+		 } catch(IllegalSymbolValueException e) {
+			 throw new CompilationException(e.getMessage());
+		 } catch(OperatorNotFoundException e) {
+			 throw new CompilationException(e.getMessage());
+		 }
+	 } restOfExpression = Expression_Left(currentLHS) ]
+	 {
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+}
+
+
+/**
+ * T1 -> T2 T1_L
+ */
+UXMLElement Term1()throws CompilationException  : 
+{
+	UXMLElement restOfExpression = null;
+}
+{	
+	restOfExpression = Term1_Left(Term2())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * T1_L -> (+ | -) T2 T1_L
+ */
+UXMLElement Term1_Left(UXMLElement currentLHS)throws CompilationException  :  
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	[
+	 (t  = <PLUS> | t  = <MINUS>)
+	 {
+		 operatorName = t.image;
+	 }
+	 
+	 currentRHS = Term2()  
+	 {
+
+		 try {
+			 rhsSymbol = currentRHS.getSymbol();
+			 attributes.put(Constants.VALUE,operatorName);
+			 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+			 currentNode.appendChild(operator);
+			 operator.appendChild(currentLHS);
+			 operator.appendChild(currentRHS);
+			 currentLHS = operator;
+		 } catch(IllegalSymbolValueException e) {
+			 throw new CompilationException(e.getMessage());
+		 } catch(OperatorNotFoundException e) {
+			 throw new CompilationException(e.getMessage());
+		 }
+	 }
+	 restOfExpression = Term1_Left(currentLHS)
+	 
+	 ]
+	 {
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+}
+
+/**
+ * T2 -> F T2_L
+ */
+UXMLElement Term2() throws CompilationException : 
+{
+	UXMLElement restOfExpression = null;
+}
+{
+	restOfExpression = Term2_Left( Factor())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * T2_L -> (* | / | %) F T2_L
+ */
+UXMLElement Term2_Left(UXMLElement currentLHS) throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	String operatorName = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+}
+{
+	[
+	 (t = <ASTERISK> | t = <DIVIDE > | t = <MOD>) 
+	 {
+		 operatorName = t.image;
+	 }
+	 currentRHS = Factor()  
+	 {
+		 try {
+			 rhsSymbol = currentRHS.getSymbol();
+			 attributes.put(Constants.VALUE,operatorName);
+			 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			 // Make sure that div doesn't give divide by zero error
+			 try {
+				 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, Operator.execute(operatorName, operands));
+			 } catch(RuntimeException e) 
+			 {
+				 Symbol param1 = operands.get(0);
+				 Symbol param2 = operands.get(1);
+				 if(param1.getDataType() == DATA_TYPE.FLOAT || param2.getDataType() == DATA_TYPE.FLOAT)
+					 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, 
+							 SymbolMachine.generate(Constants.BLANK, Constants.FLOAT, true));
+				 else 
+					 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, 
+							 SymbolMachine.generate(Constants.BLANK, Constants.INT, true));
+			 }
+			 currentNode.appendChild(operator);
+			 operator.appendChild(currentLHS);
+			 operator.appendChild(currentRHS);
+			 currentLHS = operator;
+		 } catch(IllegalSymbolValueException e) {
+			 throw new CompilationException(e.getMessage());
+		 } catch(OperatorNotFoundException e) {
+			 throw new CompilationException(e.getMessage());
+		 }
+	 }
+	 restOfExpression = Term2_Left(currentLHS)
+	 ]
+	 {
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+} 
+
+/** 
+ * F -> (E) | VariableAccess() | Constant() | <VOID> | FunctionCall()
+ */
+UXMLElement Factor() throws CompilationException : 
+{
+	Token t = null;
+	String typeCast = null;
+	Symbol value = null;
+	UXMLElement expressionValue = null, returnFactorValue = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	OOVariableAccess ooVariableAccess = null;
+}
+{
+	(<BLOCK_START> (t = < INT > | t = < FLOAT > | t = < CHAR > | t = < BOOL > | t = < STRING> | <CLASS> t = <ID>) { typeCast = t.image;} <BLOCK_END>)?
+	(
+		<ROUND_START> expressionValue = Expression() { returnFactorValue =  expressionValue ;  } <ROUND_END>
+		| ooVariableAccess = VariableAccess(false) 
+			{
+				expressionValue = ooVariableAccess.getVariableElement();
+				value = expressionValue.getSymbol();
+				
+				// Skip the creation of 'variable' element if this is an array and field access  
+				if((!(Constants.OPERATOR.equals(expressionValue.getElementName()) && 
+								Constants.VALUE_AT_INDEX.equals(expressionValue.getAttributeValue(Constants.VALUE)))) &&
+				!(Constants.FIELD.equals(expressionValue.getElementName()))) {
+					attributes.clear();
+					attributes.put(Constants.NAME, expressionValue.getSymbol().getName());
+					expressionValue = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,expressionValue.getSymbol());
+				}
+				returnFactorValue = expressionValue;
+			}
+		| value = Constants() { returnFactorValue =  new UXMLElement(null,value); }
+		| expressionValue = FunctionCall() { returnFactorValue = expressionValue; }
+		| <VOID> {try { returnFactorValue =  new UXMLElement(null,SymbolMachine.generate(Constants.BLANK,Constants.VOID, false));  } catch(Exception e ){}} 
+	)
+	{
+		try {
+			if(typeCast != null) {
+				attributes.clear();
+				attributes.put(Constants.TYPE, typeCast);
+				expressionValue = UXMLElementFactory.generateElement(Constants.CAST ,attributes, SymbolMachine.cast(returnFactorValue.getSymbol(), typeCast));
+				expressionValue.appendChild(returnFactorValue);
+				returnFactorValue = expressionValue;
+			}
+		} catch(TypeMismatchException e) {
+			throw new CompilationException(e.getMessage());
+		} catch (SymbolNotDefinedException e) {
+			throw new CompilationException(e.getMessage());
+		} catch (IllegalSymbolValueException e) {
+			throw new CompilationException(e.getMessage());
+		}
+		return returnFactorValue;
+	}
+	
+}

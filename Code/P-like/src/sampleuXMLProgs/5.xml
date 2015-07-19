@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<global-Var>
+			<var mutable="yes" name="b" type="int" />
+			<var mutable="yes" name="x" type="int">
+				<constant type="int" value="100" />
+			</var>
+		</global-Var>
+		<function name="foo">
+			<automatic-Var>
+				<var mutable="yes" name="x" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="x1" type="int" />
+				<function name="baz1">
+					<automatic-Var>
+						<var mutable="yes" name="y1" type="int" />
+					</automatic-Var>
+					<returns type="void" />
+					<block>
+						<function name="zab1">
+							<automatic-Var>
+								<var mutable="yes" name="z1" type="int" />
+							</automatic-Var>
+							<returns type="void" />
+							<block>
+								<assign>
+									<variable name="x" />
+									<operator value="+">
+										<variable name="y1" />
+										<variable name="z1" />
+									</operator>
+								</assign>
+							</block>
+						</function>
+						<call>
+							<variable name="zab1" />
+							<constant type="int" value="2" />
+						</call>
+						<print>
+							<constant type="string" value="Inside baz1" />
+						</print>
+					</block>
+				</function>
+				<function name="baz">
+					<automatic-Var>
+						<var mutable="yes" name="y" type="int" />
+					</automatic-Var>
+					<returns type="void" />
+					<block>
+						<function name="zab">
+							<automatic-Var>
+								<var mutable="yes" name="z" type="int" />
+							</automatic-Var>
+							<returns type="void" />
+							<block>
+								<assign>
+									<variable name="x" />
+									<operator value="+">
+										<variable name="y" />
+										<variable name="z" />
+									</operator>
+								</assign>
+								<print>
+									<variable name="x" />
+								</print>
+							</block>
+						</function>
+						<call>
+							<variable name="zab" />
+							<constant type="int" value="2" />
+						</call>
+						<call>
+							<variable name="baz1" />
+							<constant type="int" value="5" />
+						</call>
+					</block>
+				</function>
+				<assign>
+					<variable name="x1" />
+					<constant type="int" value="3" />
+				</assign>
+				<call>
+					<variable name="baz" />
+					<variable name="x1" />
+				</call>
+			</block>
+		</function>
+		<call>
+			<variable name="foo" />
+			<variable name="b" />
+		</call>
+	</block>
+</uXML>

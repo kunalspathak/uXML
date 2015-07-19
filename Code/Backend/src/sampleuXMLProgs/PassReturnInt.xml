@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<function name="getInt">
+		<returns type="string"/>
+		<block>	
+			<return>
+				<constant type="string" value="Hello World!!"/>
+			</return>
+		</block>
+	</function>
+	
+	<var name="b" type="string" mutable="yes"/>
+	
+	<assign>
+		<variable name="b"/>
+		<call>
+			<variable name="getInt"/>
+		</call>
+	</assign>
+	
+	<println>
+		<variable name="b"/>
+	</println>
+</uXML>

@@ -1,0 +1,36 @@
+// This program test the static vs. dynamic scoping
+{
+	The example below is taken from 
+	http://en.wikipedia.org/wiki/Scope_%28programming%29#Example
+}
+PROGRAM for_loop;
+	
+	var 
+		x : int := 0;
+		
+	procedure f : int;
+	begin
+		return x;
+	end
+	
+	procedure g : int;
+	var
+		x : int := 1;
+	begin
+		return call f(void);
+	end
+	
+	
+begin { main }
+	write(call g(void));
+end
+
+/*
+ * Output :
+ * Static scope
+ * 0
+ * 
+ * Dynamic scope 
+ * 1
+ */
+*/

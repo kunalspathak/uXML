@@ -1,0 +1,66 @@
+int global = 1;
+int *addr = &global;
+
+/*
+Pointer to a function that takes 2 float and return
+int. Pointer variables are fun1 and fun2
+*/
+funcptr (int (int)) *fun1, *fun2;
+
+/*
+Pointer to a function that takes 1st argument as a pointer to 
+a function that takes 2 float and return an int and 2nd argument 
+as int and returns a pointer to a function that takes 2 float
+and return an int. Pointer variable are fun3
+
+funcptr (fun1 (fun2, int)) *fun3;
+*/
+
+function int fun(int j) {
+	return j;
+}
+
+function int func(int j, const float f) {
+	j = 6;
+	fun1 = &fun;
+	print(call *fun1(5));
+	print(global);
+	return 0;
+}
+
+/*
+ * func2
+ */
+function float func2() {
+	return 0.0;
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int i = 0, *j;
+	*addr = 5;
+	call func(5,5.5);
+	print("Inside level 0 :", i);
+	if(call func2(void)) {
+		int i = 1;
+		print("Inside level 1 :", i);
+		if(i == 1) {
+			int i = 2;
+			print("Inside level 2 :", i);
+		}
+		print("Inside level 1 :", i);
+	}
+	print("Inside level 0 :", i);
+}
+
+/*
+Output :
+
+5 
+5 
+Inside level 0 : 0 
+Inside level 0 : 0 
+
+*/

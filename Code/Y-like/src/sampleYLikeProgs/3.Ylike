@@ -1,0 +1,20 @@
+# This program demonstrates passing functions as arguments to other functions.
+def fun1(a)
+{
+	print "Inside fun1", a
+}
+
+def fun2(b) 
+{
+	print("inside fun2")
+	call b(5)
+}
+
+def fun3(c)
+{
+	print("inside fun3")
+	call c(fun1)
+}
+
+x = fun2
+call fun3(x)

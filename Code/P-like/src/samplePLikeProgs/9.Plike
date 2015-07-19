@@ -1,0 +1,26 @@
+{
+ Factorial of a number
+}
+
+PROGRAM fact;
+
+	procedure factorial(number : int) : int;
+	begin
+		if number = 1 then
+		begin
+			return 1;
+		end
+		else
+		begin
+			return number * call factorial(number - 1);
+		end
+	end
+
+begin
+	write(call factorial(3));
+end
+
+{
+Output :
+6
+}

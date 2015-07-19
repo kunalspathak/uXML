@@ -1,0 +1,40 @@
+/**
+ * Arrays - Arrays of function pointers
+ */
+
+funcptr (void(int,int)) *fun;
+
+/*
+ * Sum
+ */
+function void sum(int var1, int var2) {
+	print(var1,"+",var2,"=", (var1 + var2));
+}
+
+/*
+ * Difference
+ */
+
+function void diff(int var1, int var2) {
+	print(var1,"-",var2,"=", (var1 - var2));
+}
+
+
+/*
+ * Main function
+ */
+function void main() {
+	funcptr fun a[2];
+	a[0] = &sum;
+	a[1] = &diff;
+	
+	call *a[0] (2,3);
+	call *a[1] (2,3);
+}
+
+/*
+Output :
+2 + 3 = 5 
+2 - 3 = -1 
+
+*/

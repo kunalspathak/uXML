@@ -1,0 +1,47 @@
+// This program test the non-local acccess
+{
+	statements in zab can't access statements declared in baz1 or zab1.
+	try replacing x := y + z with x := y1 + z
+}
+PROGRAM static_test;
+
+	var b: int;
+		x: int := 100; // Global variable
+	procedure foo(x: int);
+		var x1: int;
+		
+		procedure baz1(y1: int);
+			procedure zab1(z1: int);
+			begin
+				x := y1 + z1;
+				//write(x);
+			end { zab1 }
+		begin { baz1 }
+			call zab1(2);
+			write("Inside baz1");
+		end { baz1 }
+		
+		procedure baz(y: int);
+			procedure zab(z: int);
+			begin
+				x := y + z;
+				write(x);
+			end { zab }
+		begin { baz }
+			call zab(2);
+			call baz1(5);
+		end { baz }
+		
+		
+	begin { foo }
+		x1 := 3;
+		call baz(x1);
+	end { foo }
+	
+begin { main }
+	call foo(b);
+end
+{
+	Output : 
+	5 
+}

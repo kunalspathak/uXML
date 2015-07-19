@@ -1,0 +1,46 @@
+/**
+ * TODO: Arrays - Returning arrays of function pointers 
+ */
+
+int sample[3][3];
+/*
+ * Executor
+ */
+function int[3][3] func() {
+	int i,j,a[3][3] ;
+	for(i = 0; i < 3; i=i+1) {
+		for(j = 0; j < 3;j=j+1) {
+			a[i][j] = i * j + 5;
+		}
+	}
+	return a;
+}
+
+
+/*
+ * Main function
+ */
+function void main() {
+	int i,j,b[3];
+	b = call func(void);
+	for(i = 0; i < 3; i=i+1) {
+		for(j = 0; j < 3;j=j+1) { 
+			print(b[i][j]); 
+		}
+	}
+}
+
+/*
+Output :
+
+5 
+5 
+5 
+5 
+6 
+7 
+5 
+7 
+9 
+
+*/

@@ -1,0 +1,47 @@
+/**
+* This program demonstrates accessing 2D array. 
+*/
+
+PROGRAM ARRAY_2D; // Name of main class 'A'
+
+
+
+class ARRAY_2D {
+	
+	function void main() {
+		int[3][3] a;
+		int[3][3] b;
+		int[3][3] c;
+		int i, j;
+		
+		for(i = 0 ; i < 3; i=i+1) {
+			for(j = 0 ; j < 3; j=j+1 ) {
+				a[i,j] = 1 * i + j;
+				b[i,j] = 2 * i + j;
+			}
+		}
+		
+		for(i = 0 ; i < 3; i=i+1) { 
+			for(j = 0 ; j < 3; j=j+1 ) {
+				c[i,j] = a[i,j] + b[i,j];
+			}
+		}
+		
+		for(i = 0 ; i < 3; i=i+1) {
+			print(a[i,0], a[i,1], a[i,2]);
+		}
+		
+		for(i = 0 ; i < 3; i=i+1) {
+			print(b[i,0], b[i,1], b[i,2]);
+		}
+		
+		for(i = 0 ; i < 3; i=i+1) {
+			print(c[i,0], c[i,1], c[i,2]);
+		}
+	}
+}
+
+/*
+ * In-built call new ARRAY_2D().main() 
+ */
+

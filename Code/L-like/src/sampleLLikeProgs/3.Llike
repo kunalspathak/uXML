@@ -1,0 +1,5 @@
+; lambda function 
+; The uXML equivalent that prints the result is in Backend\src\sampleuXMLProgs\51~3.xml
+
+(( lambda (x) (* x x)) 5 )
+	   

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program demonstrates the reduce function (int) using
+		function-type
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	<block>
+		<var name="num" type="string" mutable="yes" />
+
+		<assign>
+			<variable name="num" />
+			<constant type="string" value="2" />
+		</assign>
+
+		<function-type name="square_type">
+			<automatic-Var>
+				<var name="num1" type="int" mutable="no" />
+				<var name="num2" type="int" mutable="no" />
+			</automatic-Var>
+			<returns type="int" />
+		</function-type>
+
+		<print>
+			<operator value="(=)">
+
+				<!--
+					square calculator. notice no function name is present, hence it is
+					a lambda expression.
+				-->
+				<function type="square_type">
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="num1" />
+								<variable name="num2" />
+							</operator>
+						</return>
+					</block>
+				</function>
+
+				<cast type="int">
+					<constant type="string" value="1" />
+				</cast>
+				<cast type="int">
+					<variable name="num" />
+				</cast>
+				<constant type="int" value="3" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</operator>
+		</print>
+	</block>
+</uXML>

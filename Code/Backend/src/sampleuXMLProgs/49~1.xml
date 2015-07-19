@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<var mutable="yes" name="global" type="int">
+			<constant type="int" value="1" />
+		</var>
+		<function name="func">
+			<automatic-Var>
+				<var mutable="yes" name="j" type="int" />
+				<var mutable="no" name="f" type="float" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<assign>
+					<variable name="j" />
+					<constant type="int" value="6" />
+				</assign>
+				<print>
+					<variable name="global" />
+				</print>
+				<return>
+					<variable name="j" />
+				</return>
+			</block>
+		</function>
+		<function name="main">
+			<returns type="int" />
+			<block>
+				<var mutable="yes" name="i" type="int">
+					<operator value="+">
+						<constant type="int" value="1" />
+						<call>
+							<variable name="func" />
+							<constant type="int" value="5" />
+							<constant type="float" value="5.5" />
+						</call>
+					</operator>
+				</var>
+				<return>
+					<constant type="int" value="1" />
+				</return>
+			</block>
+		</function>
+		<function name="func2">
+			<automatic-Var>
+				<var mutable="yes" name="k" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<assign>
+					<variable name="k" />
+					<constant type="int" value="6" />
+				</assign>
+			</block>
+		</function>
+		
+		<call>
+			<variable name="main"/>
+		</call>
+	</block>
+</uXML>

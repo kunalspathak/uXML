@@ -1,0 +1,20 @@
+# This program demonstrates returning array from a function
+
+def fun(a)
+{
+	if a == 1
+	{
+		return [5]
+	}
+	else 
+	{
+		return [["Shri Gajanan Maharaj"],5]
+	}
+	
+}
+
+x = call fun(1)
+print x[0]
+
+x = call fun(2)
+print x[0]

@@ -1,0 +1,48 @@
+/**
+* This program demonstrates for-loop, do-while, while-do loops, array 
+*/
+
+PROGRAM FACT; // Name of main class 'A'
+
+class A {
+	
+	constructor A() {
+		print("A()");
+	}
+	
+	function void func(int number) {
+		int i;
+		int[5] a;
+		for (i = 0; i < number;i=i+1) {
+			print(a[i]);
+			a[i] = i * 10;
+		}
+		print("___________");
+		i = 4;
+		while(i >= 0) {
+			print(a[i]);
+			a[i] = i * 20;
+			i = i - 1;
+		}
+		print("___________");
+		i = 0;
+		do {
+			print(a[i]);
+			a[i] = i * 30;
+			i = i + 1;
+		} while(i < 5);
+	}
+}
+
+class FACT {
+	
+	function void main() {
+		class A a = new A(void);
+		call a.func(5);
+	} 
+}
+
+/*
+ * In-built call new FACT().main() 
+ */
+

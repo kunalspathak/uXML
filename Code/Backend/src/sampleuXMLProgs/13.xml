@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program demonstrates function pointers and function-type features. - Part 2
+		
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<!-- Define function signature 
+		 int squareType(int,int)
+	-->
+	<function-type name="squareType">
+		<automatic-Var>
+			<var name="num1" type="int" mutable="no" />
+			<var name="num2" type="int" mutable="no" />
+		</automatic-Var>
+		<returns type="int" />
+	</function-type>
+	
+	
+	<!--  Define function that returns function of type 'proto'
+		  proto giveFunction() 
+	 -->
+	<function name="giveFunction">
+		<returns type="squareType" /> <!--  <returns type="function" value="squareType"/>  -->
+		<block>
+			<!-- Variable of type proto -->
+			<var name="funcToReturn" type="squareType" mutable="yes"/>
+			
+			<assign>
+				<variable name="funcToReturn"/>
+				<function name="squareFunction" type="squareType">
+					<block>
+						<return>
+							<cast type="int">
+								<operator value="+">
+									<variable name="num1" />
+									<variable name="num2" />
+								</operator>
+							</cast>
+						</return>
+					</block>
+				</function>
+			</assign>
+			
+			<print>
+				<call>	
+					<variable name="funcToReturn"/>
+					<constant type="int" value="21"/>
+					<constant type="int" value="2"/>
+				</call>
+			</print>
+			
+			<return>
+				<variable name="funcToReturn"/>
+			</return>
+		</block>
+	</function>
+
+	<print>
+		<call>
+			<call>
+				<variable name="giveFunction"/>
+			</call>
+			<constant type="int"  value="2"/>
+			<constant type="int"  value="3"/>
+		</call>
+	</print>
+</block>
+</uXML>

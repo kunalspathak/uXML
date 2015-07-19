@@ -1,0 +1,364 @@
+Else condition 
+
+<-- src/sampleuXMLProgs/1.xml -->
+25 
+
+<-- src/sampleuXMLProgs/2.xml -->
+Inside answer(), before inner_answer()
+23
+Inside inner_answer()
+23
+Executing square
+Inside square()
+20
+400
+Inside answer(), after inner_answer()
+20
+Inside inner_answer()
+5
+5
+
+<-- src/sampleuXMLProgs/3.xml -->
+[1,4,9,16,25] 
+
+<-- src/sampleuXMLProgs/4.xml -->
+[one - brahmastra,two - brahmastra,three - brahmastra,four - brahmastra,five - brahmastra] 
+
+<-- src/sampleuXMLProgs/5.xml -->
+120 
+
+<-- src/sampleuXMLProgs/6.xml -->
+15 
+
+<-- src/sampleuXMLProgs/7.xml -->
+Sum :  
+15 
+Product :  
+[5,10,15,20,25] 
+
+<-- src/sampleuXMLProgs/8.xml -->
+Before call :  14 
+Inside demo1() 23 
+5 
+After demo1() call :  14 
+Inside demo2() 32 
+5.0 
+After demo2() call :  14 
+
+<-- src/sampleuXMLProgs/9.xml -->
+Inside demo1() 5.0 
+23 
+
+<-- src/sampleuXMLProgs/10.xml -->
+Inside demo1() 5.0 
+23 
+
+<-- src/sampleuXMLProgs/11.xml -->
+Before giveFunction() call 
+6 
+
+<-- src/sampleuXMLProgs/12.xml -->
+23 
+5 
+
+<-- src/sampleuXMLProgs/13.xml -->
+5 {0}* {{0}*}* __________________________________ 
+32 {0}* {{0}*}* __________________________________ 
+Before, n =  23 
+After, n =  0 
+32 {0}* {{0}*}* __________________________________ 
+32 {0}* {{14}*}* __________________________________ 
+32 {0}* {{14}*}* __________________________________ 
+32 {0}* {{14}*}* __________________________________ 
+Before, m =  {{50}*}* 
+After, m =  {{50}*}* 
+
+<-- src/sampleuXMLProgs/14.xml -->
+{0}* 
+{23}* 
+5 {5}* 
+
+<-- src/sampleuXMLProgs/15.xml -->
+{21}* 
+
+<-- src/sampleuXMLProgs/16.xml -->
+Inside if 
+
+<-- src/sampleuXMLProgs/17.xml -->
+0 0 
+5 0 
+
+<-- src/sampleuXMLProgs/18.xml -->
+0 
+10 
+20 
+30 
+40 
+
+<-- src/sampleuXMLProgs/19.xml -->
+6 
+
+<-- src/sampleuXMLProgs/20.xml -->
+5 
+
+<-- src/sampleuXMLProgs/21.xml -->
+Matrix A : 
+0 
+1 
+2 
+ 
+3 
+4 
+5 
+ 
+6 
+7 
+8 
+ 
+Matrix B : 
+0 
+1 
+2 
+ 
+3 
+4 
+5 
+ 
+6 
+7 
+8 
+ 
+Matrix C : 
+0 
+2 
+4 
+ 
+6 
+8 
+10 
+ 
+12 
+14 
+16 
+ 
+
+<-- src/sampleuXMLProgs/22.xml -->
+Matrix A : 
+5 
+5 
+ 
+5 
+5 
+ 
+Matrix B : 
+23 
+23 
+ 
+23 
+23 
+ 
+Matrix C : 
+28 
+28 
+ 
+28 
+28 
+ 
+
+<-- src/sampleuXMLProgs/23.xml -->
+[{32}*,{5}*,{23}*]
+32 
+50 
+23 
+
+<-- src/sampleuXMLProgs/24.xml -->
+23 {23}* 
+{32}* 32 
+5 {5}* 
+
+<-- src/sampleuXMLProgs/25.xml -->
+15 
+50 
+5 
+2 
+0 
+
+<-- src/sampleuXMLProgs/26.xml -->
+15 
+50 
+5 
+2 
+0 
+
+<-- src/sampleuXMLProgs/27.xml -->
+5 23 
+five 
+
+<-- src/sampleuXMLProgs/28.xml -->
+Assignment done
+4 
+60 
+16 
+
+<-- src/sampleuXMLProgs/29.xml -->
+5
+14
+41
+50
+50
+fifty
+
+<-- src/sampleuXMLProgs/30.xml -->
+Assignment done
+4 
+60 
+16 
+
+<-- src/sampleuXMLProgs/31.xml -->
+Hello World
+
+<-- src/sampleuXMLProgs/32.xml -->
+India A.sayHi()
+Hello  World 23 
+______________________
+
+<-- src/sampleuXMLProgs/33.xml -->
+India A.sayHi()
+Hello  World 23 
+______________________
+India A.sayHi()
+Hello  World 23 
+______________________
+India C.sayHello()
+Hello  World 5 
+
+<-- src/sampleuXMLProgs/34.xml -->
+India A.sayHi()
+Hello  World 23 
+______________________
+India A.sayHi()
+Hello  World 23 
+
+<-- src/sampleuXMLProgs/35.xml -->
+India C.sayHi()
+Hello  ats 32 
+______________________
+
+<-- src/sampleuXMLProgs/36.xml -->
+India B.sayHi(string)
+Hello India 23 
+______________________
+India A.sayHi(int)
+Hello 5 
+______________________
+India B.sayHi(string)
+Hello five 14 
+______________________
+
+<-- src/sampleuXMLProgs/37.xml -->
+Inside A's constructor
+Inside B's constructor
+Inside B.sayHello() 
+Inside A.sayHi() 
+Inside A's constructor
+Inside A's constructor
+Inside B's constructor
+Inside A.sayHi() 
+
+<-- src/sampleuXMLProgs/38.xml -->
+C()
+A._a() 
+
+<-- src/sampleuXMLProgs/39.xml -->
+32
+5
+23
+23
+5
+5
+14
+14
+
+<-- src/sampleuXMLProgs/40.xml -->
+23
+230
+
+<-- src/sampleuXMLProgs/41.xml -->
+block0 0.0 
+block1 0.1 
+block2 0.2 
+block3 block3 
+block3 block3 
+block2 0.5 
+block1 0.25 
+block0 0.0 
+
+<-- src/sampleuXMLProgs/42.xml -->
+H e l 
+
+<-- src/sampleuXMLProgs/43.xml -->
+3 
+
+<-- src/sampleuXMLProgs/44.xml -->
+
+<-- src/sampleuXMLProgs/45.xml -->
+0 
+
+<-- src/sampleuXMLProgs/46.xml -->
+Before call j = 5 
+After call j = 23 
+
+<-- src/sampleuXMLProgs/47.xml -->
+5 
+
+<-- src/sampleuXMLProgs/48.xml -->
+else 
+50 
+
+<-- src/sampleuXMLProgs/49.xml -->
+[one - brahmastra,two - brahmastra,three - brahmastra,four - brahmastra,five - brahmastra] 
+
+<-- src/sampleuXMLProgs/50.xml -->
+120 
+
+<-- src/sampleuXMLProgs/51.xml -->
+5 
+kunal Pathak 
+
+<-- src/sampleuXMLProgs/52.xml -->
+[0,0,0] 
+
+<-- src/sampleuXMLProgs/53.xml -->
+inside fun1 
+inside fun 5 
+
+<-- src/sampleuXMLProgs/54.xml -->
+5 
+
+<-- src/sampleuXMLProgs/55.xml -->
+equal 
+
+<-- src/sampleuXMLProgs/56.xml -->
+[5,five,[5,five]] 
+five 
+[5,[5,five,[5,five]]] 
+[5,five,[5,five]] 
+
+<-- src/sampleuXMLProgs/57.xml -->
+[one - brahmastra,two - brahmastra,three - brahmastra,four - brahmastra,five - brahmastra] 
+
+<-- src/sampleuXMLProgs/58.xml -->
+120 
+
+<-- src/sampleuXMLProgs/59.xml -->
+[one - brahmastra,two - brahmastra,three - brahmastra,four - brahmastra,five - brahmastra] 
+
+<-- src/sampleuXMLProgs/60.xml -->
+120 
+
+<-- src/sampleuXMLProgs/61.xml -->
+[1,4,9] 
+120 
+[HelloA,HelloB] 
+
+<-- src/sampleuXMLProgs/62.xml -->

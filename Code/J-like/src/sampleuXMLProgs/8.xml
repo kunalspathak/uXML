@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<uXML language="Jlike" poly="yes" scope="static">
+	<block>
+		<global-Var />
+		<class-type name="A">
+			<member-Var>
+				<var mutable="yes" name="i" type="int">
+					<constant type="int" value="0" />
+				</var>
+			</member-Var>
+			<constructor name="A">
+				<automatic-Var />
+				<block>
+					<print>
+						<constant type="string" value="A()" />
+					</print>
+				</block>
+			</constructor>
+			<constructor name="A">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="string" />
+				</automatic-Var>
+				<block>
+					<print>
+						<constant type="string" value="A(string)" />
+					</print>
+				</block>
+			</constructor>
+			<function name="fun">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="int" />
+				</automatic-Var>
+				<returns type="void" />
+				<block>
+					<assign>
+						<variable name="i" />
+						<variable name="str" />
+					</assign>
+					<print>
+						<constant type="string" value="A.fun(" />
+						<variable name="str" />
+						<constant type="string" value=")" />
+					</print>
+				</block>
+			</function>
+		</class-type>
+		<class-type name="B">
+			<inherits>
+				<variable name="A" />
+			</inherits>
+			<member-Var>
+				<var mutable="yes" name="n" type="int">
+					<constant type="int" value="5" />
+				</var>
+			</member-Var>
+			<constructor name="B">
+				<automatic-Var />
+				<block>
+					<print>
+						<constant type="string" value="B()" />
+					</print>
+				</block>
+			</constructor>
+			<function name="fun">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="int" />
+				</automatic-Var>
+				<returns type="void" />
+				<block>
+					<assign>
+						<variable name="i" />
+						<variable name="str" />
+					</assign>
+					<print>
+						<constant type="string" value="B.fun(" />
+						<variable name="str" />
+						<constant type="string" value=")" />
+					</print>
+				</block>
+			</function>
+		</class-type>
+		<class-type name="C">
+			<inherits>
+				<variable name="B" />
+			</inherits>
+			<member-Var />
+			<constructor name="C">
+				<automatic-Var />
+				<block>
+					<call>
+						<variable name="super" />
+						<variable name="this" />
+						<constant type="string" value="kunal" />
+					</call>
+					<print>
+						<constant type="string" value="C()" />
+					</print>
+				</block>
+			</constructor>
+			<constructor name="C">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="string" />
+				</automatic-Var>
+				<block>
+					<print>
+						<constant type="string" value="C(string)" />
+						<variable name="str" />
+					</print>
+				</block>
+			</constructor>
+			<function name="fun1">
+				<automatic-Var>
+					<var mutable="yes" name="str" type="int" />
+				</automatic-Var>
+				<returns type="void" />
+				<block>
+					<assign>
+						<variable name="i" />
+						<variable name="str" />
+					</assign>
+					<print>
+						<constant type="string" value="C.fun(" />
+						<variable name="str" />
+						<constant type="string" value=")" />
+					</print>
+				</block>
+			</function>
+		</class-type>
+		<class-type name="D">
+			<member-Var />
+			<function name="main">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="c" type="C">
+						<call>
+							<variable name="#new#" />
+							<variable name="C" />
+							<constant type="string" value="A" />
+						</call>
+					</var>
+					<var mutable="yes" name="b" type="B">
+						<call>
+							<variable name="#new#" />
+							<variable name="B" />
+						</call>
+					</var>
+					<assign>
+						<variable name="b" />
+						<variable name="c" />
+					</assign>
+					<call>
+						<variable name="fun1" />
+						<variable name="b" />
+						<field name="n">
+							<variable name="b" />
+						</field>
+					</call>
+				</block>
+			</function>
+		</class-type>
+		<call>
+			<variable name="main" />
+			<call>
+				<variable name="#new#" />
+				<variable name="D" />
+			</call>
+		</call>
+	</block>
+</uXML>

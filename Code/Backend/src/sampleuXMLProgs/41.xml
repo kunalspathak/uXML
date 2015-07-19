@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- 
+		This program defines 3 classes A,B and C, C inherits from B inherits A.
+		It demonstrates accessing/changing field variables  
+	-->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	poly="yes">
+	<block>
+
+	<class-type name="A">
+	
+		<member-Var>	
+			<var name="i" type="int" mutable="yes">	
+				<constant type="int" value="5"/>
+			</var>
+		</member-Var>
+		
+		<function name="_a">
+			<block>	
+				<print>	
+					<constant type="string" value="A._a()"/>
+				</print>
+			</block>	
+		</function>
+		
+	</class-type>
+
+	<class-type name="B">
+		<inherits>
+			<variable name="A"/>
+		</inherits>
+		
+		<member-Var>	
+			<var name="i" type="int" mutable="yes">	
+				<constant type="int" value="23"/>
+			</var>
+		</member-Var>
+
+		 <function name="_a">
+		 	<automatic-Var>	
+				<var name="a" type="A" mutable="yes"/>
+			</automatic-Var>
+			<returns type="A"/>
+			<block>	
+				<!--  B b = new B() -->
+				<var name="a2" type="A" mutable="yes">
+					<call>	
+						<variable name="#new#"/>
+						<variable name="A"/>
+					</call>
+				</var>
+				<println>	
+					<field name="i">	
+						<variable name="a"/>
+					</field>
+				</println>
+				
+				<!-- b.i = 230 -->
+				<assign>
+					<field name="i">
+						<variable name="a2"/>
+					</field>
+					<constant type="int" value="230"/>
+				</assign>
+				
+				<return>
+					<variable name="a2"/>
+				</return>
+				
+			</block>	
+		</function>
+	</class-type>
+	
+	<!-- A a1 = new A() -->
+	<var name="a1" type="A" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="A"/>
+		</call>
+	</var>
+	
+	<var name="a1R" type="A" mutable="yes"/>
+	
+	<!-- B b1 = new B()-->
+	<var name="b1" type="B" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="B"/>
+		</call>
+	</var>
+	
+	<var name="b2" type="B" mutable="yes">
+		<variable name="b1"/>
+	</var>
+	
+	<!-- a1.i = 50 -->
+	<assign>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<constant type="int" value="50"/>
+	</assign>
+
+	<!-- a1R = b1._a(a1)  -->
+	<assign>
+		<variable name="a1R"/>
+		<call>
+			<variable name="_a"/>
+			<variable name="b1"/>
+			<variable name="b2"/>
+		</call>
+	</assign>
+	
+	<println>
+		<field name="i">
+			<variable name="a1R"/>
+		</field>
+	</println>	
+
+</block>
+</uXML>

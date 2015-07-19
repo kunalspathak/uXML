@@ -1,0 +1,28 @@
+/**
+ * TODO: Pointers - Returning pointer from a function
+ */
+
+
+/*
+ * Executor
+ */
+function int *func() {
+	int *i, j ;
+	j = 5;
+	i = &j;
+	return i;
+}
+
+/*
+ * Main function
+ */
+function void main() {
+	int *i = call func(void);
+	print(i,*i);
+}
+
+/*
+Output :
+{5}* 5 
+
+*/

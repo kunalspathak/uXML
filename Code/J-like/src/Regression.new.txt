@@ -1,0 +1,82 @@
+Inside main 
+Inside fun2 5 
+
+<-- src/sampleuXMLProgs/2.xml -->
+Inside constructor A 
+Inside fun2 5 
+
+<-- src/sampleuXMLProgs/3.xml -->
+A() 
+B() 
+B.fun( 5 ) 
+
+<-- src/sampleuXMLProgs/4.xml -->
+A() 
+A.fun( 5 ) 
+
+<-- src/sampleuXMLProgs/5.xml -->
+A() 
+B() 
+B.fun( 5 ) 
+
+<-- src/sampleuXMLProgs/6.xml -->
+A() 
+A() 
+A() 
+B() 
+23 23 5 
+23 23 5 
+
+<-- src/sampleuXMLProgs/7.xml -->
+A() 
+B() 
+C(string) A 
+A() 
+B() 
+C.fun( 5 ) 
+
+<-- src/sampleuXMLProgs/8.xml -->
+A() 
+120 
+
+<-- src/sampleuXMLProgs/9.xml -->
+A() 
+0 
+0 
+0 
+0 
+0 
+___________ 
+40 
+30 
+20 
+10 
+0 
+___________ 
+0 
+20 
+40 
+60 
+80 
+
+<-- src/sampleuXMLProgs/10.xml -->
+A() 
+0 
+1 
+4 
+
+<-- src/sampleuXMLProgs/11.xml -->
+0 1 2 
+1 2 3 
+2 3 4 
+0 1 2 
+2 3 4 
+4 5 6 
+0 2 4 
+3 5 7 
+6 8 10 
+
+<-- src/sampleuXMLProgs/12.xml -->
+Inside A.a 
+
+<-- src/sampleuXMLProgs/13.xml -->

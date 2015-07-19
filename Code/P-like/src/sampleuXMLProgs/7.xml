@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<global-Var>
+			<var mutable="yes" name="i" type="int" />
+		</global-Var>
+		<for-loop>
+			<from>
+				<assign>
+					<variable name="i" />
+					<constant type="int" value="5" />
+				</assign>
+			</from>
+			<till>
+				<operator value=")=">
+					<variable name="i" />
+					<constant type="int" value="1" />
+				</operator>
+			</till>
+			<step>
+				<assign>
+					<variable name="i" />
+					<operator value="-">
+						<variable name="i" />
+						<constant type="int" value="1" />
+					</operator>
+				</assign>
+			</step>
+			<block>
+				<print>
+					<variable name="i" />
+				</print>
+			</block>
+		</for-loop>
+	</block>
+</uXML>

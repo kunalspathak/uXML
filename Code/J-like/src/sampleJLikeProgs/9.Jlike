@@ -1,0 +1,35 @@
+/**
+* This program demonstrates recursive function call using factorial program demonstration. 
+*/
+
+PROGRAM FACT; // Name of main class 'A'
+
+class A {
+	int i = 0;
+	
+	constructor A() {
+		print("A()");
+	}
+	
+	function int factorial(int number) {
+		if(number == 1) {
+			return 1; 
+		}
+		else {
+			return number * call this.factorial(number - 1);
+		}
+	}
+}
+
+class FACT {
+	
+	function void main() {
+		class A a = new A(void);
+		print(call a.factorial(5));
+	} 
+}
+
+/*
+ * In-built call new FACT().main() 
+ */
+

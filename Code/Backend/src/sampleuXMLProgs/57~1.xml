@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no">
+	<block>
+		<function name="fun">
+			<automatic-Var>
+				<var mutable="yes" name="a" type="Dynamic" />
+			</automatic-Var>
+			<block>
+				<print>
+					<operator value="[]">
+						<variable name="a" />
+						<constant type="int" value="0" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<call>
+			<variable name="fun" />
+			<array>
+				<constant type="int" value="5" />
+			</array>
+		</call>
+	</block>
+</uXML>

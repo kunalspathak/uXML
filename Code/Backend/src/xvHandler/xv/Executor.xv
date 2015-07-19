@@ -1,0 +1,1209 @@
+package xvHandler;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.IOException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.util.ArrayList;
+import java.util.Scanner;
+import compiler.dataTypes.ConstantValue;
+import compiler.components.Symbol;
+import compiler.components.Environment;
+import compiler.components.BuiltInFunctions;
+import compiler.dataTypes.FunctionType;
+import compiler.dataTypes.PointerType;
+import compiler.dataTypes.ArrayType; 
+import compiler.dataTypes.OverloadedFunctionType;
+import compiler.dataTypes.ClassType;
+import compiler.operator.Operator;
+import compiler.dataTypes.SymbolMachine;
+import compiler.util.Constants;
+import compiler.util.Constants.FUNCTION_TYPE;
+import compiler.uXMLGenerator.UXMLOOCodeGenerator;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import org.xml.sax.SAXException;
+import compiler.exceptions.*;
+
+public class Executor {
+    // current symbol to be returned
+    Symbol returnSymbol = null;
+    // current function nested level
+    int currentNestedLevel = -1;
+    boolean isAlreadyEntered = false;
+    PrintStream out = null;
+    protected final
+    %%
+        NodeList children = '*';   
+    	// Function-specific
+        NodeList argumentsList = './automatic-Var/var';
+        NodeList formalArguments = './automatic-Var[1]';
+        Double nestedLevelofFunction = 'count(ancestor::function)';
+        String functionName = './variable[1]/@name';
+        NodeList functionBody = './block[1]';
+        String returnType = './returns[1]/@type';
+        String returnFunctionType = './returns[1]/@value';
+        // Class-specific
+        NodeList ancestors = 'child::inherits/*';
+        NodeList memberVariables = 'child::member-Var/*';
+        NodeList constructors = 'child::constructor';
+        NodeList memberFunctions = 'child::function';
+        NodeList mainFunction = '//function';
+        String callToParentClass = './block[1]/call[1]/variable[1]/@name';
+        NodeList argsToSuperClassCall = './block[1]/call[1]/*';
+        NodeList scopeList = './scope[1]';
+        String scopeType = './@scope';
+        String polymorphism = './@poly';
+        String varDeclaration = './@var-declaration';
+        Double childrenCount = 'count(*)'; 
+        String conditionalBlock = 'name(child::*[2])';
+        // 'constant' element specific
+        String attributeName = './@name';
+        String attributeType = './@type';
+        String attributeMutable = './@mutable';
+        String attributeValue = './@value';
+        String attributeRefType = './@refType';
+        String attributePtrMutable = './@ptrMutable';
+        String attributeValueMutable = './@valueMutable';
+        String arrayType = '../@type';
+        Double arraySize = './@size';
+        Double arrayStartIndex = './@startIndex';
+    %%
+
+    /**
+     * This method visits the node that it gets as an argument and matches with appropriate 
+     * rule. Once the rule is matched and guard conditions are checked, the action associated
+     * with the corresponding guard condition is executed. 
+     *
+     */
+    public Symbol visit(Node node) {
+        %%
+            // Read the attributes of programming language
+            "uXML" :
+            {
+                Environment.scopeType = $scopeType;
+                Environment.isPolymorphism = Constants.YES.equals($polymorphism)? true:false;
+                Environment.isVarMandatory = Constants.NO.equals($varDeclaration)? false:true;
+                for(int childNo = 0; childNo < $childrenCount;childNo++)
+                    visit($children.item(childNo));
+            };
+            
+            // Constant reference
+            "constant" : 'count(*) = 0'
+            {
+                try 
+                {
+                    ConstantValue constant = new ConstantValue($attributeType,$attributeValue);
+                    returnSymbol = constant;
+                } catch (IllegalSymbolValueException e) { System.err.println(e.getMessage()); returnSymbol = null; } 
+            };
+            
+            // Variable reference
+            "variable" : 'count(*) = 0'
+            {
+                try {
+                	// If this is an OO language and variable name is 'this' it means that currentClass is already known
+                	// and the variable is requesting for current class's access, so return it.
+                	// However if currentClass is not known and still 'this' is used, throw the error
+                	if(Environment.isPolymorphism && Constants.THIS.equals($attributeName)) {
+                			if(Environment.currentClass != null)
+                    			returnSymbol = Environment.currentClass;
+                    		else {
+                    			System.err.println("'this' can be only used inside the class.");
+                    			returnSymbol = null;
+                    		}	
+                	}
+                	 /*if direct access to current class's variable 
+                	else if(Environment.isPolymorphism && Environment.currentClass != null) 
+            		{
+            			try {
+                    		returnSymbol = Environment.currentClass.getSymbol($attributeName);
+                    	} catch (SymbolNotDefinedException e) {
+                    		System.err.println(e.getMessage());
+                    		returnSymbol = null;
+                    	}
+            		} */
+                	else
+	                    // Starting searching for variables in current activation record and if not found, follow the 
+	                    // static/dynamic link depending on the scope type
+                		returnSymbol = Environment.getSymbol($attributeName);
+                } catch(SymbolNotDefinedException e) { System.err.println(e.getMessage()); returnSymbol = null; }
+            };
+            
+            // Perform the type-cast
+            "cast" : 
+            {
+                // Read the variable to be type-casted
+                returnSymbol = visit($children.item(0));
+                if(returnSymbol != null) {
+	                // Read the data-type in which above variable to be type-casted
+	                try {
+	                    returnSymbol = SymbolMachine.cast(returnSymbol, $attributeType); 
+	                } catch (IllegalSymbolValueException e) { returnSymbol = null; System.err.println(e.getMessage()); } 
+	                catch (TypeMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+					catch(SymbolNotDefinedException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+                }
+            };
+            
+            // Global variables
+            "global-Var" :
+            {
+            	for(int childNo = 0; childNo < $childrenCount;childNo++)
+                    visit($children.item(childNo));
+            };
+            
+            // Variable declaration
+            "var" : 
+            {
+               try 
+               {
+                    Symbol newVariable = null;
+                    // Check if there is an immediate assignment to the declared variable 
+                    if($childrenCount == 1 && $scopeList.getLength() == 0 || $childrenCount == 2) {
+                    	// Generate the mutable variable 
+                    	newVariable = SymbolMachine.generate($attributeName,$attributeType,true);
+                    	
+                    	// If this is a pointer, then check the values of ptrMutable and valueMutable and update newVariable
+                        // accordingly.
+                        if(newVariable instanceof PointerType) {
+    	                    // Set value mutable
+    	                    if($attributeValueMutable != null && $attributeValueMutable.trim().length() > 0)
+    	                    	((PointerType)newVariable).setPointeeMutable(Constants.YES.equals($attributeValueMutable)?true:false);
+                        }
+                    	// Read the value to be assigned to this variable
+                    	returnSymbol = ($childrenCount == 1)?visit($children.item(0)):visit($children.item(1));
+                    	// Set the value to this variable
+                    	try { newVariable.setValue(returnSymbol); 
+                    	} catch(ImmutableSymbolException e) {
+                    		// Since we are making newVariable as mutable, this exception can occur
+                    		// only if this is a pointer constant and user code tries to assign a constant
+                    		// variable to the constant pointer.
+                    		System.err.println(e.getMessage()); newVariable = null;
+                    	} catch(TypeMismatchException e) { 
+                    		System.err.println(e.getMessage()); newVariable = null; 
+                    	}
+                    	// Set the mutable status of this varaible.
+                    	if(newVariable instanceof PointerType) {
+                    		// Set pointer mutable
+    	                    if($attributePtrMutable != null && $attributePtrMutable.trim().length() > 0)
+    	                    	((PointerType)newVariable).setMutableStatus(Constants.YES.equals($attributePtrMutable)?true:false);
+                        }
+                    	else
+                    		newVariable.setMutableStatus(Constants.YES.equals($attributeMutable)?true:false);
+                    	
+                    } else {
+                    	// There is no initialization of this variable, hence simply generate a new variable.
+                    	newVariable = SymbolMachine.generate($attributeName,$attributeType,Constants.YES.equals($attributeMutable)?true:false);
+                    	
+                    	 // If this is a pointer, then check the values of ptrMutable and valueMutable and update newVariable
+                        // accordingly.
+                        if(newVariable instanceof PointerType) {
+                        	// Set pointer mutable
+    	                    if($attributePtrMutable != null && $attributePtrMutable.trim().length() > 0)
+    	                    	((PointerType)newVariable).setMutableStatus(Constants.YES.equals($attributePtrMutable)?true:false);
+    	                    
+    	                    // Set value mutable
+    	                    if($attributeValueMutable != null && $attributeValueMutable.trim().length() > 0)
+    	                    	((PointerType)newVariable).setPointeeMutable(Constants.YES.equals($attributeValueMutable)?true:false);
+                        }
+                        // If this is an array, set the name of variable, since it was set to the array-type 
+                        // in SymbolMachine.generate() method.  
+                        if(newVariable instanceof ArrayType) {
+                        	newVariable.setName($attributeName);
+                        }
+                    }
+                    
+                    // If this variable declaration is present at nestedLevel as that of current activation 
+                    // record, then add the variable in current activation record, else skip
+                    if(Environment.currentActivationRecord.getNestedLevel() == currentNestedLevel) {
+                    	// If class definition then add the symbols in current class
+            			// SymbolNotDefinedException will never occur for parameters, it is just
+            			// throw for constructor
+            			if(Environment.isClassDefinition)
+            				Environment.currentClass.addSymbol(newVariable); 
+            			else
+            				Environment.currentActivationRecord.addSymbol(newVariable);
+                    }
+                    returnSymbol = newVariable;
+                } catch (IllegalSymbolValueException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+            };
+            
+            // Represents pointer-type
+            "pointer-type" :
+            {
+            	PointerType newPointerType = null;
+            	try {
+                	// Make it as non-mutable.
+            		newPointerType = (PointerType)SymbolMachine.generate($attributeName, Constants.POINTER, false);
+            		// Create the data-type depending on the reference type and set as this pointer's reference type.
+            		newPointerType.setReferenceType($attributeRefType);
+            		// Set the initial pointee value
+            		newPointerType.setPointee(SymbolMachine.generate($attributeName, $attributeRefType, true));
+            		
+            		// If class definition then add the symbols in current class
+        			// SymbolNotDefinedException will never occur for parameters, it is just
+        			// throw for constructor
+        			if(Environment.isClassDefinition)
+        				Environment.currentClass.addSymbol(newPointerType);
+        			else
+        				Environment.currentActivationRecord.addSymbol(newPointerType);
+        			
+            	} catch (IllegalSymbolValueException e) { System.err.println(e.getMessage()); } 
+            	catch (TypeMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+				catch (ImmutableSymbolException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+            	returnSymbol = newPointerType;
+            };
+             
+            "array-type" :
+            {
+            	try {
+            		// Start constructing the array. Since last dimension's details are in the end,
+                	// build an array in bottom-up fashion
+                	ArrayList<ArrayType> newArrayType = new ArrayList<ArrayType>();
+                	newArrayType.add((ArrayType)visit($children.item(0)));
+                	// If only 1D array is there, then initialize it, else continue reading rest of the
+                	// dimensions
+                	if($childrenCount == 1) {
+                		newArrayType.get(0).setValue(SymbolMachine.generate(Constants.BLANK, $attributeType, true));
+                	}
+                	else {
+	                	ArrayType arrayElement = null;
+		            	for(int dimension = 1; dimension < $childrenCount; dimension++)
+		            	{
+		            		arrayElement = (ArrayType)visit($children.item(dimension));
+		            		// If this is the last dimension, then set the array of primitive data-type
+		            		if($childrenCount - dimension == 1)
+		            			arrayElement.setValue(SymbolMachine.generate(Constants.BLANK, $attributeType, true));
+		            		newArrayType.add(arrayElement);
+		            	}
+		            	
+		            	// Reset the values of array  in reverse order
+		            	for(int dimension = $childrenCount.intValue() - 1; dimension > 0; dimension--) 
+		            		newArrayType.get(dimension - 1).setValue(newArrayType.get(dimension));
+                	}
+                	// The array definition is present in newArrayType's 0th element.
+	            	returnSymbol = newArrayType.get(0);
+	            	returnSymbol.setName($attributeName);
+	            	
+	            	// If class definition then add the symbols in current class
+	    			// SymbolNotDefinedException will never occur for parameters, it is just
+	    			// throw for constructor
+	    			if(Environment.isClassDefinition)
+	    				Environment.currentClass.addSymbol(returnSymbol); 
+	    			else
+	    				Environment.currentActivationRecord.addSymbol(returnSymbol);
+	            	
+            	} catch (IllegalSymbolValueException e) { }
+            	catch (ImmutableSymbolException e) { } 
+            	catch (TypeMismatchException e) { } 
+            };
+
+            "dim" : 
+            {
+            	try 
+                {
+            		// Make the array non-mutable.
+            		ArrayType currentDim = (ArrayType)SymbolMachine.generate(Constants.BLANK, Constants.ARRAY, false);
+            		currentDim.setSize($arraySize.intValue());
+            		currentDim.setStartIndex($arrayStartIndex.intValue());
+            		returnSymbol =  currentDim;
+                } catch (IllegalSymbolValueException e) {System.err.println(e.getMessage()); returnSymbol = null;}
+            };
+            
+            // Constant array 
+            "array" :
+            {
+            	try {
+            		// Create an array
+            		ArrayType array = (ArrayType)SymbolMachine.generate(Constants.BLANK, Constants.ARRAY, false);
+            		for(int elementNo = 0; elementNo < $childrenCount; elementNo++) {
+            			array.appendElement(visit($children.item(elementNo)));
+            		}
+            		ConstantValue constantArray = new ConstantValue(Constants.DYNAMIC, true);
+            		constantArray.setValue(array);
+            		returnSymbol = constantArray;
+            	} catch (IllegalSymbolValueException e) {System.err.println(e.getMessage()); returnSymbol = null;}
+            	catch (TypeMismatchException e) {System.err.println(e.getMessage()); returnSymbol = null;}
+            };
+            
+            // Class definition
+            "class-type" : 
+            {
+            	try {
+	            	// Create a new instance of class-type
+	            	ClassType currentClass = (ClassType)SymbolMachine.generate($attributeName, Constants.CLASS, Constants.YES.equals($attributeMutable)?true:false);
+	            	// Assign same name since this is just a class-type 
+	            	currentClass.setClassName($attributeName);
+	            	
+	            	// Add all the inheriting classes as ancestors
+	            	for(int ancestorNo = 0; ancestorNo < $ancestors.getLength(); ancestorNo++) {
+	            		currentClass.addAncestor((ClassType)visit($ancestors.item(ancestorNo)));
+	            	}
+	            	// Switch to make sure that symbols are stored in this class and not in activation record
+	            	Environment.isClassDefinition = true;
+	            	Environment.currentClass = currentClass;
+	            	
+	            	// Add all the member variables in current class 
+	            	for(int memberVarNo = 0; memberVarNo < $memberVariables.getLength(); memberVarNo++) {
+	            		visit($memberVariables.item(memberVarNo));
+	            	}
+	            	
+	            	// Add all the constructors in current class 
+	            	for(int constructorNo = 0; constructorNo < $constructors.getLength(); constructorNo++) {
+	            		visit($constructors.item(constructorNo));
+	            	}
+	            	
+	            	// Add all the member functions in current class 
+	            	for(int functionNo = 0; functionNo < $memberFunctions.getLength(); functionNo++) {
+	            		visit($memberFunctions.item(functionNo));
+	            	}
+	            	// Switch to make sure that symbols are stored in activation record and not in this class  
+	            	Environment.isClassDefinition = false;
+	            	Environment.currentClass = null;
+	            	Environment.currentActivationRecord.addSymbol(currentClass);
+	            	returnSymbol = currentClass;
+	            } catch (IllegalSymbolValueException e) { System.err.println(e.getMessage()); returnSymbol = null; } 
+	            catch (SymbolNotDefinedException e) { System.err.println(e.getMessage()); returnSymbol = null; }
+            };
+            
+            // Constructor
+            "constructor" :
+            {
+            	FunctionType constructor = null;
+            	Node constructorBody = null;
+            	
+            	String currentClassName = Environment.currentClass.getClassName();
+            	// Check if constructor name is same as current class name
+            	if(!$attributeName.equals(currentClassName)) {
+            		System.err.println("Constructor should be defined for class '" + currentClassName + "' and not for class '" + $attributeName+ "'");
+            		return null;
+            	}
+            	// Make constructor non-mutable
+            	constructor = new FunctionType(Constants.CONSTRUCTOR, false,Constants.VOID);
+        		constructor.setNestedLevel(0);
+            	
+            	// If this constructor takes arguments, then set them in constructor definition 
+                if($formalArguments.getLength() == 1) {
+                    // Add formal parameters in function 
+                    for(int argsNo = 0; argsNo < $argumentsList.getLength();argsNo++)
+                    	constructor.addSymbol(visit($argumentsList.item(argsNo)));
+                }
+                constructorBody = $functionBody.item(0); 
+                
+                // If this is a derived class and if there is no call to super class's 
+                // constructor then insert a call to default constructor of parent class
+                // as the first line of constructorBody
+                if(!Environment.currentClass.isBaseClass() && !Constants.SUPER_CLASS.equals($callToParentClass)) {
+                	Node firstLineInConstructor = constructorBody.getFirstChild();
+                	Node callToSuperClass = UXMLOOCodeGenerator.generateCallToSuper(constructorBody.getOwnerDocument());
+                	constructorBody.insertBefore(callToSuperClass, firstLineInConstructor);
+                }
+                
+                ArrayList<Symbol> argsToSuper = new ArrayList<Symbol>();
+                
+                // Fetch the arguments passed to super class constructor
+                // Since this is a derived class, there is a call to super class constructor
+                if(!Environment.currentClass.isBaseClass()) {
+	                for(int args = 2; args < $argsToSuperClassCall.getLength(); args++) {
+	                	argsToSuper.add(visit($argsToSuperClassCall.item(args)));
+	                }
+                }
+                // Store the function body 
+                constructor.setFunctionBody(constructorBody);
+                try {
+                	// add the constructor in current class
+                	Environment.currentClass.addConstructor(constructor, argsToSuper);
+                	returnSymbol = constructor;
+                } catch(SymbolNotDefinedException e) { System.err.println(e.getMessage()); returnSymbol = null; }
+            };
+            
+            // Access field variables of an object
+            "field" :
+            {
+            	// Fetch the object whose variable is to be accessed
+            	ClassType currentClass = (ClassType)visit($children.item(0));
+            	try {
+            		returnSymbol = currentClass.getSymbol($attributeName);
+            	} catch (SymbolNotDefinedException e) {
+            		System.err.println(e.getMessage());
+            		returnSymbol = null;
+            	}
+            };
+            
+            // Assignment statements
+            "assign" : 'count(*) >= 2' 'count(*) <= 4'
+            {
+                Symbol lhs = visit($children.item(0));
+                Symbol rhs = visit($children.item(1));
+                try {
+                	if(lhs == null) {
+                		System.err.println("Trying to assign the value '" + rhs + "' to a null variable.");
+                		return null;
+                	}
+					lhs.setValue(rhs);
+				}  catch (IllegalSymbolValueException e)  { returnSymbol = null; System.err.println(e.getMessage()); }	
+				catch (TypeMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+				catch(ImmutableSymbolException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+                returnSymbol = rhs;  // Return the last evaluated value
+            };
+            
+            // Operator
+            "operator" : 
+            {
+                    if(Constants.ARITHMETIC_OPERATORS.contains($attributeValue)) {
+                    	returnSymbol = processArithmeticOperator($children,$attributeValue, false);
+                    }  
+                    
+                    // Logical Not
+                    else if (Constants.LOGICAL_NOT.equals($attributeValue)) {
+                    	
+                    	returnSymbol =  processLogicalNot($children,$attributeValue, false);
+                    }
+                    
+                    // Conditional operator
+                    else if(Constants.CONDITIONAL_OPERATORS.contains($attributeValue)) {
+                    	returnSymbol = processConditionalOperator($children, $attributeValue, $conditionalBlock, false);
+                    } 
+
+                    // Functional operator
+                    else if(Constants.FUNCTIONAL_OPERATORS.contains($attributeValue)) {
+                    	returnSymbol = processFunctionalOperator($children, $attributeValue, false);
+                    }
+            }; 
+            
+            // For-loop
+            "for-loop" : 'from' 'till' 'step' 'block'
+            {
+                visit($children.item(0));                                            // 'from'
+                while(((ConstantValue)visit($children.item(1))).booleanValue()) {    // 'to'
+                	// Return the last evaluated value
+        	        returnSymbol = visit($children.item(3));                         // 'block'
+        	        visit($children.item(2));                                        // 'step'
+                }
+            };
+            
+            "from" : "assign" 
+            {
+            	visit($children.item(0)); 
+            };
+            
+            "till" : "operator" 
+            {
+                visit($children.item(0));
+            };
+            
+            "step" : "assign" 
+            {
+                visit($children.item(0));
+            };
+            
+            "iterate" : "block" "till"
+            {
+                do 
+                {
+                	// Return the last evaluated value
+                    returnSymbol = visit($children.item(0));
+                } while(((ConstantValue)visit($children.item(1))).booleanValue()) ;
+                
+            } 
+            | "till" "block"
+            {
+                while(((ConstantValue)visit($children.item(0))).booleanValue()) {
+                	// Return the last evaluated value
+                    returnSymbol = visit($children.item(1));
+                }
+            };
+            
+            "function-type" :
+            {
+            	// The assumption is that the function-type will never be changed, hence make it non-mutable.
+            	FunctionType functionSignature = new FunctionType($attributeName, false,$returnType);
+            	
+            	// If this function-type has arguments, then add them as function formal parameters
+            	if($childrenCount == 2) {
+                    for(int argsNo = 0; argsNo < $argumentsList.getLength();argsNo++)
+                    	functionSignature.addSymbol(visit($argumentsList.item(argsNo)));                        
+                } 
+            	
+            	// Add the function-type in symbol table
+            	// If class definition then add the symbols in current class
+    			// SymbolNotDefinedException will never occur for parameters, it is just
+    			// throw for constructor
+    			if(Environment.isClassDefinition)
+    				Environment.currentClass.addSymbol(functionSignature); 
+    			else
+    				Environment.currentActivationRecord.addSymbol(functionSignature);
+                
+                returnSymbol = functionSignature;
+
+            };
+            
+            // Function definition
+            "function" : 
+            {
+                FunctionType function = null;
+                FunctionType functionSignature = null;
+                
+                // If function-type is specified for this function,
+                // then set the values.
+                if($attributeType != null && $attributeType.trim().length() > 0) {
+	                try {
+	                	// Extract the function-type that is specified in the @type value of the function
+	                	functionSignature = (FunctionType) Environment.getSymbol($attributeType);
+	                } catch (SymbolNotDefinedException e) { System.err.println(e.getMessage()); }
+	                
+	                String returnTypeIs = $returnType;
+	                // If return-type is specified again, then set the currently defined function's return type to that specified in
+	                // the function definition, if not, set it to that specified in the given function-type.
+	                // Here, since this function's definition will not change, make it non-mutable
+	                function = new FunctionType($attributeName, true, 
+	                		($returnType != null && $returnType.trim().length() > 0)? $returnType : functionSignature.getReturnType());
+	                
+	                try {
+	                // If function's return type is a 'function' then associate the appropriate function definition
+	                if(Constants.FUNCTION.equals(function.getReturnType())) {
+	                	if($returnType != null && $returnType.trim().length() > 0)
+	                		function.setReturnValue(SymbolMachine.generate(Constants.BLANK,$returnType, true));
+	                	else
+	                		function.setReturnValue(SymbolMachine.generate(Constants.BLANK,functionSignature.getName(), true));
+	                }
+	                } catch (Exception e) { System.err.println(e.getMessage()); }
+	                		
+	                for(Symbol args : functionSignature.getFormalParameters())
+	                	function.addSymbol(args);
+	                
+                } else {
+                	// Here, since this function's definition will not change, make it non-mutable 
+                	function = new FunctionType($attributeName, true,$returnType);
+                }  
+                
+                // Set the nested level information of current function
+                currentNestedLevel = $nestedLevelofFunction.intValue() + 1;
+                function.setNestedLevel(currentNestedLevel); 
+                
+                // If this function takes arguments, then even though function-type was specified for
+                // this function, reset the list of formal parameters and set them according to the 
+                // latest definition. 
+                if($formalArguments.getLength() == 1/*$childrenCount > 2*/) {
+                	// Clear the list of formal parameters, if any.
+                	function.clearFormalParameters();
+                    // Add formal parameters in function 
+                    for(int argsNo = 0; argsNo < $argumentsList.getLength();argsNo++)
+                        function.addSymbol(visit($argumentsList.item(argsNo)));
+                }
+                
+                // Once the local parameters are added to the appropriate activation record's symtab,
+                // restore the current nested level
+                currentNestedLevel = Environment.currentActivationRecord.getNestedLevel();
+
+                // Store the function body 
+                function.setFunctionBody($functionBody.item(0));
+
+                // If class definition then add the symbols in current class
+    			// SymbolNotDefinedException will never occur for parameters, it is just
+    			// throw for constructor
+    			if(Environment.isClassDefinition)
+    				Environment.currentClass.addSymbol(function);
+    			else
+    				Environment.currentActivationRecord.addSymbol(function);
+                
+                returnSymbol = function;
+            };
+            
+            // Function call
+            "call" : 
+            {
+            	String nameOfFunction = $functionName;
+            	FUNCTION_TYPE functionDefinition = BuiltInFunctions.getFunctionType(nameOfFunction);
+            	// initialize the list of arguments
+                ArrayList<Symbol> actualArgs = new ArrayList<Symbol>(); 
+
+            	switch(functionDefinition) {
+	            	case OPERATOR :
+	            		
+	            		// Change the 'map' or 'reduce' keyword into actual operators
+	            		if(Constants.MAP.equals(nameOfFunction))
+	            			nameOfFunction = Constants.MAP_FUNCTION;
+	            		else if(Constants.REDUCE.equals(nameOfFunction))
+	            			nameOfFunction = Constants.REDUCE_FUNCTION;
+
+	            		if(Constants.ARITHMETIC_OPERATORS.contains(nameOfFunction)) {
+	                    	returnSymbol = processArithmeticOperator($children,nameOfFunction, true);
+	                    }  
+	                    
+	                    // Logical Not
+	                    else if (Constants.LOGICAL_NOT.equals(nameOfFunction)) {
+	                    	
+	                    	returnSymbol =  processLogicalNot($children,nameOfFunction, true);
+	                    }
+	                    
+	                    // Conditional operator
+	                    else if(Constants.CONDITIONAL_OPERATORS.contains(nameOfFunction)) {
+	                    	returnSymbol = processConditionalOperator($children, nameOfFunction, $conditionalBlock, true);
+	                    } 
+
+	                    // Functional operator
+	                    else if(Constants.FUNCTIONAL_OPERATORS.contains(nameOfFunction)) {
+	                    	returnSymbol = processFunctionalOperator($children, nameOfFunction, true);
+	                    }
+	                    
+	            		break;
+	            	case ASSIGNMENT :
+
+	                    Symbol lhs = visit($children.item(1));
+	                    Symbol rhs = visit($children.item(2));
+	                    try {
+	                    	if(lhs == null) {
+	                    		System.err.println("Trying to assign the value '" + rhs + "' to a null variable.");
+	                    		return null;
+	                    	}
+	    					lhs.setValue(rhs);
+	    				}  catch (IllegalSymbolValueException e)  { returnSymbol = null; System.err.println(e.getMessage()); }	
+	    				catch (TypeMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+	    				catch(ImmutableSymbolException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+	                    returnSymbol = rhs; // Return rhs
+	                	                    
+	            		break;
+	            	default :
+	                	// Class-type whose function needs to be executed, if any.
+	                	ClassType currentClass = null;
+	                	ClassType savedCurrentClass = null;
+	                	
+	                	// Function to execute
+	                	FunctionType function = null;
+	                	
+	                    
+	                    // Create the list of arguments to be passed to the function
+	                    for(int argsNo = 1; argsNo < $childrenCount;argsNo++) {
+	                    	
+	                    	// If poly = true, then extract the class name whose function is getting called 
+	                    	if(argsNo == 1 && Environment.isPolymorphism) {
+	                    		currentClass = (ClassType)visit($children.item(argsNo));
+	                    		savedCurrentClass = Environment.currentClass;
+	                    		Environment.currentClass = currentClass;
+	                    		continue;
+	                    	} 
+	                        actualArgs.add(visit($children.item(argsNo)));
+	                    }
+	                    
+	                    // If poly = true, then extract the appropriate function from the class
+	                    if(Environment.isPolymorphism) {
+	                    	try {
+	                    		function = currentClass.lookupFunction(nameOfFunction, actualArgs);
+	                    		
+	                    	} catch(SymbolNotDefinedException e) {
+	                    		System.err.println(e.getMessage());
+	                    		return null; 
+	                    	}
+	                    }
+	                    // else simply extract the function from the symbol table
+	                    else {
+	    	                Symbol functionSym = visit($children.item(0));
+	    	                
+	    	                // If functionSym is null, it means a call to undefined symbol has been made.
+	    	                // Return null.
+	    	                if(functionSym == null) {
+	    	                	System.err.println("No suitable function found.");
+	    	                    return null;
+	    	                }
+	    	                
+	    	                // If var-declaration is optional, then check if constant value contains
+	    	                // overloadedFunction
+	    	                
+	    	                if( !Environment.isVarMandatory  &&
+	    	                		functionSym instanceof ConstantValue) {
+	    	                		try {
+	    	                			functionSym = ((ConstantValue)functionSym).overloadedFunctionValue().getFunction(actualArgs);
+		    	                	} catch (SymbolNotDefinedException e) {
+		    							System.err.println(e.getMessage());
+		    							return null;
+		    						}
+	    	                }
+	    	                else if(functionSym instanceof OverloadedFunctionType) {
+	    	                    // Extract the appropriate function based on the arguments that are being passed
+	    	                    try {
+	    							functionSym = ((OverloadedFunctionType)functionSym).getFunction(actualArgs);
+	    						} catch (SymbolNotDefinedException e) {
+	    							System.err.println(e.getMessage());
+	    							return null;
+	    						}
+	    	                }
+	    	                // If this is a functiontype, then simply match the parameters that will be passed
+	    	                // and if doesn't match, give error
+	    	                else  {
+	    	                	FunctionType functionSymbol = (FunctionType)functionSym;
+	    	                	String formalParamSignature = functionSymbol.getSignature();
+	    	                	String actualArgsSignature = functionSymbol.getSignatureOf(actualArgs);
+	    	                	if(!formalParamSignature.equals(actualArgsSignature)) {
+	    	                		System.err.println(new TypeMismatchException(actualArgsSignature, formalParamSignature).getMessage());
+	    	            			return null;
+	    	                	}
+	    	                }
+	    	                
+	    	                // else, this is the correct function to be invoked based on arguments that are being passed
+	    	                // to this function
+	    	                function = (FunctionType)functionSym;
+	                    }
+	                         
+	                    // Updated the currentNestedLevel to that of callee function.
+	                    currentNestedLevel = function.getNestedLevel();
+	                    
+	                    // Execute the calling sequence of a caller
+	                    Environment.callSequenceProcessor.callAction_caller(function.getNestedLevel());
+
+
+	                     /* COMMENTED : No need since return value are not checked against return type
+	                     if(Constants.FUNCTION.equals(function.getReturnType()))
+	                    	 Environment.currentActivationRecord.setReturnValue(function.getReturnValue());
+//	                    	 returnSymbol = function.getReturnValue(); 
+	                     else
+	                         // Initialize the returnValue field of activation record of current procedure.
+	                    	 // Since it will be reset after function execution, make the return value as mutable
+	                    	 Environment.currentActivationRecord.setReturnValue(new ConstantValue(function.getReturnType(), true));
+//	                    	 returnSymbol = new ConstantValue(function.getReturnType(), true);
+*/	                     
+	                     try 
+	                     {
+	                    	// new function execution, hence enter the block
+	                    	Environment.currentActivationRecord.enterTheBlock();
+	                    	// Since this is a function call, actual arguments will be set inside the symbol table of a function
+	                    	// Hence block has already been created, in such case, its not necessary to enter the block again when 'block'
+	                    	// function comes
+	                    	isAlreadyEntered = true;
+	                    	
+	                        // Execute the function body
+	                        visit(function.execute(actualArgs));
+	                        
+	                        // Retrieve the stored currentClass
+	                        Environment.currentClass = savedCurrentClass;
+	                        
+	                        // After function execution, leave the block
+	                        // Environment.currentActivationRecord.leaveTheBlock();
+	     
+	                        /* Commented : Don't check for return value, it will be handled by front end parser
+	                        // Check if function returns value other than 'void', and if yes, activation record should
+	                        // have returned some value.
+	                        String functionReturnType = function.getReturnType() ;
+	                        if(!Constants.VOID.equals(functionReturnType) && !Environment.currentActivationRecord.isReturnsValue()) {
+	                        	System.err.println("Function '" + function + "' should return a value of type '" + 
+	                        			(Constants.FUNCTION.equals(functionReturnType)?function.getReturnType():functionReturnType + "'"));
+	                        	returnSymbol = null;
+	                        	return returnSymbol; 
+	                        }
+	                        // Reset that activation record has return a value.
+	                        Environment.currentActivationRecord.setReturnsValue(false);
+	                        */
+	                        
+	                        // If this is a call to constructor then return the instance of current class
+	                        if(Environment.isPolymorphism && Constants.CONSTRUCTOR.equals(nameOfFunction)) {
+	                        	returnSymbol = currentClass;
+	                        }
+	                       /* else
+	                        	returnSymbol = Environment.currentActivationRecord.getReturnValue();*/
+	                                            
+	                     } catch(IllegalSymbolValueException e) { returnSymbol = null; System.err.println(e.getMessage()); }
+	                     catch(TypeMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+	                     catch(SignatureMismatchException e)  { returnSymbol = null; System.err.println(e.getMessage()); }
+	                    // Execute the return sequence of a caller
+	                     Environment.callSequenceProcessor.returnAction_caller();
+	                     currentNestedLevel = Environment.currentActivationRecord.getNestedLevel();
+	                     
+	                     // If poly = true, then reset the class definition flags
+	                     // Variable lookup should happen in current activation record
+	                     if(Environment.isPolymorphism) {
+//	                    	 Environment.isClassDefinition = false;
+//	                    	 Environment.currentClass = null;
+	                     }
+            	}
+            	
+            };
+             
+            // Return statement
+            "return" : 
+            {
+            	//returnSymbol = visit($children.item(0));
+                // Set the return value into current activation field
+                Symbol returnValue = visit($children.item(0));
+                try {
+                    /*Environment.currentActivationRecord.getReturnValue().setValue(returnValue);
+                    returnSymbol = Environment.currentActivationRecord.getReturnValue();*/
+                	// Directly set the return value, without checking.
+                	if(Constants.FUNCTION.equals(returnValue.getType())) {
+                		returnSymbol = returnValue;
+                	} else {
+                		returnSymbol = new ConstantValue(returnValue.getType(),true);
+                		returnSymbol.setValue(returnValue);
+                	}
+                    Environment.currentActivationRecord.setReturnsValue(true);
+                } catch (IllegalSymbolValueException e) { System.err.println(e.getMessage()); } 
+                  catch (TypeMismatchException e) { System.err.println(e.getMessage()); } 
+                  catch(ImmutableSymbolException e) { System.err.println(e.getMessage()); returnSymbol = null; }
+            };
+            
+            // Block of statements
+            "block" :  
+            {
+            	if(!isAlreadyEntered)
+           		 	Environment.currentActivationRecord.enterTheBlock();
+	           	 // Since already entered was true, because at the time of function  call, control already entered the block,
+	           	 // turn off the switch
+	           	 else
+	           		 isAlreadyEntered = false;
+            	
+                for(int childNo = 0; childNo < $childrenCount;childNo++) {
+                	// Return the last evaluated value
+                    returnSymbol = visit($children.item(childNo));
+                }
+            	Environment.currentActivationRecord.leaveTheBlock();
+            };
+            
+            // Print statement 
+            "print" :
+            {
+            	Symbol symbolToPrint = null;
+            	for(int stmtNo = 0; stmtNo < $childrenCount; stmtNo++) {
+                	symbolToPrint = visit($children.item(stmtNo));
+                	if(Constants.NO_TYPE.equals(symbolToPrint.getType())) // If no-type then throw error
+                		 System.err.println("Trying to print uninitialized variable '" + symbolToPrint.getName() + "'.");
+                	else
+                		out.print(symbolToPrint + " ");
+                }
+                out.println();
+            };
+            
+            // Print statement
+            "println" :
+            {
+            	Symbol symbolToPrint = null;
+                for(int stmtNo = 0; stmtNo < $childrenCount; stmtNo++) {
+                	symbolToPrint = visit($children.item(stmtNo));
+                    if(Constants.NO_TYPE.equals(symbolToPrint.getType()))
+                		 System.err.println("Trying to print uninitialized variable '" + symbolToPrint.getName() + "'.");
+                	else
+                		out.println(symbolToPrint);
+                }
+            };
+            
+            // No action if anything else
+            '*' : '*' 
+            {
+                for(int childNo = 0; childNo < $childrenCount;childNo++) {
+                	// Return the last evaluated value
+                    returnSymbol = visit($children.item(childNo));
+                }
+            };
+        %%
+        
+        return returnSymbol;
+    }
+     
+    private String generateTabs() {
+        StringBuffer tabString = new StringBuffer("");
+        for(int i = 0; i < currentNestedLevel; i++)
+            tabString.append("\t");
+            
+        return tabString.toString();
+    }
+    
+    /**
+     * This function processes the arithmetic operations and return the result.
+     * Here arguments could be more than 2
+     */
+    private Symbol processArithmeticOperator(NodeList operatorArgs, String operatorName, boolean isFunctionCall) {
+    	ArrayList<Symbol> args = new ArrayList<Symbol>();
+    	Symbol operatorResult = null;
+    	int startChildNo = isFunctionCall? 1 : 0; // If function call, skip the function name i.e. operator name
+    	int operatorArgsCount = operatorArgs.getLength();
+        
+        // read the 1st element in the list
+        operatorResult = visit(operatorArgs.item(startChildNo));
+        // Cummulative operation execution
+        try {
+        	// If unary operator
+        	if(operatorArgsCount == 1) {
+        		args = new ArrayList<Symbol>();
+        		args.add(operatorResult);
+        		operatorResult = Operator.execute(operatorName, args); // execute the operator
+        	}
+        	else {	
+		        for(int argsNo = startChildNo + 1; argsNo < operatorArgsCount;argsNo++) {
+		        	args = new ArrayList<Symbol>();
+		        	args.add(operatorResult);
+		        	args.add(visit(operatorArgs.item(argsNo)));
+		        	// execute the operation
+		        	operatorResult = Operator.execute(operatorName, args); // execute the operator
+		        }
+        	}
+        } catch(OperatorNotFoundException e)  { System.err.println(e.getMessage()); }
+        catch(IllegalSymbolValueException e) { System.err.println(e.getMessage()); }
+
+        return operatorResult; // return the result
+    }
+    
+    /**
+     * This function processes the conditional operations and return the result.
+     */
+    private Symbol processConditionalOperator(NodeList operatorArgs, String operatorName, String conditionalBlockName, boolean isFunctionCall) {
+    	
+    	ArrayList<Symbol> args = new ArrayList<Symbol>();
+    	Symbol operatorResult = null;
+    	ConstantValue conditionalResult = null;
+    	int operatorArgsCount = operatorArgs.getLength();
+    	int startChildNo = isFunctionCall? 1 : 0; // If function call, skip the function name i.e. operator name
+
+    	// if unary operation
+    	args.add(visit(operatorArgs.item(startChildNo)));
+    	// If binary operation and 2nd element is not a block
+    	if(operatorArgsCount > 1 + (isFunctionCall? 1 : 0)  && !Constants.BLOCK.equals(conditionalBlockName)) 
+           args.add(visit(operatorArgs.item(startChildNo + 1)));
+       
+    	try {
+        	operatorResult = Operator.execute(operatorName, args); // execute the operator
+        } catch(OperatorNotFoundException e)  { System.err.println(e.getMessage()); }
+        catch(IllegalSymbolValueException e) { System.err.println(e.getMessage()); }
+
+       
+    	conditionalResult = (ConstantValue) operatorResult;
+
+    	// If unary with 'only' condition true
+    	if(operatorArgsCount == 2 + (isFunctionCall? 1 : 0) && conditionalResult.booleanValue() && Constants.BLOCK.equals(conditionalBlockName))
+    		operatorResult = visit(operatorArgs.item(startChildNo + 1));
+       
+    	// If binary with 'if' condition true                        
+    	else if(operatorArgsCount > 2 + (isFunctionCall? 1 : 0) && conditionalResult.booleanValue()) 
+    		operatorResult = visit(operatorArgs.item(startChildNo + 2));
+       	
+    	// If binary with 'else' condition true                         
+    	else if(operatorArgsCount > 3 + (isFunctionCall? 1 : 0))
+    		operatorResult = visit(operatorArgs.item(startChildNo + 3));
+    	
+    	return operatorResult;
+    }
+    
+    /**
+     * This function processes the functional operations and return the result.
+     */
+    private Symbol processFunctionalOperator(NodeList operatorArgs, String operatorName , boolean isFunctionCall) {
+
+    	int operatorArgsCount = operatorArgs.getLength();
+    	Symbol operatorResult = null;
+    	int startChildNo = isFunctionCall? 1 : 0; // If function call, skip the function name i.e. operator name
+    	
+        // Read the function name and retrieve the appropriate function body from
+        // the symtab
+        Symbol functionSym = visit(operatorArgs.item(startChildNo));
+        
+        // If functionSym is null, it means a call to undefined symbol has been made.
+        // Return null.
+        if(functionSym == null) {
+        	System.err.println("No function found for operator '" + operatorName + "'");
+            return null;
+        }
+        FunctionType function = null;
+        // If function name is already defined and just the name is used for map/reduce
+        // then get the default function as of now. So overloaded function won't work currently.
+        if(functionSym instanceof OverloadedFunctionType)
+        	function = ((OverloadedFunctionType) functionSym).getDefaultFunction();
+        else
+        	function = (FunctionType)functionSym;
+        
+        // Apply map function
+        if(Constants.MAP_FUNCTION.equals(operatorName)) {
+        	ArrayType outputOfMap = null;
+        	try {
+        		outputOfMap = (ArrayType)SymbolMachine.generate(Constants.BLANK, Constants.ARRAY, true);
+        	} catch(IllegalSymbolValueException e){ System.err.println(e.getMessage());  }
+            
+            ArrayList<Symbol> actualArgs = null;
+            
+            // Create the list of arguments to be passed to the function
+            for(int argsNo = startChildNo + 1; argsNo < operatorArgsCount;argsNo++) {
+                actualArgs = new ArrayList<Symbol>();
+                actualArgs.add(visit(operatorArgs.item(argsNo)));
+
+                // Execute the calling sequence of a caller
+                Environment.callSequenceProcessor.callAction_caller(function.getNestedLevel());
+                     
+                // Initialize the returnValue field of activation record of current procedure.
+                // Since it will be reset after function execution, make the return value as mutable
+//                COMMENTED : No need since return value are not checked against return type
+//                Environment.currentActivationRecord.setReturnValue(new ConstantValue(function.getReturnType(), true));
+//                returnSymbol = new ConstantValue(function.getReturnType(), true);
+                     
+                try 
+                {
+                	// new function execution, hence enter the block
+                	Environment.currentActivationRecord.enterTheBlock();
+                	// Check the comments in "call" where the function.execute() is called. 
+                	isAlreadyEntered = true;
+                	
+                	// Execute the function body
+                    // out.println("Executing function...");
+                    visit(function.execute(actualArgs));
+                    
+                    // After function execution, leave the block
+                   //Environment.currentActivationRecord.leaveTheBlock();
+                    // get the return value from current activation record
+                    /*//Commented : Don't check for return value, it will be handled by front end parser
+                    outputOfMap.add(Environment.currentActivationRecord.getReturnValue());*/
+                    outputOfMap.appendElement(returnSymbol);
+                    
+                    // Execute the return sequence of a caller
+                    Environment.callSequenceProcessor.returnAction_caller();
+                        
+                } catch(IllegalSymbolValueException e) { System.err.println(e.getMessage()); /*outputOfMap.add(null);*/outputOfMap.appendElement(null); } 
+                catch(TypeMismatchException e) { System.err.println(e.getMessage()); /*outputOfMap.add(null);*/outputOfMap.appendElement(null); } 
+                catch(SignatureMismatchException e) { System.err.println(e.getMessage()); /*outputOfMap.add(null);*/ outputOfMap.appendElement(null);}
+                operatorResult = returnSymbol;
+            }
+            operatorResult = outputOfMap;
+        } else if(Constants.REDUCE_FUNCTION.equals(operatorName)) {
+            ArrayList<Symbol> actualArgs = null;
+            
+            // read the 1st element in the list
+            operatorResult = visit(operatorArgs.item(startChildNo + 1));
+            // Create the list of arguments to be passed to the function
+            for(int argsNo = startChildNo + 2; argsNo < operatorArgsCount;argsNo++) {
+                actualArgs = new ArrayList<Symbol>();
+                actualArgs.add(operatorResult);
+                actualArgs.add(visit(operatorArgs.item(argsNo)));
+         
+                // Execute the calling sequence of a caller
+                Environment.callSequenceProcessor.callAction_caller(function.getNestedLevel());
+                 
+                // Initialize the returnValue field of activation record of current procedure
+                // Since it will be reset after function execution, make the return value as mutable
+//                Environment.currentActivationRecord.setReturnValue(new ConstantValue(function.getReturnType(), true));
+//                returnSymbol = new ConstantValue(function.getReturnType(), true);
+                 
+                try 
+                {
+                	// new function execution, hence enter the block
+                	Environment.currentActivationRecord.enterTheBlock();
+                	// Check the comments in "call" where the function.execute() is called. 
+                	isAlreadyEntered = true;
+                	
+                    // Execute the function body
+                    // out.println("Executing function...");
+                    visit(function.execute(actualArgs));
+                     
+                    // After function execution, leave the block
+                    // Environment.currentActivationRecord.leaveTheBlock();
+                    
+                    // get the return value from current activation record
+                    /*// Commented : Don't check for return value, it will be handled by front end parser
+                    operatorResult = Environment.currentActivationRecord.getReturnValue();*/
+                    operatorResult = returnSymbol;
+                    
+                    // Execute the return sequence of a caller
+                    Environment.callSequenceProcessor.returnAction_caller();
+                    
+                } catch(IllegalSymbolValueException e)  { operatorResult = null; System.err.println(e.getMessage()); }
+                catch(TypeMismatchException e)  { operatorResult = null; System.err.println(e.getMessage()); }
+                catch(SignatureMismatchException e)  { operatorResult = null; System.err.println(e.getMessage()); }
+           } 
+        }
+        return operatorResult;
+    }
+    
+    /**
+     * This function processes the logical not operation and return the result.
+     */
+    private Symbol processLogicalNot(NodeList operatorArgs, String operatorName, boolean isFunctionCall) {
+    	ArrayList<Symbol> args = new ArrayList<Symbol>();
+    	int operatorArgsCount = operatorArgs.getLength();
+    	Symbol operatorResult = null;
+    	ConstantValue conditionalResult = null;
+    	int startChildNo = isFunctionCall? 1 : 0; // If function call, skip the function name i.e. operator name
+    	
+    	// This is a unary operation
+    	args.add(visit(operatorArgs.item(startChildNo)));
+    	
+    	// Execute the condition
+    	try {
+        	operatorResult = Operator.execute(operatorName, args); // execute the operator
+        } catch(OperatorNotFoundException e)  { System.err.println(e.getMessage()); }
+        catch(IllegalSymbolValueException e) { System.err.println(e.getMessage()); }
+        
+        conditionalResult = (ConstantValue) operatorResult;
+        
+        // If condition is true, then execute 'if-part'
+        if(operatorArgsCount > 1 + (isFunctionCall? 1 : 0) && conditionalResult.booleanValue()) 
+            operatorResult = visit(operatorArgs.item(startChildNo + 1));
+        // If condition is true, then execute 'else-part'
+        else if(operatorArgsCount > 2 + (isFunctionCall? 1 : 0))
+            operatorResult = visit(operatorArgs.item(startChildNo + 2));
+        
+        return operatorResult;
+    }
+    
+    /**
+     * Main method that invokes visit() method that starts visiting root node of given
+     * uXML.
+     *
+     */
+    public static void main(String args[]) {
+        Executor executor = new Executor();
+        
+        // get document
+        Document document = null;
+        String fileName = null;
+        executor.out = System.out;
+        try {
+            if(args.length == 0) {
+            	Scanner in = new Scanner(System.in);
+            	System.out.print("Enter the file name @ src/sampleuXMLProgs/");
+            	fileName = in.nextLine();
+            }
+            else {
+                fileName = args[0];   
+                if(args.length == 2) {
+                	executor.out = new PrintStream(new FileOutputStream(new File(args[1]),true));
+                }
+            }
+            
+            fileName = "src" + File.separator + "sampleuXMLProgs" + File.separator + fileName + ".xml";
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(fileName);
+            
+            // remove trivial text nodes
+            NodeList list = (NodeList)executor.xv.xpath.compile("//text()[not(normalize-space(.))]").evaluate(document, XPathConstants.NODESET);    
+            for (int n = list.getLength(); --n >= 0; )
+              list.item(n).getParentNode().removeChild(list.item(n));
+        
+            // remove trivial comments nodes
+            list = (NodeList)executor.xv.xpath.compile("//comment()").evaluate(document, XPathConstants.NODESET);
+            for (int n = list.getLength(); --n >= 0; )
+              list.item(n).getParentNode().removeChild(list.item(n));
+            
+            // intialize the environment
+            Environment.initialize(new ProcedureCallSeq(), true);
+            // Make main method as the parent method of all procedures.
+            executor.currentNestedLevel = 0;
+            //Environment.callSequenceProcessor.callAction_caller(0);
+            
+            // Start visiting each node of uXML
+            executor.visit(document.getDocumentElement());
+        
+        } catch (SAXException e) { 
+			System.err.println("Problem parsing file " + args[0]);
+		} catch (IOException e) {
+			System.err.println("Problem opening file " + args[0]);
+		} catch (ParserConfigurationException e) {
+			System.err.println("Problem with the parser configuration, while parsing file " + args[0]);
+		} catch (XPathExpressionException e) {
+			System.err.println("Problem in xPath expression.");
+		} catch (Exception e) {
+			System.err.println("Please fix the compilation errors.\n" + e.getMessage());
+		} finally {
+			executor.out.println();
+			executor.out.println("<-- " + fileName + " -->");
+			executor.out.close();
+		}
+    } 
+}

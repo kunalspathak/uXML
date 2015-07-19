@@ -1,0 +1,59 @@
+/**
+ * This program test the assignment of overloaded function to a function pointer. 
+ * Here 2 functions 'sum' are defined that takes different type of parameters. Also there
+ * is a function pointer that points to a function that takes 2 'int'. 
+ * When tried assigning the function 'sum' to this function pointer, right type of function
+ * is getting assigned.
+ * 
+ */
+
+/* Pointer to a function that takes 2 'int' and returns nothing */
+funcptr (void(int,int)) *fun;
+
+
+/* Sum */
+function void sum(int var1, int var2) {
+	print("inside sum(int,int)");
+	print(var1,"+",var2,"=", (var1 + var2));
+}
+
+/* overloaded sum */
+
+function void sum(float var1, float var2) {
+	print("inside sum(float,float)");
+	print(var1,"+",var2,"=", (var1 + var2));
+}
+
+/* Difference */
+function void diff(int var1, int var2) {
+	print("inside diff(int,int)");
+	print(var1,"-",var2,"=", (var1 - var2));
+}
+
+
+/* Main function */
+function void main() {
+	funcptr fun a, *b;
+	a = &sum;
+	b = &a;
+	
+	// Calls int function 
+	call *a(10,5);
+	
+	a = &diff;
+	call **b(10,5);
+	
+	// Gives error since a is a pointer to a function that points
+	// to a function that takes 2 'int', while here float is being passed
+//	 call *a(10.0,5.0);
+}
+
+/*
+Output :
+
+inside sum(int,int) 
+10 + 5 = 15 
+inside diff(int,int) 
+10 - 5 = 5 
+
+*/

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program test the optional var-declaration feature of uXML with
+		array-type. It can be also tested with other complex data-types like 
+		pointer-type and function-type. 
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	var-declaration="no">
+	<block>
+	
+		<!--  typedef intPtr arrayOfPtr[3] ;-->
+		<array-type name="arrayOfInt" type="int">
+			<dim size="3"/>
+		</array-type>
+	
+		<!-- int i -->
+		<var name="i" type="arrayOfInt" mutable="yes" />
+		
+		<!--  x = 5 -->
+		<assign>
+			<variable name="x" />
+			<variable name="i" />
+		</assign>
+		
+
+		<!--  print x -->
+		<print>
+			<variable name="x" />
+		</print>
+
+	</block>
+</uXML>
+

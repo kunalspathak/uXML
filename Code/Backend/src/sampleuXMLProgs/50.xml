@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program is same version of 5.xml program i.e. demonstration of
+		the map function (string). However this one takes functional
+		programming approach.
+	-->
+<uXML language="Llike" scope="static">
+	<!-- 
+		(map function (one,two,three,four,five) ) 
+		-->
+	<block>
+		<print>
+			<call>
+				<variable name="map" />
+				<function>
+					<automatic-Var>
+						<var name="num" type="string" mutable="no" />
+					</automatic-Var>
+					<returns type="string" />
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="num" />
+								<constant type="string" value=" - brahmastra" />
+							</operator>
+						</return>
+					</block>
+				</function>
+				<constant type="string" value="one" />
+				<constant type="string" value="two" />
+				<constant type="string" value="three" />
+				<constant type="string" value="four" />
+				<constant type="string" value="five" />
+			</call>
+		</print>
+	</block>
+</uXML>

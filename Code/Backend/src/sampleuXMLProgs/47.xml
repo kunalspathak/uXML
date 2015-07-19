@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<pointer-type name="int*" refType="int" />
+		<var name="k" ptrMutable="yes" type="int*" valueMutable="yes" />
+		<function name="func">
+			<automatic-Var>
+				<var name="i" ptrMutable="yes" type="int*" valueMutable="yes" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<assign>
+					<operator value="#">
+						<variable name="i" />
+					</operator>
+					<constant type="int" value="23" />
+				</assign>
+			</block>
+		</function>
+		<function name="main">
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="j" type="int">
+					<constant type="int" value="5" />
+				</var>
+				<print>
+					<constant type="string" value="Before call j =" />
+					<variable name="j" />
+				</print>
+				<call>
+					<variable name="func" />
+					<operator value="@">
+						<variable name="j" />
+					</operator>
+				</call>
+				<print>
+					<constant type="string" value="After call j =" />
+					<variable name="j" />
+				</print>
+			</block>
+		</function>
+		<call>
+			<variable name="main" />
+		</call>
+	</block>
+</uXML>

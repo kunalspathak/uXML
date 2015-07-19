@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		This program demonstrates function pointers and function-type features - Part 1
+		
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<pointer-type name="ptr1" refType="int"/>
+	<pointer-type name="ptr2" refType="ptr1"/>
+	<pointer-type name="ptr3" refType="ptr2"/>
+	
+	
+	<function name="printer">
+		<block>
+			<print>
+				<variable name="i"/>
+				<constant type="string" value="j = "/>
+				<variable name="j"/>
+				
+				<constant type="string" value="*j = "/>
+				<operator value="#">
+					<variable name="j"/>
+				</operator>
+				
+				<constant type="string" value="@j = "/>
+				<operator value="@">
+					<variable name="j"/>
+				</operator>
+				
+				<constant type="string" value="k = "/>
+				<variable name="k"/>
+				<constant type="string" value="*k = "/>
+				<operator value="#">
+					<variable name="k"/>
+				</operator>
+				<constant type="string" value="**k = "/>
+				<operator value="#">
+					<operator value="#">
+						<variable name="k"/>
+					</operator>
+				</operator>
+				<variable name="l"/>
+				<constant type="string" value="__________________________________"/>
+			</print>
+		</block>
+	</function>
+	
+	<!-- int i  -->
+	<var name="i" type="int" mutable="yes"/>
+	
+	<!-- int *j  -->
+	<var name="j" type="ptr1" ptrMutable="yes" valueMutable="no"/>
+	
+	<!-- int **k  -->
+	<var name="k" type="ptr2" ptrMutable="yes" valueMutable="no"/>
+	
+	<!-- int ***l -->
+	<var name="l" type="ptr3" ptrMutable="yes" valueMutable="no"/>
+	
+	
+	<!-- i = 5 -->
+	<assign>
+		<variable name="i"/>
+		<constant type="int" value="5"/>
+	</assign>
+	
+	<print>
+		<constant type="string" value="j = @i"/>
+	</print>
+	
+	<!-- j = @i -->
+	<assign>
+		<variable name="j"/>
+		<operator value="@">
+			<variable name="i"/>
+		</operator>
+	</assign>
+
+	
+	<print>
+		<constant type="string" value="k = @j"/>
+	</print>
+	<!-- k = @j -->
+	<assign>
+		<variable name="k"/>
+		<operator value="@">
+			<variable name="j"/>
+		</operator>
+	</assign>
+	
+	<print>
+		<constant type="string" value="l = @k"/>
+	</print>
+	<!-- l = @k -->
+	<assign>
+		<variable name="l"/>
+		<operator value="@">
+			<variable name="k"/>
+		</operator>
+	</assign>
+	
+	 print 
+	<call>
+		<variable name="printer"/>
+	</call>
+	
+	
+</block>
+	
+</uXML>

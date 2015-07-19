@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--  This program demonstrates the map function (string) -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../../../overall.xsd"
+ scope="static">
+	<block>
+		<print>
+			<operator value=")=(">
+				<!-- square calculator -->
+				<function>
+					<automatic-Var> 
+						<var name="num" type="string" mutable="no" />
+					</automatic-Var>
+					<returns type="string" />
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="num" />
+								<constant type="string" value=" - brahmastra" />
+							</operator> 
+						</return> 
+					</block>
+				</function>
+				<constant type="string" value="one" />
+				<constant type="string" value="two" />
+				<constant type="string" value="three" />
+				<constant type="string" value="four" />
+				<constant type="string" value="five" />
+			</operator>
+		</print>
+	</block>
+</uXML>

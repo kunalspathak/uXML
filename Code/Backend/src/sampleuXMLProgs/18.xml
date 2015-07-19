@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates basic level of array access -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<array-type name="arr1" type="int">
+		<!--<dim size="4" />
+		<dim size="2" />
+		<dim size="3" />-->
+		<dim size="5" />
+	</array-type>
+	
+	<var name="i" type="arr1" mutable="yes"/>
+	<var name="j" type="arr1" mutable="yes"/>
+	
+	<print>
+		<operator value="[]">
+			<variable name="i"/>
+			<constant type="int" value="2"/>
+		</operator>
+		<operator value="[]">
+			<variable name="j"/>
+			<constant type="int" value="2"/>
+		</operator>
+	</print>
+	
+	<assign>
+		<operator value="[]">
+			<variable name="i"/>
+			<constant type="int" value="2"/>
+		</operator>
+		<constant type="int" value="5"/>
+	</assign>
+
+	<print>
+		<operator value="[]">
+			<variable name="i"/>
+			<constant type="int" value="2"/>
+		</operator>
+				<operator value="[]">
+			<variable name="j"/>
+			<constant type="int" value="2"/>
+		</operator>
+	</print>
+	</block>
+</uXML>

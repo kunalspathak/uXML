@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program demonstrates 2 class having same methods.  -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static" poly="yes">
+<block>
+<class-type name="A">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="23"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India A.sayHi()"/>
+			</println>
+		
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+</class-type>
+
+
+<class-type name="B">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="5"/>
+		</var>
+	</member-Var>
+	
+	<function name="sayHello">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India B.sayHi()"/>
+			</println>
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+</class-type>
+
+
+<var name="objA" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+<var name="objB" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+
+<call>
+	<variable name="sayHi"/>
+	<variable name="objA"/>
+	<constant type="string" value="World"/>
+</call>
+<println>
+	<constant type="string" value="______________________"/>
+</println>
+<call>
+	<variable name="sayHi"/>
+	<variable name="objB"/>
+	<constant type="string" value="World"/>
+</call>
+</block>
+</uXML>
+<!--
+
+India A.sayHi()
+Hello  World 23 
+______________________
+Undefined symbol : B.sayHi(string) is not defined.
+ 
+ -->

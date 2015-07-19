@@ -1,0 +1,22 @@
+/**
+ * Factorial of a number
+ */
+
+function int factorial(int number) {
+	if(number == 1) {
+		return 1; 
+	}
+	else {
+		return number * call factorial(number - 1);
+	}
+}
+
+/* Main function */
+function void main() {
+	print(call factorial(3));
+}
+
+/*
+Output :
+6
+*/

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This program demonstrates function overloading feature - Part 1 -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<!-- func(string) -->
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="string" mutable="yes"/>
+		</automatic-Var>	
+		<block>
+			<print>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+	<!-- func(int) -->
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="int" mutable="yes"/>
+		</automatic-Var>	
+		<block>
+			<print>
+				<variable name="i"/>
+			</print>
+		</block>
+	</function>
+	
+	<!-- func(int,int) -->
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="int" mutable="yes"/>
+			<var name="j" type="int" mutable="yes"/>
+		</automatic-Var>	
+		<block>
+			<print>
+				<variable name="i"/>
+				<variable name="j"/>
+			</print>
+		</block>
+	</function>
+	
+	<!-- func(5,23) -->
+	<call>
+		<variable name="func"/>
+		<constant type="int" value="5"/>
+		<constant type="int" value="23"/>
+	</call>
+	
+	<!-- func(string) -->
+	<call>	
+		<variable name="func"/>
+		<constant type="string" value="five"/>
+	</call>
+</block>	
+</uXML>
+
+<!--
+Output: 
+5 23 five
+
+-->

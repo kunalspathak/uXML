@@ -1,0 +1,19 @@
+# This program demonstrates working of array of functions 
+
+def exe(a)
+{
+	call a[0](a[1])
+}
+
+def fun(b) {
+	print "fun", b
+}
+
+def howdy(b) {
+	print "howdy", b
+}
+
+x = [fun,5]
+call exe(x)
+x = [howdy,23]
+call exe(x)

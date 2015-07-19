@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<uXML language="Llike" scope="static">
+	<block>
+		<block>
+			<var mutable="yes" name="w" type="int">
+				<constant type="int" value="77" />
+			</var>
+			<block>
+				<block>
+					<var mutable="yes" name="w" type="int">
+						<constant type="int" value="8" />
+					</var>
+					<var mutable="yes" name="x" type="int">
+						<variable name="w" />
+					</var>
+					<block>
+						<print>
+							<call>
+								<variable name="+" />
+								<variable name="w" />
+								<variable name="x" />
+							</call>
+
+						</print>
+					</block>
+				</block>
+			</block>
+		</block>
+	</block>
+</uXML>

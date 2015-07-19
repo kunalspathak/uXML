@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uXML language="Llike" scope="static">
+		<!--  2 == 3? "if" : "else" OR
+			(== 2 3 ("if") ("else")) 
+		-->
+	<block>
+		<var name="i" type="int" mutable="yes"/>
+		<call>
+			<variable name="==" />
+			<constant type="int" value="2" />
+			<constant type="int" value="3" />
+			<block>
+				<print>
+					<constant type="string" value="if"/>
+				</print>
+			</block>
+			<block>
+				<print>
+					<constant type="string" value="else"/>
+				</print>
+			</block>
+		</call><!--
+		
+		(= i (* 2 1 (+ 5 7 13)))
+		alternative : (= i (* 2 1 (+ 25)))
+		--><call>
+			<variable name="="/>
+			<variable name="i"/>
+			<call>
+				<variable name="*" />
+				<constant type="int" value="2" />
+				<constant type="int" value="1" />
+				<call>
+					<variable name="+" />
+					<constant type="int" value="5" />
+					<constant type="int" value="7" />
+					<constant type="int" value="13" />
+				</call>
+			</call>
+		</call>
+		<print>
+			<variable name="i"/>
+		</print>
+		
+	</block>
+</uXML>

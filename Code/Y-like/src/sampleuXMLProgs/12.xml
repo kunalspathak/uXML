@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no">
+	<block><!--def square ( a ) -->
+		<function name="square">
+			<automatic-Var>
+				<var mutable="yes" name="a" type="Dynamic" />
+			</automatic-Var>
+			<block><!--return a * a -->
+				<return>
+					<operator value="*">
+						<variable name="a" />
+						<variable name="a" />
+					</operator>
+				</return>
+			</block>
+		</function><!--x = map ( square , [ 1 , 2 , 3 ] ) -->
+		<assign>
+			<variable name="x" />
+			<operator value=")=(">
+				<variable name="square" />
+				<constant type="int" value="1" />
+				<constant type="int" value="2" />
+				<constant type="int" value="3" />
+			</operator>
+		</assign><!--print x -->
+		<print>
+			<variable name="x" />
+		</print><!--def concat ( a ) -->
+		<function name="concat">
+			<automatic-Var>
+				<var mutable="yes" name="a" type="Dynamic" />
+			</automatic-Var>
+			<block><!--return a + "-brahmastra" -->
+				<return>
+					<operator value="+">
+						<variable name="a" />
+						<constant type="string" value="-brahmastra" />
+					</operator>
+				</return>
+			</block>
+		</function>
+		<!--
+			x = map ( concat , [ "one" , "two" , "three" , 4 , 5 ] )
+		-->
+		<assign>
+			<variable name="x" />
+			<operator value=")=(">
+				<variable name="concat" />
+				<constant type="string" value="one" />
+				<constant type="string" value="two" />
+				<constant type="string" value="three" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</operator>
+		</assign><!--print x -->
+		<print>
+			<variable name="x" />
+		</print>
+	</block>
+</uXML>

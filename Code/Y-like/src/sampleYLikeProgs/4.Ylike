@@ -1,0 +1,11 @@
+# This program demonstrates the usage of for-loop and while-do loop
+for i = 1 to 5
+{
+	print i
+}
+
+while i > 0
+{
+	print i
+	i = i - 1
+}

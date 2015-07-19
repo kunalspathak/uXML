@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static"><block><function name="func"><returns type="void"/><block/></function><function name="main"><returns type="void"/><block><pointer-type name="int*" refType="int"/><var name="j" ptrMutable="yes" type="int*" valueMutable="yes"/><print><variable name="j"/></print></block></function><call><variable name="main"/></call></block></uXML>

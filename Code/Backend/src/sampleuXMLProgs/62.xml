@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no">
+	<block>
+		<assign>
+			<variable name="x" />
+			<operator value=")=(">
+				<function name="#lambda#">
+					<automatic-Var>
+						<var mutable="yes" name="z" type="Dynamic" />
+					</automatic-Var>
+					<block>
+						<operator value="*">
+							<variable name="z" />
+							<variable name="z" />
+						</operator>
+					</block>
+				</function>
+				<constant type="int" value="1" />
+				<constant type="int" value="2" />
+				<constant type="int" value="3" />
+			</operator>
+		</assign>
+		<print>
+			<variable name="x" />
+		</print>
+		<assign>
+			<variable name="x" />
+			<operator value="(=)">
+				<function name="#lambda#">
+					<automatic-Var>
+						<var mutable="yes" name="x" type="Dynamic" />
+						<var mutable="yes" name="y" type="Dynamic" />
+					</automatic-Var>
+					<block>
+						<operator value="*">
+							<variable name="x" />
+							<variable name="y" />
+						</operator>
+					</block>
+				</function>
+				<constant type="int" value="1" />
+				<constant type="int" value="2" />
+				<constant type="int" value="3" />
+				<constant type="int" value="4" />
+				<constant type="int" value="5" />
+			</operator>
+		</assign>
+		<print>
+			<variable name="x" />
+		</print>
+		<assign>
+			<variable name="x" />
+			<operator value=")=(">
+				<function name="#lambda#">
+					<automatic-Var>
+						<var mutable="yes" name="z" type="Dynamic" />
+					</automatic-Var>
+					<block>
+						<operator value="+">
+							<constant type="string" value="Hello" />
+							<variable name="z" />
+						</operator>
+					</block>
+				</function>
+				<constant type="string" value="A" />
+				<constant type="string" value="B" />
+			</operator>
+		</assign>
+		<print>
+			<variable name="x" />
+		</print>
+	</block>
+</uXML>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This program defines 2 classes A and B, B inherited from A.
+It test method overloading -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static" poly="yes">
+<block>
+<class-type name="A">
+	
+	<member-Var>
+		<var name="i" type="int" mutable="yes">
+			<constant type="int" value="23"/>
+		</var>
+	</member-Var>
+	
+	<!--  sayHi(string) -->
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India A.sayHi(string)"/>
+			</println>
+		
+			<print>
+				<constant type="string" value="Hello "/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+			
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+		</block>
+	</function>
+	
+	<!-- sayHi (int) -->
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="number" type="int" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<var name="b" type="B" mutable="no">
+				<call>
+	 				<variable name="#new#"/>
+	 				<variable name="B"/>
+	 			</call>
+ 			</var>
+			
+			<println>
+				<constant type="string" value="India A.sayHi(int)"/>
+			</println>
+		
+			<print>
+				<constant type="string" value="Hello"/>
+				<variable name="number"/>
+			</print>
+			
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+			
+			<assign>
+				<variable name="i"/>
+				
+				
+				<!--<field name="i">
+					<variable name="this"/>
+				</field>
+				--><constant type="int" value="14"/>
+			</assign>
+			<call>
+				<variable name="sayHi"/>
+				<variable name="b"/>
+				<constant type="string" value="five"/>
+			</call>
+		</block>
+	</function>
+	
+</class-type>
+
+<class-type name="B">
+
+	<inherits>
+		<variable name="A"/>
+	</inherits>
+
+	<function name="sayHi">
+		<automatic-Var>
+			<var name="name" type="string" mutable="no"/>
+		</automatic-Var>
+		<block>
+			<println>
+				<constant type="string" value="India B.sayHi(string)"/>
+			</println>
+			<print>
+				<constant type="string" value="Hello"/>
+				<variable name="name"/>
+				<variable name="i"/>
+			</print>
+			<println>
+				<constant type="string" value="______________________"/>
+			</println>
+		</block>
+	</function>
+	
+</class-type>
+
+<var name="objA1" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+<!--<var name="objA2" type="A" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="A"/>
+ 	</call>
+</var>
+--><var name="objB1" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+<!--<var name="objB2" type="B" mutable="yes">
+ 	<call>
+ 		<variable name="#new#"/>
+ 		<variable name="B"/>
+ 	</call>
+</var>
+
+ --><!-- objA1 now contains instance of Class B -->
+<assign>
+	<variable name="objA1"/>
+	<variable name="objB1"/>
+</assign><!--
+
+  Should call sayHi() of B, since objA1 contains instance of B 
+--><call>
+	<variable name="sayHi"/>
+	<variable name="objA1"/>	
+	<constant type="string" value="India"/>	
+</call>
+ 
+<call>
+	<variable name="sayHi"/>
+	<variable name="objA1"/>	
+	<constant type="int" value="5"/>	
+</call>
+</block>
+</uXML>
+<!-- 
+Output :
+India B.sayHi(string)
+Hello India 23 
+______________________
+
+India A.sayHi(int)
+Hello 5 
+______________________
+
+India B.sayHi(string)
+Hello five 23 
+______________________
+
+ -->

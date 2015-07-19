@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="yes">
+	<block>
+		<function-type name="twoToOne">
+			<automatic-Var>
+				<var name="var1" type="int" mutable="yes" />
+			</automatic-Var>
+			<returns type="int" />
+		</function-type>
+
+		<function name="fun">
+			<automatic-Var>
+				<var mutable="yes" name="a" type="int" />
+			</automatic-Var>
+			<block>
+				<print>
+					<constant type="string" value="inside fun"/>
+					<variable name="a" />
+				</print>
+			</block>
+		</function>
+		<function name="fun1">
+			<automatic-Var>
+				<var mutable="yes" name="a" type="twoToOne" />
+			</automatic-Var>
+			<block>
+				<print>
+					<constant type="string" value="inside fun1"/>
+				</print>
+				<call>
+					<variable name="a" />
+					<constant type="int" value="5" />
+				</call>
+			</block>
+		</function>
+		<call>
+			<variable name="fun1" />
+			<variable name="fun" />
+		</call>
+	</block>
+</uXML>

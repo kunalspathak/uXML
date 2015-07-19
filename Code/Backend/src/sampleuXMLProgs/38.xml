@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- This program defines 2 classes A and B, B inherits A.
+	It test the features of constructors -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	poly="yes">
+<block>
+	<class-type name="A">
+		<constructor name="A">
+			<block>
+				<println>
+					<constant type="string" value="Inside A's constructor" />
+				</println>
+			</block>
+		</constructor>
+
+		<function name="sayHi">
+			<block>
+				<println>
+					<constant type="string" value="Inside A.sayHi() " />
+				</println>
+			</block>
+		</function>
+
+	</class-type>
+
+	<class-type name="B">
+		<inherits>
+			<variable name="A" />
+		</inherits>
+		<constructor name="B">
+			<block>
+				<!--
+					<call> <variable name="super"/> <variable name="B"/> </call>
+				-->
+				<println>
+					<constant type="string" value="Inside B's constructor" />
+				</println>
+			</block>
+		</constructor>
+
+		<function name="sayHello">
+			<block>
+				<println>
+					<constant type="string" value="Inside B.sayHello() " />
+				</println>
+			</block>
+		</function>
+	</class-type>
+
+
+	<var name="a" type="A" mutable="yes" />
+	<var name="a1" type="A" mutable="yes" />
+	<var name="b" type="B" mutable="yes" />
+
+	
+	<!-- 
+		b.sayHello()
+		Should give error since b is being used without initialization 
+	
+	<call>
+		<variable name="sayHello" />
+		<variable name="b" />
+	</call>-->
+
+	<!-- 
+		a = new B()
+		Allowed, since A is an ancestor of B 
+	-->
+	<assign>
+		<variable name="a" />
+		<call>
+			<variable name="#new#" />
+			<variable name="B" />
+		</call>
+	</assign>
+
+
+	<!-- 
+		((B)a).sayHello()
+		Since a contains an instance of B 
+		
+		Prints :
+		Inside A's constructor
+
+		Inside B's constructor
+		
+		Inside B.sayHello() 
+	-->
+	<call>
+		<variable name="sayHello" />
+		<cast type="B">
+			<variable name="a" />
+		</cast>
+	</call>
+	
+	<!-- 
+		a.sayHi()
+		Since a contains an instance of B, B is a descendant of A
+		hence a inherits the 'sayHi()' method from A 
+	-->
+	<call>
+		<variable name="sayHi" />
+		<variable name="a" />
+	</call>
+	
+	<!-- a1 = new A()
+	prints Inside A's constructor 
+	-->
+	<assign>
+		<variable name="a1" />
+		<call>
+			<variable name="#new#" />
+			<variable name="A" />
+		</call>
+	</assign>
+	
+	<!-- b = new B() 
+	Prints :
+		Inside A's constructor
+	
+		Inside B's constructor
+	-->
+	<assign>
+		<variable name="b" />
+		<call>
+			<variable name="#new#" />
+			<variable name="B" />
+		</call>
+	</assign>
+	
+	<!-- b.sayHi() 
+	Prints :
+	Inside A.sayHi()
+	-->
+	<call>
+		<variable name="sayHi" />
+		<variable name="b" />
+	</call>
+
+	
+	<!--
+		a1.sayHello() or ((B)a1).sayHello()
+		Gives error since a1 contains an instance of A and not of B 
+	 
+	<call>
+		<variable name="sayHello" />
+		<cast type="B">
+		<variable name="a1" />
+		</cast>
+	</call>
+	-->
+</block>
+</uXML>
+<!--
+Output :
+Inside A's constructor
+
+Inside B's constructor
+
+Inside B.sayHello() 
+
+Inside A.sayHi() 
+
+Inside A's constructor
+
+Inside A's constructor
+
+Inside B's constructor
+
+Inside A.sayHi() 
+ 
+-->

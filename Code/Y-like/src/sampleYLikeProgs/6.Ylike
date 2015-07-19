@@ -1,0 +1,8 @@
+# This program demonstrates the array
+x = [1,2,'a',4,5]
+y = [1,x,1]
+
+print x
+print y
+z = ['a', x,y, "ABC"]
+print z[1,4]

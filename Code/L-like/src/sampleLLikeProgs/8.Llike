@@ -1,0 +1,11 @@
+; Demonstration of 'map'.
+(
+map 
+((lambda (x) (+ x 1) ))
+2 3 4
+)
+
+; Output
+; [3, 4, 5]
+; 5 
+

@@ -1,0 +1,1302 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.6";
+}
+PARSER_BEGIN(Y)
+package parserOfY;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import compiler.components.*;
+import compiler.dataTypes.*;
+import compiler.exceptions.*;
+import compiler.operator.*;
+import compiler.util.*;
+import compiler.util.Constants.DATA_TYPE;
+import compiler.uXMLGenerator.*;
+
+import xvHandler.Executor;
+import xvHandler.CodeAnalysis;
+import xvHandler.ProcedureCallSeq;
+
+import parserOfY.exceptions.*;
+import sun.font.CreatedFontTracker;
+import sun.security.smartcardio.SunPCSC.Factory;
+ 
+public class Y {
+	  
+	private static UXMLElement currentNode = null;
+	private static String currentFunctionName = null;
+	private static FunctionType currentFunction = null;
+	private static boolean globalVariableDeclaration = false;
+	
+	public static void main(String args[]) throws ParseException {
+		FileInputStream io = null; 
+		String codeAnalysisFlag = null;
+		LineNumberReader loc = null;
+     
+		String fileName = null;
+		String filePath = null;
+	    if(args.length == 0) {
+	    	Scanner in = new Scanner(System.in);
+	    	System.out.print("Enter the file name @ src/sampleYLikeProgs/");
+	    	fileName = in.nextLine();
+	    	while(fileName.trim().length() == 0)
+	    		fileName = in.nextLine();
+	    	codeAnalysisFlag = in.nextLine();
+	    	args = new String[1];
+	    	args[0] = fileName;
+	    }
+	    else {
+	        fileName = args[0];
+	        if(args.length > 1)
+	        	codeAnalysisFlag = args[1];
+	    }
+	    
+	    try {
+	    	filePath = "src" + File.separator + "sampleYLikeProgs" + File.separator + fileName + ".Ylike";
+	    	io = new FileInputStream(filePath);
+	    	Y parser = new Y(io);
+	    	
+	    	// Initialize the environment
+	    	Environment.initialize(new ProcedureCallSeq(), false);
+	    	Environment.isVarMandatory = false;
+	    	// Initialize the uXMLDocument generator
+	    	currentNode = UXMLElementFactory.initialize("Ylike", Constants.STATIC);
+	    	// Make Variable declaration as optional
+	    	currentNode.setAttributeValue(Constants.VAR_DECLARATION, Constants.NO);
+	        
+	        Environment.currentActivationRecord.enterTheBlock();
+	        parser.YLike();
+	        Environment.currentActivationRecord.leaveTheBlock();
+	        
+	        // Save the uXML document
+	        UXMLElementFactory.done(fileName);
+	        
+	        if("-analysis".equals(codeAnalysisFlag)) {
+	        	loc = new LineNumberReader(new FileReader(filePath));
+	        	while (loc.readLine() != null) {}
+	        	CodeAnalysis.main(args, loc.getLineNumber());
+	        }
+	        else
+	        	Executor.main(args);
+	        io.close();
+        
+	    } catch (FileNotFoundException fe) {
+	    	System.err.println("File '" + fileName + "' not found.");
+	    	System.exit(1);
+	    } catch(IOException ie) {
+	    	System.err.println("Error reading file '" + fileName + "'.");
+	    	System.exit(1);
+	    }
+	    catch(ParseException e) {
+	        String message = e.getMessage();
+	        int startIndex = message.indexOf("line ") + 5;
+	        int endIndex = message.indexOf(",");
+	        String lineNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("column ") + 7;
+	        endIndex = message.indexOf(".");
+	        String columnNo = message.substring(startIndex, endIndex).trim();
+	
+	        startIndex = message.indexOf("\"") + 1;
+	        endIndex = message.lastIndexOf("\" at line");
+	        String keyword = message.substring(startIndex, endIndex).replaceAll("\"","").trim();
+	        
+	        System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	        StringBuffer expectedTokens = new StringBuffer("Expected tokens : ");
+	        String tokenValue = null;
+	        tokenValue = tokenImage[e.expectedTokenSequences[0][0]]; 
+	    	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	    	expectedTokens.append(tokenValue);
+	        for(int tokenId = 1; tokenId < e.expectedTokenSequences.length;tokenId++) {
+	        	tokenValue = tokenImage[e.expectedTokenSequences[tokenId][0]];
+	        	tokenValue = "'" + tokenValue.substring(1, tokenValue.length() - 1) + "'";
+	        	expectedTokens.append(", ")
+	        		.append(tokenValue);
+	        }
+	    	System.err.println(expectedTokens.toString());
+	    } catch(TokenMgrError e) {
+	    	String message = e.getMessage();
+			int startIndex = message.indexOf("line ") + 5;
+			int endIndex = message.indexOf(",");
+			String lineNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("column ") + 7;
+			endIndex = message.indexOf(".");
+			String columnNo = message.substring(startIndex, endIndex).trim();
+			
+			startIndex = message.indexOf("\"") + 1;
+			endIndex = message.indexOf("\"",startIndex);
+			String keyword = message.substring(startIndex, endIndex).trim();
+			
+			System.err.println("Compilation Error : Unexpected keyword '" + keyword +  "' at line " + lineNo + ", column " + columnNo);
+	    }
+	    catch(CompilationException e) {
+	    	System.err.println(e.getMessage());
+	    }
+  }
+}
+PARSER_END(Y)
+
+
+SKIP : { " " | "\r" | "\t" | "\n" }
+
+/* Constants */
+TOKEN: { < INT_CONSTANT : ( < DIGIT > ) + > }
+TOKEN: { < FLOAT_CONSTANT : ( < DIGIT > ) + "." ( < DIGIT > ) + > }
+TOKEN: { < STRING_CONSTANT : "\"" (~["\""])+ "\"" > }
+TOKEN: { < BOOL_CONSTANT : "true" | "false" > }
+TOKEN: { < CHAR_CONSTANT : "'" ~["'"] "'" > }
+
+/* Comments */
+//Cited from : http://en.wikibooks.org/wiki/Compiler_Construction
+
+
+SPECIAL_TOKEN : {<"#"> : InsideNewComment}
+<InsideNewComment> SPECIAL_TOKEN :
+{
+	<"\n" | "\r"> : DEFAULT
+}
+<InsideNewComment> MORE: {<~[]>}
+
+/* OPERATORS */
+TOKEN : { < PLUS: "+" > }	
+TOKEN : { < MINUS: "-" > }
+TOKEN : { < ASTERISK: "*" > }
+TOKEN : { < DIVIDE: "/" > } 
+TOKEN : { <MOD: "%" > }
+TOKEN : { < AMPERSAND : "&" > }
+TOKEN : { < BIT_OR : "|" > } 
+TOKEN : { < BIT_XOR : "^" > }
+TOKEN : { < BIT_COMPLEMENT : "~" > }
+
+/* Logical Operators */
+TOKEN: { < AND : "and" > }
+TOKEN: { < OR : "or" > }
+TOKEN: { < NOT: "not" > }
+
+/* Conditional Operators */
+TOKEN: { < EQ : "==" > }
+TOKEN: { < NT_EQ : "!=" > }
+TOKEN: { < LT: "<" > }
+TOKEN: { < LT_EQ : "<=" > }
+TOKEN: { < GT_EQ : ">=" > }
+TOKEN: { < GT: ">" > }
+
+/* Functional Operators */
+TOKEN: { <MAP : "map" > }
+TOKEN: { <REDUCE : "reduce" > }
+TOKEN: { <LAMBDA : "lambda" > }
+
+/* Keywords */
+TOKEN : { < PROGRAM : "PROGRAM" > } 
+TOKEN : { < IF : "if" > } 
+TOKEN : { < ELSE : "else" > } 
+TOKEN : { < WHILE : "while" > } 
+TOKEN : { < FOR : "for" > }
+TOKEN : { < TO : "to" > }
+TOKEN : { < DOWNTO : "downto" > }
+TOKEN : { <CALL : "call" > }
+TOKEN : { <WRITE : "print"> }
+TOKEN : { <WRITELN : "println"> }
+TOKEN : { <DEF : "def"> }
+TOKEN : { <RETURN : "return"> }
+TOKEN : { < BLOCK_START : "{" > } 
+TOKEN : { < BLOCK_END : "}" > }
+TOKEN : { < SQUARE_START : "[" > } 
+TOKEN : { < SQUARE_END : "]" > } 
+TOKEN : { < ROUND_START : "(" > } 
+TOKEN : { < ROUND_END : ")" > }
+TOKEN : { < ASSIGN : "=" > } 
+TOKEN : { < COMMA : "," >} 
+TOKEN : { < COLON : ":" > }
+TOKEN : { < VOID : "void" > }
+
+/* Data types */
+TOKEN : { <ID : ("_" | <ALPHA>)("_" | <DIGIT> | <ALPHA>)* > }
+
+TOKEN : {<ALPHA : ["a" - "z"] | ["A" - "Z"]>}
+TOKEN : {<DIGIT : ["0" - "9"]>}
+
+//Possible allowable constants
+Symbol Constants() throws CompilationException : {Token t = null;}
+{
+	try {
+		(t = < INT_CONSTANT > { UXMLElementFactory.eat(t.image);return new ConstantValue(Constants.INT,t.image);} 
+		| t = < FLOAT_CONSTANT > { UXMLElementFactory.eat(t.image);return new ConstantValue(Constants.FLOAT,t.image);}
+		| t = < CHAR_CONSTANT > 
+		{
+			UXMLElementFactory.eat(t.image);
+			String ch = t.image.substring(1,2);
+			return new ConstantValue(Constants.CHAR,ch);
+		}
+		| t = < STRING_CONSTANT > 
+		{ 
+			String str = t.image;
+			UXMLElementFactory.eat(str);
+			str = str.substring(1, str.length() - 1);
+			return new ConstantValue(Constants.STRING,str);
+		}
+		| t = < BOOL_CONSTANT >{ UXMLElementFactory.eat(t.image);return new ConstantValue(Constants.BOOLEAN,t.image);}
+		)
+	} catch(IllegalSymbolValueException e) {
+		throw new CompilationException(e.getMessage());
+	}
+}
+
+void YLike() throws CompilationException : { UXMLElement block = null; }
+{
+	{
+		block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+		currentNode.appendChild(block);
+		currentNode = block;
+	}
+	(Statements() | FunctionDef())*
+}
+
+/**
+ * Statements
+ */
+void Statements() throws CompilationException : 
+{
+	UXMLElement funcCall = null;
+}
+{
+	Assign() | IfElse() | ForLoop() | WhileDo() | 
+    funcCall = FunctionCall() {currentNode.appendComment(); currentNode.appendChild(funcCall);} | 
+    Write() | Return()
+}
+
+/**
+ * Assignment
+ */
+void Assign() throws CompilationException : 
+{
+	UXMLElement lhsElement = null, rhsElement = null, savedCurrentNode = currentNode, assignment = null;
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	Token t = null;
+}
+{
+	lhsElement = VariableAccess(false, false) 
+	t = <ASSIGN> {UXMLElementFactory.eat(t.image);} 
+	rhsElement = Expression()
+	{
+
+		lhsSymbol = lhsElement.getSymbol();
+		rhsSymbol = rhsElement.getSymbol();
+		
+		try {
+			if(lhsSymbol instanceof ArrayType) 
+				((ArrayType)lhsSymbol).copyArray(rhsSymbol);	
+			else
+				lhsSymbol.setValue(rhsSymbol);
+		} catch(ImmutableSymbolException e) {
+			throw new CompilationException(e.getMessage());
+		} catch(TypeMismatchException e) { 
+			throw new CompilationException(e.getMessage());
+		} catch(IllegalSymbolValueException e) {
+			throw new CompilationException(e.getMessage());
+		} 
+		assignment = UXMLElementFactory.generateElement(Constants.ASSIGN, null ,null);
+		attributes.put(Constants.NAME, lhsSymbol.getName());
+		if(rhsElement.getElement() == null)
+			assignment.appendChild(UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,lhsSymbol));
+		else
+			assignment.appendChild(lhsElement);
+		assignment.appendChild(rhsElement);
+		currentNode.appendComment();
+		currentNode.appendChild(assignment);
+	}
+}
+
+/**
+ * If else
+ */
+void IfElse() throws CompilationException :
+{
+	UXMLElement parentNode = currentNode;
+	Token t = null;
+}
+{
+  t = < IF > { UXMLElementFactory.eat(t.image); } 
+  MultiConditions(true) 
+  Block()
+  (
+    t = < ELSE > { UXMLElementFactory.eat(t.image); currentNode.appendComment(); } 
+    Block()
+  )? {  currentNode = parentNode; /*Restore the node*/ }
+}
+
+/**
+ * Logical operators
+ * isIfCond attribute decides if comments need to be appended or not.
+ */
+void MultiConditions(boolean isIfCond) throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement parentNode = currentNode, savedCurrentNode = currentNode, not = null, condition = null, lhsCondition = null,rhsCondition = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	lhsCondition = Condition(isIfCond)
+	((
+	t = <AND> {t.image = "$$";} | t = <OR> ) { UXMLElementFactory.eat(t.image); operatorName = t.image; }
+	rhsCondition = Condition(isIfCond)
+	{
+		lhsSymbol = lhsCondition.getSymbol();
+		rhsSymbol = rhsCondition.getSymbol(); 
+		attributes.clear();
+		attributes.put(Constants.VALUE, operatorName);
+		operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+		operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+		condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true));
+		condition.appendChild(lhsCondition);
+		condition.appendChild(rhsCondition);
+		
+		currentNode = savedCurrentNode;
+		if(isIfCond)
+			currentNode.appendComment();
+		currentNode.appendChild(condition);
+		
+		savedCurrentNode = currentNode;
+		lhsCondition = condition;
+	}
+	)*
+	{
+		if(condition != null)
+			currentNode = condition;
+	}
+	
+}
+
+/**
+ * Conditional operators
+ * isIfCond attribute decides if comments need to be appended or not.
+ */
+UXMLElement Condition(boolean isIfCond) throws CompilationException :
+{
+	Token t = null;
+	UXMLElement lhsExpression = null, rhsExpression = null, condition = null;
+	Symbol lhsSymbol = null, rhsSymbol = null;
+	String operatorName = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	HashMap<String,String> attributes = new HashMap<String, String>();
+}
+{
+	lhsExpression = Expression() 
+	(( t = <EQ> {UXMLElementFactory.eat(t.image); t.image = "==";} | 
+	   t = <NT_EQ> {UXMLElementFactory.eat(t.image);} | 
+	   t = <LT> {UXMLElementFactory.eat(t.image); t.image = "(";} | 
+	   t = <LT_EQ> {UXMLElementFactory.eat(t.image); t.image = "(=";}| 
+	   t = <GT> {UXMLElementFactory.eat(t.image); t.image = ")";} | 
+	   t = <GT_EQ>{UXMLElementFactory.eat(t.image); t.image = ")=";} ) 
+	{ 
+		operatorName = t.image;
+	} 
+	rhsExpression = Expression())?
+	{
+		lhsSymbol = lhsExpression.getSymbol();
+		// Unary operator
+		if(operatorName == null)
+		{
+			operatorName = "==";
+			attributes.clear();
+			attributes.put(Constants.VALUE, operatorName);
+			operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true));
+			condition.appendChild(lhsExpression);
+			if(isIfCond)
+				currentNode.appendComment();
+			currentNode.appendChild(condition);
+			currentNode = condition;
+			return condition;
+		}
+		// Binary operator
+		else {
+			rhsSymbol = rhsExpression.getSymbol();
+			attributes.clear();
+			attributes.put(Constants.VALUE, operatorName);
+			operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			condition = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true));
+			condition.appendChild(lhsExpression);
+			condition.appendChild(rhsExpression);
+			if(isIfCond)
+				currentNode.appendComment();
+			currentNode.appendChild(condition);
+			currentNode = condition;
+			return condition;
+		}
+		
+	}
+}
+
+/**
+ * for loop
+ */
+void ForLoop()throws CompilationException :
+{
+	UXMLElement parentNode = currentNode, for_loop = null, controllerNode = null, savedCurrentNode = null;
+	Symbol variableSymbol = null, variableValueSymbol = null, loopIndexSymbol = null;
+	UXMLElement variableSymbolElement = null, variableValueElement = null, loopIndexElement = null, 
+	initialValueElement = null, finalValueElement = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	boolean isUp = true;
+	Token t = null;
+}
+{
+  t = < FOR > {UXMLElementFactory.eat(t.image); }
+  {
+	for_loop = UXMLElementFactory.generateElement(Constants.FOR_LOOP, null, null);
+	savedCurrentNode = currentNode; 
+	currentNode.appendChild(for_loop);
+	currentNode = for_loop.appendChild(UXMLElementFactory.generateElement(Constants.FROM, null, null));
+  }
+  t = <ID >
+  {
+	  UXMLElementFactory.eat(t.image); 
+	  try {
+		  loopIndexSymbol = Environment.createSymbol(t.image); // This might be the undeclared symbol, hence need to create it
+	  } catch(SymbolNotDefinedException e) { throw new CompilationException(e.getMessage());}
+	  attributes.clear();
+	  attributes.put(Constants.NAME, loopIndexSymbol.getName());
+	  loopIndexElement = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,loopIndexSymbol);
+  }
+  t = <ASSIGN > {UXMLElementFactory.eat(t.image); } 
+  initialValueElement = Expression()
+  {
+	  // From
+	  controllerNode = UXMLElementFactory.generateElement(Constants.ASSIGN, null, null);
+	  controllerNode.appendChild(loopIndexElement);
+	  controllerNode.appendChild(initialValueElement);
+	  currentNode.appendChild(controllerNode);
+	  try {
+		  loopIndexElement.getSymbol().setValue(initialValueElement.getSymbol()); // Initialize the value as it might be used to access the array elements.
+	  } catch(ImmutableSymbolException e) {}
+	  catch (TypeMismatchException e) {}
+	  catch(IllegalSymbolValueException e) {}
+	  currentNode = for_loop.appendChild(UXMLElementFactory.generateElement(Constants.TILL, null, null));
+  }
+  ( t = < TO > {UXMLElementFactory.eat(t.image); } | 
+    t = < DOWNTO > {UXMLElementFactory.eat(t.image); isUp = false;}) 
+  finalValueElement = Expression() 
+  {
+	  // Till
+	  attributes.clear();
+	  attributes.put(Constants.VALUE, isUp? "(=" : ")="); // If TO then ++, else --
+	  controllerNode = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, null);
+	  controllerNode.appendChild(loopIndexElement.getClone());
+	  controllerNode.appendChild(finalValueElement);
+	  currentNode.appendChild(controllerNode);
+	  currentNode = for_loop.appendChild(UXMLElementFactory.generateElement(Constants.STEP, null, null));
+	  // Step
+	  controllerNode = UXMLElementFactory.generateElement(Constants.ASSIGN, null, null);
+	  controllerNode.appendChild(loopIndexElement.getClone());
+	  currentNode = currentNode.appendChild(controllerNode);
+	  
+	  attributes.clear();
+	  attributes.put(Constants.VALUE, isUp? "+" : "-"); // If TO then ++, else --
+	  controllerNode = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, null);
+	  controllerNode.appendChild(loopIndexElement.getClone());
+	  attributes.clear();
+	  attributes.put(Constants.TYPE, Constants.INT);
+	  attributes.put(Constants.VALUE, "1");
+	  controllerNode.appendChild(UXMLElementFactory.generateElement(Constants.CONSTANT, attributes, null));
+	  currentNode.appendChild(controllerNode);
+	  for_loop.insertComment();
+	  currentNode = for_loop;
+  }
+  Block() { currentNode = parentNode; /* Restore the node */ }
+}
+
+/**
+ * While do
+ */
+void WhileDo() throws CompilationException:
+{
+	UXMLElement parentNode = currentNode, savedCurrentNode = null, iterate = null, till = null;
+	Token t = null;
+}
+{
+  t = < WHILE > {UXMLElementFactory.eat(t.image);}
+  {
+	iterate = UXMLElementFactory.generateElement(Constants.ITERATE, null, null);
+	
+	till = UXMLElementFactory.generateElement(Constants.TILL, null, null);
+	iterate.appendChild(till);
+	savedCurrentNode = currentNode;
+	currentNode = till;
+  }
+  MultiConditions(false) 
+  {
+	  currentNode = savedCurrentNode;
+	  currentNode.appendComment();
+	  currentNode.appendChild(iterate);
+	  currentNode = iterate;
+  } 
+  Block() {currentNode = parentNode;  /*Restore the node*/ }
+}
+
+/**
+ * Function call
+ */
+UXMLElement FunctionCall() throws CompilationException : 
+{
+	UXMLElement argumentElement = null, call = null, function = null;
+	String functionName = null;
+	Symbol argumentSymbol = null, functionType = null;
+	ArrayList<Symbol> actualArgs = new ArrayList<Symbol>();
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	FunctionType functionSymbol = null;
+	Token t = null;
+}
+{
+	// Function call	
+	t = <CALL> {UXMLElementFactory.eat(t.image);} 
+	function = VariableAccess(true, true)
+	{
+		functionType = function.getSymbol();
+		functionName = functionType.getName();
+		call = UXMLElementFactory.generateElement(Constants.CALL, null, null);
+		attributes.clear();
+		call.appendChild(function);
+	}
+	t = <ROUND_START> {UXMLElementFactory.eat(t.image);} 
+	argumentElement = Expression()
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		// Check if expression is void and if yes, then no-argument function call is made
+		if(!Constants.VOID.equals(argumentSymbol.getType())) {
+			actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+			call.appendChild(argumentElement);
+		}
+	}
+	(t = <COMMA> {UXMLElementFactory.eat(t.image);} 
+	argumentElement = Expression()
+	{
+		argumentSymbol = argumentElement.getSymbol();
+		actualArgs.add(argumentSymbol instanceof FunctionType? ((FunctionType)(argumentSymbol)).getReturnValue() : argumentSymbol);
+		call.appendChild(argumentElement);
+	}
+	
+	)* 
+	t = <ROUND_END> {UXMLElementFactory.eat(t.image);}
+	{
+		try {
+			// If this is the recursive call, then just extract the current Procedure
+			if(functionName.equals(currentFunctionName)) 
+				functionSymbol = currentFunction;
+			else {
+				
+				if(!(functionType instanceof OverloadedFunctionType || functionType.getDataType() == DATA_TYPE.DYNAMIC) )
+					throw new CompilationException("Type mismatch \n Found    : '" + functionName + DataTypeFinder.getDataType(functionType) + "' \n Required : '" + functionName + "'");
+				
+				// Get the function
+				if(functionType.getDataType() == DATA_TYPE.DYNAMIC) {
+					call.setSymbol(functionType);
+				}
+				else {
+					functionSymbol = ((OverloadedFunctionType) functionType).getFunction(actualArgs);
+					call.setSymbol(functionSymbol);
+				}
+			}
+		} catch (SymbolNotDefinedException e) { throw new CompilationException(e.getMessage()); }
+		
+		return call;
+	}
+}
+
+/**
+ * Print
+ */
+void Write()throws CompilationException :
+{
+	Token t = null;
+	UXMLElement print, expression;
+}
+{
+	(t = <WRITE> | t = <WRITELN>) 
+	{
+		UXMLElementFactory.eat(t.image);
+		print = UXMLElementFactory.generateElement(t.image.replaceAll("write","print"), null, null);
+	}
+	expression = Expression()
+	{
+		print.appendChild(expression);
+	}
+	(
+		t = <COMMA> {UXMLElementFactory.eat(t.image);}
+		expression = Expression()
+		{
+			print.appendChild(expression);
+		}
+	)*
+	{
+		currentNode.appendComment();
+		currentNode.appendChild(print);
+	}
+}
+
+/**
+ * Return
+ */
+void Return() throws CompilationException :
+{
+	UXMLElement returnExpression = null, returnElement = null;
+	String requiredReturnType = null, foundReturnType = null;
+	Symbol returnSymbol = null;
+	Token t = null;
+}
+{
+	t = <RETURN> {UXMLElementFactory.eat(t.image);}
+	returnExpression = Expression()
+	{
+		returnElement = UXMLElementFactory.generateElement(Constants.RETURN, null, null);
+		returnSymbol = returnExpression.getSymbol();
+		returnSymbol = (returnSymbol instanceof FunctionType)? ((FunctionType)returnSymbol).getReturnValue():returnSymbol;
+		returnElement.appendChild(returnExpression);
+		currentNode.appendComment();
+		currentNode.appendChild(returnElement);
+	}
+}
+
+/**
+ * Function definition
+ */
+void FunctionDef() throws CompilationException : 
+{
+	Token t = null;
+	String functionName = null, paramName = null;
+	UXMLElement savedCurrentNode = currentNode, procedureNode , automaticVarNode , block, paramNode = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	Symbol paramSymbol = null;
+}
+{
+	t=<DEF>
+	{
+		UXMLElementFactory.eat(t.image);
+		// Execute the calling sequence of a caller - 
+	    Environment.callSequenceProcessor.callAction_caller(0);
+	    Environment.currentActivationRecord.enterTheBlock();
+	    // Everything apart from function definition is global
+	    globalVariableDeclaration = false; 
+	}
+	t = <ID> 
+	{ 
+		UXMLElementFactory.eat(t.image);
+		functionName = t.image;
+		currentFunction = new FunctionType(functionName, true, Constants.VOID);
+		// Nested level of function will be '0' since nested functions are not 
+		// allowed in Ylike
+		currentFunction.setNestedLevel(0);
+		attributes.clear();
+		attributes.put(Constants.NAME, functionName);
+		procedureNode = UXMLElementFactory.generateElement(Constants.FUNCTION , attributes, null);
+		
+	}  
+	t=<ROUND_START> {UXMLElementFactory.eat(t.image);} 
+	(
+		{
+			automaticVarNode = procedureNode.appendChild(UXMLElementFactory.generateElement(Constants.AUTOMATIC_VAR, null, null));
+		}
+		t = <ID> 
+		{ 
+			UXMLElementFactory.eat(t.image);
+			paramName = t.image;
+			paramSymbol = new ConstantValue(paramName,Constants.NO_TYPE,true);
+			currentFunction.addSymbol(paramSymbol);
+			attributes.clear();
+			attributes.put(Constants.NAME, paramName);
+			attributes.put(Constants.TYPE, Constants.NO_TYPE);
+			attributes.put(Constants.MUTABLE, Constants.YES);
+			automaticVarNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+		}  
+		(t=<COMMA>{UXMLElementFactory.eat(t.image);} 
+		t = <ID> 
+		{ 
+			UXMLElementFactory.eat(t.image);
+			paramName = t.image;
+			paramSymbol = new ConstantValue(paramName,Constants.NO_TYPE,true);
+			currentFunction.addSymbol(paramSymbol);
+			attributes.clear();
+			attributes.put(Constants.NAME, paramName);
+			attributes.put(Constants.TYPE, Constants.NO_TYPE);
+			attributes.put(Constants.MUTABLE, Constants.YES);
+			automaticVarNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+		} 
+	)*)? t=<ROUND_END> {UXMLElementFactory.eat(t.image);}
+	
+	{
+		currentNode.appendComment();
+		currentNode = currentNode.appendChild(procedureNode);
+		// Save the function in global symbol table
+		Environment.addGlobalSymbol(currentFunction);
+		// Copy the formal params in current symbol table
+		for(Symbol formalArg : currentFunction.getFormalParameters()) 
+			Environment.currentActivationRecord.addSymbol(formalArg);
+	}
+	Block()
+	{
+		// Function done
+		Environment.callSequenceProcessor.returnAction_caller();
+		globalVariableDeclaration = true;
+		currentNode = savedCurrentNode;
+	}
+}
+
+/**
+ * Scope start
+ * {
+ */
+void ScopeStart() : {}
+{
+	<BLOCK_START>	
+	{
+		Environment.currentActivationRecord.enterTheBlock();
+	}
+}
+
+/**
+ * Scope end
+ * }
+ */
+void ScopeEnd() : {}
+{
+	<BLOCK_END>	
+	{
+		Environment.currentActivationRecord.leaveTheBlock();
+	}
+}
+
+/**
+ * Block
+ */
+void Block()throws CompilationException :
+{
+	UXMLElement savedCurrentNode = currentNode, block = null;
+}
+{ 
+	ScopeStart()
+	{
+	  block = UXMLElementFactory.generateElement(Constants.BLOCK, null, null);
+	  currentNode.appendChild(block);
+	  currentNode = block;
+    }
+  	(
+  	  Statements()
+  	)*
+  	ScopeEnd()
+  	{
+	  currentNode = savedCurrentNode;
+  	}
+}
+
+
+/**
+ * isFunctionCall - If this access refers to the function call
+ * isVarDeclared - If this access refers to the already defined variable (true) or first-time usage (false)
+ */
+UXMLElement VariableAccess(boolean isFunctionCall, boolean isVarDeclared) throws CompilationException :
+{
+	Token t = null;
+	String variableName = null;
+	Symbol variableSymbol = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	UXMLElement variableSymbolElement = null;
+}
+{
+	t = <ID>
+	{
+		try {
+			variableName = t.image;
+			UXMLElementFactory.eat(t.image);
+			// If this is a function call, then simply store the current procedure.
+			// This trick is to enable recursive calls
+			if(isFunctionCall && variableName.equals(currentFunctionName)) 
+				variableSymbol = currentFunction;
+			else {
+				// If the variable is already declared then get it from Environment
+				// else create the symbol, add it in current Activation record and
+				// return it.
+				variableSymbol = isVarDeclared? Environment.getSymbol(variableName) : 
+					Environment.createSymbol(variableName);
+			}
+				
+			attributes.clear();
+			attributes.put(Constants.NAME, variableSymbol.getName());
+			variableSymbolElement = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,variableSymbol);
+		} catch(SymbolNotDefinedException e) {throw new CompilationException(e.getMessage());}
+	}
+	variableSymbolElement = ArrayAccess(variableSymbolElement) { return variableSymbolElement; }
+}
+
+/**
+ * Create Array
+ */
+UXMLElement CreateArray() throws CompilationException : 
+{
+	Symbol constantSymbol = null;
+	UXMLElement savedCurrentNode = currentNode, arrayNode, elementNode = null;
+	ArrayType array = null;
+	Token t = null;
+	HashMap<String,String> attributes = new HashMap<String,String>();
+}
+{ 
+	{
+		try {
+			array = (ArrayType)SymbolMachine.generate(Constants.BLANK, Constants.ARRAY, false);
+		} catch(IllegalSymbolValueException e) { throw new CompilationException(e.getMessage()); }
+		arrayNode = UXMLElementFactory.generateElement(Constants.ARRAY, null, array);
+	}
+	(t=<SQUARE_START>{UXMLElementFactory.eat(t.image);} 
+	(
+		elementNode = CreateArray() | 
+		elementNode = VariableAccess(false,true) |
+		elementNode = MapOrReduce() |
+		constantSymbol = Constants()
+		{
+			attributes.clear();
+			attributes.put(Constants.TYPE,constantSymbol.getType());
+			attributes.put(Constants.VALUE,constantSymbol.getValue());
+			elementNode = UXMLElementFactory.generateElement(Constants.CONSTANT, attributes, constantSymbol);
+		}
+	) 
+	{
+		arrayNode.appendChild(elementNode);
+		array.appendElement(elementNode.getSymbol());
+	}
+			
+	(t=<COMMA> {UXMLElementFactory.eat(t.image);}
+	(
+		elementNode = CreateArray() | 
+		elementNode = VariableAccess(false,true) |
+		elementNode = MapOrReduce() |
+		constantSymbol = Constants()
+		{
+			attributes.clear();
+			attributes.put(Constants.TYPE,constantSymbol.getType());
+			attributes.put(Constants.VALUE,constantSymbol.getValue());
+			elementNode = UXMLElementFactory.generateElement(Constants.CONSTANT, attributes, constantSymbol);
+		}
+	)
+	{
+		arrayNode.appendChild(elementNode);
+		array.appendElement(elementNode.getSymbol());
+	}
+	)* t=<SQUARE_END>{UXMLElementFactory.eat(t.image);})
+	{
+		return arrayNode;
+	}
+}
+
+
+/**
+ * Array Access
+ *  ([ Expression() ])* 
+ */
+UXMLElement ArrayAccess(UXMLElement variableElement) throws CompilationException :
+{
+	Token t = null;
+	int index = 0;
+	HashMap<String, String> attributes = new HashMap<String, String> ();
+	attributes.put(Constants.VALUE, "[]");
+	UXMLElement operator = null, 
+	indexElement = null,returnElement = operator;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	Symbol arrayElementAtIndex = null;
+}
+{
+	(t=<SQUARE_START> {UXMLElementFactory.eat(t.image);} 
+	indexElement = Expression() 
+	{
+		operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, variableElement.getSymbol());
+		operator.appendChild(variableElement);
+		operator.appendChild(indexElement);
+		operands.clear();
+		operands.add(variableElement.getSymbol());
+		operands.add(indexElement.getSymbol());
+		arrayElementAtIndex = new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true);
+		operator.setSymbol(arrayElementAtIndex);
+		variableElement = operator;
+	}
+	(t=<COMMA> {UXMLElementFactory.eat(t.image);} 
+	indexElement = Expression()
+	{
+		operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, variableElement.getSymbol());
+		operator.appendChild(variableElement);
+		operator.appendChild(indexElement);
+		operands.clear();
+		operands.add(variableElement.getSymbol());
+		operands.add(indexElement.getSymbol());
+		arrayElementAtIndex = new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true);
+		operator.setSymbol(arrayElementAtIndex);
+		variableElement = operator;
+	}
+	)*
+	t=<SQUARE_END>{UXMLElementFactory.eat(t.image);}
+	)? {  return variableElement; }
+
+}
+
+/**
+ * Map or Reduce
+ */
+UXMLElement MapOrReduce() throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement operator, function, data = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+	ArrayType dataArray = null;
+}
+{
+	(t = <MAP> {UXMLElementFactory.eat(t.image); t.image = Constants.MAP_FUNCTION; }| 
+	 t = <REDUCE> {UXMLElementFactory.eat(t.image); t.image = Constants.REDUCE_FUNCTION; } )
+	{
+		attributes.put(Constants.VALUE,t.image);
+		operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, null);
+	}
+	t = <ROUND_START> {UXMLElementFactory.eat(t.image);}
+	/* Function */
+	(function = VariableAccess(false,true) |
+	 function = LambdaFunction()
+	) 
+	
+	{operator.appendChild(function);} t=<COMMA> {UXMLElementFactory.eat(t.image);}
+	/* Data */
+	data = CreateArray()
+	{
+		ArrayList<UXMLElement> children = data.getChildren();
+		for(int childNo = 0; childNo < children.size(); childNo++) {
+			operator.appendChild(children.get(childNo));
+		}
+	}
+	t=<ROUND_END>{UXMLElementFactory.eat(t.image);}
+	{
+		operator.setSymbol(data.getSymbol());
+		return operator;
+	}
+}
+
+/**
+ * Lambda function
+ */
+UXMLElement LambdaFunction() throws CompilationException : 
+{
+	Token t = null;
+	String paramName = null;
+	UXMLElement functionElement,automaticVarNode, functionBodyElement,block  = null;
+	Symbol paramSymbol = null;
+	FunctionType function = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();	
+}
+{
+	t = <LAMBDA>
+	{
+		UXMLElementFactory.eat(t.image);
+		// Execute the calling sequence of a caller - 
+	    Environment.callSequenceProcessor.callAction_caller(0);
+	    Environment.currentActivationRecord.enterTheBlock();
+	    
+		function = new FunctionType(Constants.BLANK, true, Constants.VOID);
+		// Nested level of function will be '0' since nested functions are not 
+		// allowed in Ylike
+		function.setNestedLevel(0);
+		functionElement = UXMLElementFactory.generateElement(Constants.FUNCTION, null, function);
+	}
+	(
+		{
+			automaticVarNode = functionElement.appendChild(UXMLElementFactory.generateElement(Constants.AUTOMATIC_VAR, null, null));
+		}
+		t = <ID> 
+		{ 
+			paramName = t.image;
+			UXMLElementFactory.eat(t.image);
+			paramSymbol = new ConstantValue(paramName,Constants.NO_TYPE,true);
+			function.addSymbol(paramSymbol);
+			attributes.clear();
+			attributes.put(Constants.NAME, paramName);
+			attributes.put(Constants.TYPE, Constants.NO_TYPE);
+			attributes.put(Constants.MUTABLE, Constants.YES);
+			automaticVarNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+		}  
+		(t = <COMMA> {UXMLElementFactory.eat(t.image);}
+		t = <ID> 
+		{ 
+			paramName = t.image;
+			UXMLElementFactory.eat(t.image);
+			paramSymbol = new ConstantValue(paramName,Constants.NO_TYPE,true);
+			function.addSymbol(paramSymbol);
+			attributes.clear();
+			attributes.put(Constants.NAME, paramName);
+			attributes.put(Constants.TYPE, Constants.NO_TYPE);
+			attributes.put(Constants.MUTABLE, Constants.YES);
+			automaticVarNode.appendChild(UXMLElementFactory.generateElement(Constants.VAR, attributes, paramSymbol));
+		} 
+	 )*)? t = <COLON> {UXMLElementFactory.eat(t.image);}
+	{
+		// Save the function in global symbol table
+//		Environment.currentActivationRecord.addSymbol(currentFunction);
+		// Copy the formal params in current symbol table
+		for(Symbol formalArg : function.getFormalParameters()) 
+			Environment.currentActivationRecord.addSymbol(formalArg);
+
+	}
+	functionBodyElement = Expression()
+	{
+		// Function done
+		Environment.callSequenceProcessor.returnAction_caller();
+		block = UXMLElementFactory.generateElement(Constants.BLOCK,null,null);
+		block.appendChild(functionBodyElement);
+		functionElement.appendChild(block);
+		return functionElement;
+	}
+}
+
+/**
+ * E -> T1 E_L
+ */
+UXMLElement Expression() throws CompilationException : 
+{
+	UXMLElement restOfExpression = null;
+}
+{
+	restOfExpression = Expression_Left(Term1())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * E_L -> (& | | | ^ ) T1 E_L
+ */
+UXMLElement Expression_Left(UXMLElement currentLHS)throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	[
+	 (t = <AMPERSAND> {t.image = "$";} | t = <BIT_OR> | t = <BIT_XOR> )
+	 {
+		 operatorName = t.image;
+		 UXMLElementFactory.eat(t.image);
+	 }
+	 currentRHS = Term1() 
+	 {
+		 rhsSymbol = currentRHS.getSymbol();
+		 attributes.put(Constants.VALUE,operatorName);
+		 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+		 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+		 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true));
+		 currentNode.appendChild(operator);
+		 operator.appendChild(currentLHS);
+		 operator.appendChild(currentRHS);
+		 currentLHS = operator;
+	 }
+	 restOfExpression = Expression_Left(currentLHS)
+	]
+	{
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+}
+
+
+/**
+ * T1 -> T2 T1_L
+ */
+UXMLElement Term1()throws CompilationException  : 
+{
+	UXMLElement restOfExpression = null;
+}
+{	
+	restOfExpression = Term1_Left(Term2())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * T1_L -> (+ | -) T2 T1_L
+ */
+UXMLElement Term1_Left(UXMLElement currentLHS)throws CompilationException  :  
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+	String operatorName = null;
+}
+{
+	[
+	 (t  = <PLUS> | t  = <MINUS>)
+	 {
+		 operatorName = t.image;
+		 UXMLElementFactory.eat(t.image);
+	 }
+	 
+	 currentRHS = Term2()  
+	 {
+		 rhsSymbol = currentRHS.getSymbol();
+		 attributes.put(Constants.VALUE,operatorName);
+		 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+		 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+		 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true)
+		 );
+		 currentNode.appendChild(operator);
+		 operator.appendChild(currentLHS);
+		 operator.appendChild(currentRHS);
+		 currentLHS = operator;
+	 }
+	 restOfExpression = Term1_Left(currentLHS)
+	 
+	 ]
+	 {
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+}
+
+/**
+ * T2 -> F T2_L
+ */
+UXMLElement Term2() throws CompilationException : 
+{
+	UXMLElement restOfExpression = null;
+}
+{
+	restOfExpression = Term2_Left( Factor())
+	{
+		return restOfExpression;
+	}
+}
+
+/**
+ * T2_L -> (* | / | %) F T2_L
+ */
+UXMLElement Term2_Left(UXMLElement currentLHS) throws CompilationException : 
+{
+	Token t = null;
+	UXMLElement currentRHS = null,restOfExpression = null;
+	UXMLElement operator = null;
+	Symbol lhsSymbol = currentLHS.getSymbol(), rhsSymbol = null;
+	HashMap<String,String> attributes = new HashMap<String, String>();
+	String operatorName = null;
+	ArrayList<Symbol> operands = new ArrayList<Symbol>();
+}
+{
+	[
+	 (t = <ASTERISK> | t = <DIVIDE > | t = <MOD>) 
+	 {
+		 operatorName = t.image;
+		 UXMLElementFactory.eat(t.image);
+	 }
+	 currentRHS = Factor()  
+	 {
+		 try {
+			 rhsSymbol = currentRHS.getSymbol();
+			 attributes.put(Constants.VALUE,operatorName);
+			 operands.add((lhsSymbol instanceof FunctionType)? ((FunctionType)lhsSymbol).getReturnValue() : lhsSymbol );
+			 operands.add((rhsSymbol instanceof FunctionType)? ((FunctionType)rhsSymbol).getReturnValue() : rhsSymbol );
+			 // Make sure that div doesn't give divide by zero error
+			 try {
+				 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, new ConstantValue(Constants.BLANK,Constants.NO_TYPE,true));
+			 } catch(RuntimeException e) 
+			 {
+				 Symbol param1 = operands.get(0);
+				 Symbol param2 = operands.get(1);
+				 if(param1.getDataType() == DATA_TYPE.FLOAT || param2.getDataType() == DATA_TYPE.FLOAT)
+					 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, 
+							 SymbolMachine.generate(Constants.BLANK, Constants.FLOAT, true));
+				 else 
+					 operator = UXMLElementFactory.generateElement(Constants.OPERATOR, attributes, 
+							 SymbolMachine.generate(Constants.BLANK, Constants.INT, true));
+			 }
+			 currentNode.appendChild(operator);
+			 operator.appendChild(currentLHS);
+			 operator.appendChild(currentRHS);
+			 currentLHS = operator;
+		 } catch(IllegalSymbolValueException e) {
+			 throw new CompilationException(e.getMessage());
+		 }
+	 }
+	 restOfExpression = Term2_Left(currentLHS)
+	 ]
+	 {
+		if(restOfExpression == null)
+			restOfExpression = currentLHS;
+		return restOfExpression;
+	 }
+} 
+
+/** 
+ * F -> (E) | VariableAccess() | Constant() | <VOID> | FunctionCall()
+ */
+UXMLElement Factor() throws CompilationException : 
+{
+	Token t = null;
+	String typeCast = null;
+	Symbol value = null;
+	UXMLElement expressionValue = null, returnFactorValue = null;
+	HashMap<String, String> attributes = new HashMap<String, String>();
+}
+{
+	
+	(
+	t = <ROUND_START> {UXMLElementFactory.eat(t.image);} 
+	expressionValue = Expression() { returnFactorValue =  expressionValue ;  } 
+	t = <ROUND_END> {UXMLElementFactory.eat(t.image);}
+	| expressionValue = VariableAccess(false, true) 
+		{
+			value = expressionValue.getSymbol();
+			
+			if((!(Constants.OPERATOR.equals(expressionValue.getElementName()) && 
+							Constants.VALUE_AT_INDEX.equals(expressionValue.getAttributeValue(Constants.VALUE))))) {
+				attributes.clear();
+				attributes.put(Constants.NAME, expressionValue.getSymbol().getName());
+				expressionValue = UXMLElementFactory.generateElement(Constants.VARIABLE,attributes,expressionValue.getSymbol());
+			}
+			returnFactorValue = expressionValue;
+		}
+	| value = Constants() { returnFactorValue =  new UXMLElement(null,value); }
+	| expressionValue = FunctionCall() { returnFactorValue = expressionValue; }
+	| <VOID> 
+	{
+		try { 
+			returnFactorValue =  new UXMLElement(null,SymbolMachine.generate(Constants.BLANK,Constants.VOID, false));
+			UXMLElementFactory.eat(Constants.VOID);
+		} catch(Exception e ){}} 
+	| expressionValue = CreateArray() {returnFactorValue = expressionValue;}
+	| expressionValue = MapOrReduce() {returnFactorValue = expressionValue;}
+	)
+	{
+		return returnFactorValue;
+	}
+	
+}

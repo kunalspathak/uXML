@@ -1,0 +1,23 @@
+***   J-like (Java-like) Language   ***
+1. Constants : numeric, character, float, boolean, string
+2. Variables : numeric, character, float, boolean, string
+3. Assignment statements : =
+4. Arithmetic operations : +, -, *, /, %, ^, |, &, ~
+5. Logical operations : &&, ||, !
+6. Conditional operations : ==, !=, <, >, <=, =>
+7. Conditional statements : If-else
+8. Iteration loops : for, do-while, while-do-while
+9. Arrays
+10. Class, Constructors - Initializing objects, calling member functions, variables, 
+12. Advanced Class - function overloading, inheritance
+
+___________________________________________________________________________________________________
+TODO:
+1. Can't use array of objects of same class as member variables because A is not yet fully defined when the array is created
+Hence 'a' won't be accessible from a[1]
+eg. class A {
+		A a[5];
+    }
+
+2. Use 'constructor'and 'function' keyowrd before declaring constructor and function respectively.
+3. For calling a function of the same class from different function, refer it using 'this'.

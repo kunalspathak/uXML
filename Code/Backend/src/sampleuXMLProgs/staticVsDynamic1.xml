@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This program demonstrates procedure parameters feature -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    scope="static">
+    <block>
+    
+    <!-- Variable in main method -->
+    <var name="m" type="int" mutable="yes"/>
+    
+    <!-- int square(int) -->
+    <function name="square">
+        <automatic-Var>
+            <var name="num" type="int" mutable="no"/>
+        </automatic-Var>
+        <returns type="int"/>
+        <block>
+        	<!-- OUTPUT (static)  : Inside square method 5 -->
+        	<!-- OUTPUT (dynamic) : Inside square method 23 -->
+            <print>
+                <constant type="string" value="Inside square method"/>
+                <variable name="m"/>
+            </print>
+            <return>
+                <operator value="*">
+                    <variable name="num"/>
+                    <variable name="num"/>
+                </operator>
+            </return>
+        </block>
+    </function>
+
+    <!-- int answer (int (*evaluator (int)),int) -->
+    <function name="answer">
+        <automatic-Var>
+            <var name="int evaluator(int)" type="function" mutable="no"/>
+            <var name="x" type="int" mutable="no"/>
+        </automatic-Var>
+        <returns type="int"/>
+        <block>
+            <!-- Same variable 'm' defined in answer() procedure -->
+            <var name="m" type="int" mutable="yes"/>
+            <assign>
+                <variable name="m"/>
+                <constant type="int" value="23"/>
+            </assign>
+            <!-- evaluator(x) -->
+            <return>
+                <call>
+                    <variable name="evaluator"/>
+                    <variable name="x"/>
+                </call>
+            </return>
+        </block>
+    </function>
+    
+    <assign>
+        <variable name="m"/>
+        <constant type="int" value="5"/>
+    </assign>
+    
+    <!-- OUTPUT: Inside main method 5 -->
+    <print>
+        <constant type="string" value="Inside main method"/>
+        <variable name="m"/>
+    </print>
+    
+    <!-- OUTPUT: 25-->
+    <print>
+	    <call>
+	        <variable name="answer"/>
+	        <variable name="square"/>
+	        <constant type="int" value="5"/>
+	    </call>
+    </print>
+    
+    <!-- OUTPUT: 5-->
+    <print>
+        <variable name="m"/>
+    </print> 
+    </block>
+</uXML>

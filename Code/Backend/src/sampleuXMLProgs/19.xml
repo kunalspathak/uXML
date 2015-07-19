@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This program demonstrates array access 2-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<array-type name="arr1" type="int">
+		<!--<dim size="4" />
+		<dim size="2" />
+		<dim size="3" />-->
+		<dim size="5" startIndex="0"/>
+	</array-type>
+	
+	<var name="i" type="int" mutable="yes"/>
+	<var name="j" type="arr1" mutable="yes"/>
+	
+		<for-loop>
+		<from>
+			<assign>
+				<variable name="i"/>
+				<constant type="int" value="0"/>
+			</assign>
+		</from>
+		<till>
+			<operator value="(">
+				<variable name="i"/>
+				<constant type="int" value="5"/>
+			</operator>
+		</till>
+		<step>
+			<assign>
+				<variable name="i"/>
+				<operator value="+">
+					<variable name="i"/>
+					<constant type="int" value="1"/>
+				</operator>
+			</assign>
+		</step>
+		<block>
+			<assign>
+				<operator value="[]">
+					<variable name="j"/>
+					<variable name="i"/>
+				</operator>
+				<operator value="*">
+					<constant type="int" value="10"/>
+					<variable name="i"/>
+				</operator>
+				
+			</assign>
+		</block>	
+	</for-loop>
+	
+	
+	<for-loop>
+		<from>
+			<assign>
+				<variable name="i"/>
+				<constant type="int" value="0"/>
+			</assign>
+		</from>
+		<till>
+			<operator value="(">
+				<variable name="i"/>
+				<constant type="int" value="5"/>
+			</operator>
+		</till>
+		<step>
+			<assign>
+				<variable name="i"/>
+				<operator value="+">
+					<variable name="i"/>
+					<constant type="int" value="1"/>
+				</operator>
+			</assign>
+		</step>
+		<block>
+			<print>
+				<operator value="[]">
+					<variable name="j"/>
+					<variable name="i"/>
+				</operator>
+			</print>
+		</block>	
+	</for-loop>
+	</block>
+</uXML>

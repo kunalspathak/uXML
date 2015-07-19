@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		This program demonstrates constant pointer and pointer to constant variable - Part1
+		
+	-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<pointer-type name="ptr1" refType="int"/>
+	<pointer-type name="ptr2" refType="ptr1"/>
+	
+	<function name="printer">
+		<block>
+			<print>
+				<variable name="i"/>
+				<variable name="j"/>
+				<variable name="k"/>
+				<constant type="string" value="__________________________________"/>
+			</print>
+		</block>
+	</function>
+	
+
+	
+	<!-- int i  -->
+	<var name="i" type="int" mutable="yes"/>
+	<var name="n" type="int" mutable="yes">
+		<constant type="int" value="23"/>
+	</var>
+
+	<!-- int *j  -->
+	<var name="j" type="ptr1" ptrMutable="yes" valueMutable="no">
+		<operator value="@">
+			<variable name="i"/>
+		</operator>
+	</var>
+	
+	<!-- int **m  
+	<var name="k" type="ptr2" ptrMutable="no" valueMutable="no"/>
+	<var name="m" type="ptr2" ptrMutable="no" valueMutable="no"/>
+	-->
+	
+	<print>
+		<variable name="j"/>
+	</print>
+	
+	<!-- i = 5 -->
+	<assign>
+		<variable name="i"/>
+		<constant type="int" value="5"/>
+	</assign>
+	
+	<!-- j = @n -->
+	<assign>
+		<variable name="j"/>
+		<operator value="@">
+			<variable name="n"/>
+		</operator>
+	</assign>
+	
+	<print>
+		<variable name="j"/>
+	</print>
+	
+	<assign>
+		<variable name="n"/>
+		<constant type="int" value="5"/>
+	</assign>
+	
+	<print>
+		<variable name="n"/>
+		<variable name="j"/>
+	</print>
+	
+	
+	</block>
+</uXML>

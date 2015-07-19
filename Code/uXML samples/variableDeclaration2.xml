@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This represents variable declaration in uXML 
+Approach 2 : Declare group of variables for a given data-type
+-->
+<!-- 
+    Desc : List of variable declaration
+            - Present only if 'explicit' attribute of xyz is yes. Otherwise uXML 
+              is representing python or javascript-like language where variable 
+              declaration is not mandatory.
+-->
+<Variables explicit="yes">
+        <!-- Integer -->
+        <int unsigned="yes" mutable="yes">
+                <var name="var1" default="0"/>
+                <var name="var2" default="5"/>
+        </int>
+
+        <!-- Decimal -->
+        <decimal unsigned="yes" mutable="yes">
+                <var name="var3" default="5.0"/>
+                <var name="var4" default="0.0"/>
+        </decimal>
+
+        <!-- String  -->
+        <string encoding="UTF-8" mutable="yes">
+                <var name="var5" default="null"/>
+                <var name="var6" default="test"/>
+        </string>
+
+        <!-- Character -->
+        <char encoding="UTF-8" mutable="yes">
+                <var name="var7" default=" "/>
+                <var name="var8" default="k"/>
+        </char>
+        
+        <!-- Boolean -->
+        <boolean mutable="yes">
+                <var name="var9" default="true"/>
+                <var name="var10" default="false"/>
+        </boolean>
+        
+        <!-- Pointer -->
+        <ptr pointsTo="{int | float | string | char | boolean | array | user | void}" mutable="yes">
+                <var name="var11" />
+                <var name="var12" />   
+        </ptr>
+
+        <!-- Array -->
+        <array  keyType="{int | float | string | char | boolean | object | user }" 
+                valueType="{int | float | string | char | boolean | array | object | function | user | void}" >
+                <var name="var13" >
+                        <dim size="5" startIndex="0"/>
+                        <dim size="3" startIndex="-3"/>
+                </var>
+                <var name="var14" >
+                        <dim size="5" startIndex="0"/>
+                </var>               
+        </array>
+        
+        <!-- Object -->
+        <object classname="package.HelloWorld" mutable="yes">
+                <var name="var15" />
+                <var name="var16" /> 
+        </object>
+        
+        <!-- user -->
+        <user mutable="yes">
+                <var name="var17">
+                        <Variables> ... </Variables>
+                        <Constructor> ... </Constructor>
+                        <Functions> ... </Functions>                        
+                </var>
+                <var name="var18">
+                        <Variables> ... </Variables>
+                        <Constructor> ... </Constructor>
+                        <Functions> ... </Functions>                        
+                </var>   
+        </user>
+       
+       <!-- Enum -->
+        <enum>
+                <var name="var19">
+                        <enum-constant name="sunday" value=""/>
+                        <enum-constant name="monday" value="0"/>
+                        <enum-constant name="tuesday" value=""/>
+                        <enum-constant name="wednesday" value=""/>
+                        <enum-constant name="thursday" value=""/>
+                </var>
+                <var name="var20" >
+                        <enum-constant name="jan" value=""/>
+                        <enum-constant name="feb" value=""/>
+                        <enum-constant name="mar" value=""/>
+                        <enum-constant name="apr" value=""/>
+                </var>
+        </enum>
+        
+        <!-- Void -->
+        <void mutable="yes">
+                <var name="var21" />
+                <var name="var22" />   
+        </void>
+        
+        <!-- 
+              Function
+              Name of this element is function-type and not function since 'function' is used for 
+              defining the actual body of function
+        -->
+        <function-type signature = "sigName" mutable="yes">
+                <var name="var21" />
+                <var name="var22" />   
+        </function-type>
+</Variables>

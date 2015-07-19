@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<uXML language="Clike" scope="static">
+	<block>
+		<function-type name="(int,int)">
+			<automatic-Var>
+				<var mutable="no" name="" type="int" />
+				<var mutable="no" name="" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+		</function-type>
+		<pointer-type name="(int,int)*" refType="(int,int)" />
+		<var name="fun" ptrMutable="yes" type="(int,int)*" valueMutable="yes" />
+		<function name="sum">
+			<automatic-Var>
+				<var mutable="yes" name="var1" type="int" />
+				<var mutable="yes" name="var2" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<constant type="string" value="inside sum(int,int)" />
+				</print>
+				<print>
+					<variable name="var1" />
+					<constant type="string" value="+" />
+					<variable name="var2" />
+					<constant type="string" value="=" />
+					<operator value="+">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<function name="sum">
+			<automatic-Var>
+				<var mutable="yes" name="var1" type="float" />
+				<var mutable="yes" name="var2" type="float" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<constant type="string" value="inside sum(float,float)" />
+				</print>
+				<print>
+					<variable name="var1" />
+					<constant type="string" value="+" />
+					<variable name="var2" />
+					<constant type="string" value="=" />
+					<operator value="+">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<function name="diff">
+			<automatic-Var>
+				<var mutable="yes" name="var1" type="int" />
+				<var mutable="yes" name="var2" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<print>
+					<constant type="string" value="inside diff(int,int)" />
+				</print>
+				<print>
+					<variable name="var1" />
+					<constant type="string" value="-" />
+					<variable name="var2" />
+					<constant type="string" value="=" />
+					<operator value="-">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</print>
+			</block>
+		</function>
+		<function name="main">
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="a" type="(int,int)*" />
+				<pointer-type name="(int,int)**" refType="fun" />
+				<var name="b" ptrMutable="yes" type="(int,int)**" valueMutable="yes" />
+				<assign>
+					<variable name="a" />
+					<operator value="@">
+						<variable name="sum" />
+					</operator>
+				</assign>
+				<assign>
+					<variable name="b" />
+					<operator value="@">
+						<variable name="a" />
+					</operator>
+				</assign>
+				<call>
+					<operator value="#">
+						<variable name="a" />
+					</operator>
+					<constant type="int" value="10" />
+					<constant type="int" value="5" />
+				</call>
+				<assign>
+					<variable name="a" />
+					<operator value="@">
+						<variable name="diff" />
+					</operator>
+				</assign>
+				<call>
+					<operator value="#">
+						<operator value="#">
+							<variable name="b" />
+						</operator>
+					</operator>
+					<constant type="int" value="10" />
+					<constant type="int" value="5" />
+				</call>
+			</block>
+		</function>
+		<call>
+			<variable name="main" />
+		</call>
+	</block>
+</uXML>

@@ -1,0 +1,133 @@
+i= 5 3 
+i= 4 3 
+i= 3 3 
+i= 2 3 
+i= 1 3 
+i= 0 3 
+
+<-- src/sampleuXMLProgs/1.xml -->
+{{5}*}* {{{5}*}*}* {{5}*}* {5}* 5 
+{{64}*}* {64}* 64 64 
+{{23}*}* {23}* 23 23 
+
+<-- src/sampleuXMLProgs/2.xml -->
+{5}* {23}* 5 23 
+{25}* {230}* 25 230 
+{5}* {23}* 5 {{23}*}* a {a}* 
+
+<-- src/sampleuXMLProgs/3.xml -->
+5 
+5 
+Inside level 0 : 0 
+Inside level 0 : 0 
+
+<-- src/sampleuXMLProgs/4.xml -->
+Inside funny 23 
+Inside main 
+Inside fun 5 
+Inside fun 5 
+
+<-- src/sampleuXMLProgs/5.xml -->
+Inside funny 23 
+Inside main 
+Inside fun 5 
+Inside funny 5 
+
+<-- src/sampleuXMLProgs/6.xml -->
+10 + 5 = 15 
+10 - 5 = 5 
+10 * 5 = 50 
+10 / 5 = 2 
+10 << 5 = 320 
+
+<-- src/sampleuXMLProgs/7.xml -->
+2 
+
+<-- src/sampleuXMLProgs/8.xml -->
+0 1 2 
+1 2 3 
+2 3 4 
+0 1 2 
+2 3 4 
+4 5 6 
+0 2 4 
+3 5 7 
+6 8 10 
+
+<-- src/sampleuXMLProgs/9.xml -->
+0 
+2 
+4 
+
+<-- src/sampleuXMLProgs/10.xml -->
+Before call j = 5 
+After call j = 23 
+
+<-- src/sampleuXMLProgs/11.xml -->
+0 
+1 
+4 
+
+<-- src/sampleuXMLProgs/12.xml -->
+5 6 7 
+
+<-- src/sampleuXMLProgs/13.xml -->
+2 + 3 = 5 
+2 - 3 = -1 
+
+<-- src/sampleuXMLProgs/14.xml -->
+0 
+2 
+12 
+
+<-- src/sampleuXMLProgs/15.xml -->
+10 + 5 = 15 
+10 - 5 = 5 
+
+<-- src/sampleuXMLProgs/16.xml -->
+{5}* 5 
+
+<-- src/sampleuXMLProgs/17.xml -->
+5 
+5 
+5 
+5 
+6 
+7 
+5 
+7 
+9 
+
+<-- src/sampleuXMLProgs/18.xml -->
+10 + 5 = 15 
+10 - 5 = 5 
+
+<-- src/sampleuXMLProgs/19.xml -->
+6 
+
+<-- src/sampleuXMLProgs/20.xml -->
+10 + 5 = 15 
+10 - 5 = 5 
+
+<-- src/sampleuXMLProgs/21.xml -->
+inside executor 
+10 + 5 = 15 
+inside executor 
+10 - 5 = 5 
+
+<-- src/sampleuXMLProgs/22.xml -->
+inside sum(int,int) 
+10 + 5 = 15 
+inside diff(int,int) 
+10 - 5 = 5 
+
+<-- src/sampleuXMLProgs/23.xml -->
+5 
+
+<-- src/sampleuXMLProgs/24.xml -->
+{0}* 
+
+<-- src/sampleuXMLProgs/25.xml -->
+{0}* 
+
+<-- src/sampleuXMLProgs/26.xml -->

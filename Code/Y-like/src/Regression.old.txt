@@ -1,0 +1,72 @@
+here 23 Hello 
+
+<-- src/sampleuXMLProgs/1.xml -->
+Hello World 
+5 
+5.5 
+5.5 
+ kunal 
+
+<-- src/sampleuXMLProgs/2.xml -->
+inside fun3 
+inside fun2 
+Inside fun1 5 
+
+<-- src/sampleuXMLProgs/3.xml -->
+1 
+2 
+3 
+4 
+5 
+6 
+5 
+4 
+3 
+2 
+1 
+
+<-- src/sampleuXMLProgs/4.xml -->
+equal 
+equal 
+
+<-- src/sampleuXMLProgs/5.xml -->
+[1,2,a,4,5] 
+[1,[1,2,a,4,5],1] 
+5 
+
+<-- src/sampleuXMLProgs/6.xml -->
+120 
+
+<-- src/sampleuXMLProgs/7.xml -->
+5 
+[Shri Gajanan Maharaj] 
+
+<-- src/sampleuXMLProgs/8.xml -->
+5 
+[Shri Gajanan Maharaj] 
+
+<-- src/sampleuXMLProgs/9.xml -->
+fun 5 
+howdy 23 
+
+<-- src/sampleuXMLProgs/10.xml -->
+x+y= 1 
+x-y= -1 
+x*y= 6 
+x/y= 0 
+x%y= 4 
+
+<-- src/sampleuXMLProgs/11.xml -->
+[1,4,9] 
+[one-brahmastra,two-brahmastra,three-brahmastra,4-brahmastra,5-brahmastra] 
+
+<-- src/sampleuXMLProgs/12.xml -->
+120 
+
+<-- src/sampleuXMLProgs/13.xml -->
+[1,4,9] 
+120 
+[Hello-A,Hello-B] 
+[1,[Hello-A,Hello-B],2] 
+
+<-- src/sampleuXMLProgs/14.xml -->

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	var-declaration="no">
+	<block>
+		<!--
+			<array-type name="dynamic2D" type="Dynamic"> <dim size="3" />
+			</array-type> <var name="i" type="dynamic2D" mutable="yes"> <array>
+			<constant type="int" value="5" /> <constant type="string"
+			value="five" /> <constant type="char" value="5" /> </array> </var>
+		-->
+		
+		<!-- i = [5, "five" , [5, "five"]] -->
+		<assign>
+			<variable name="i" />
+			<array>
+				<constant type="int" value="5" />
+				<constant type="string" value="five" />
+				<array>
+					<constant type="int" value="5" />
+					<constant type="string" value="five" />
+				</array>
+			</array>
+		</assign>
+
+		<print>
+			<variable name="i" />
+		</print>
+		
+		<!-- print i[1,1] or i[2,1] -->
+		<print>
+			<operator value="[]">
+				<variable name="i"/>
+				<constant type="int" value="2"/>
+				<constant type="int" value="1"/>
+			</operator>
+		</print>
+		
+		<!-- j = [5,i] -->
+		<assign>
+			<variable name="j"/>
+			<array>
+				<constant type="int" value="5" />
+				<variable name="i"/>
+			</array>
+		</assign>
+		
+		<print>
+			<variable name="j"/>
+		</print>
+		
+		<!-- print j[1]-->
+		<print>
+			<operator value="[]">
+				<variable name="j"/>
+				<constant type="int" value="1"/>
+			</operator>
+		</print>
+		
+	</block>
+</uXML>

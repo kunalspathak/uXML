@@ -1,0 +1,62 @@
+/**
+* This program demonstrates type casting
+*/
+
+PROGRAM D; // Name of main class 'A'
+
+class A {
+
+	constructor A() {
+		print("A()");
+	}
+	
+	constructor A(string str) {
+		print("A(string)");
+	}
+	
+	function void fun(string str) {
+		print("A.fun(",str,")");
+	}
+}
+
+class B inherits A {
+	
+	constructor B() {
+		// super("kunal");
+		print("B()");
+	} 
+	
+	constructor B(string str) {
+		print("B(string)",str);
+	}
+	
+	function void fun(int str) {
+		print("B.fun(",str,")");
+	}
+}
+
+class C inherits A ,B{
+	 
+	constructor C() {
+		// super("kunal");
+		print("C()");
+	} 
+	
+	constructor C(string str) {
+		print("C(string)",str);
+	}
+}
+	
+class D {
+	
+	function void main() {
+		class A objA = new B(void); // Assigning subclass's instance to parent class object
+//		class B objB = {class B}objA;
+		call objA.fun(5);
+	} 
+}
+
+/*
+ * In-built call new D().main() 
+ */
+

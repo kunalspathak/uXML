@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+In order to execute this program, put the print statement at the end of "var" and "function" rule
+
+try {
+		System.out.println(newVariable.getName() + " : " + DataTypeFinder.getDataType(newVariable));
+	} catch (SymbolNotDefinedException e) {}
+	
+try {
+		System.out.println(function.getName() + "() : " + DataTypeFinder.getDataType(function));
+} catch (SymbolNotDefinedException e) {}
+ -->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+	
+	<pointer-type name="intPtr" refType="int"/>
+	<pointer-type name="intintPtr" refType="intPtr"/>
+	
+	<function-type name="f">
+		<automatic-Var>
+			<var name="v1" type="intintPtr"/>
+			<var name="v2" type="intPtr"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+	
+	<pointer-type name="funcPtr" refType="f"/>
+	<pointer-type name="funcfuncPtr" refType="funcPtr"/>
+	
+	
+	<!-- array of pointer -->
+	<array-type name="arrayOfPtr" type="intintPtr">
+		<dim size="5"/>
+		<dim size="5"/>
+	</array-type>
+	
+	<!--  array of function -->
+	<array-type name="arrayOfFunc" type="f">
+		<dim size="3"/>
+		<dim size="3"/>
+	</array-type>
+	
+	<!--  array of function pointer -->
+	<array-type name="arrayOfFuncPtr" type="funcPtr">
+		<dim size="3"/>
+		<dim size="3"/>
+	</array-type>
+	
+	<!--  array of pointer to pointer to function -->
+	<array-type name="arrayOfFuncFuncPtr" type="funcfuncPtr">
+		<dim size="3"/>
+		<dim size="3"/>
+	</array-type>
+	
+	<var name="i" type="int" />
+	<var name="j" type="intPtr"/>
+	<var name="k" type="intintPtr"/>
+	
+	<var name="arrayOfPtrVariable" type="arrayOfPtr"/>
+	
+	<var name="arrayOfFuncVariable" type="arrayOfFunc"/>
+	
+	<var name="arrayOfFuncPtrVariable" type="arrayOfFuncPtr"/>
+	<var name="arrayOfFuncFuncPtrVariable" type="arrayOfFuncFuncPtr"/>
+	
+	<var name="func" type="f"/>
+	
+</uXML>

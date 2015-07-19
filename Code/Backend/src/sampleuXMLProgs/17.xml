@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<var name="m" type="int" mutable="yes" />
+	<var name="n" type="int" mutable="yes" />
+
+	<operator value="!">
+		<operator value="$$">
+			<operator value="==">
+				<variable name="m" />
+				<constant type="int" value="0" />
+			</operator>
+			<operator value="==">
+				<variable name="n" />
+				<constant type="int" value="1" />
+			</operator>
+		</operator>
+		<block>
+			<print>
+				<constant type="string" value="Inside if" />
+			</print>
+		</block>
+		<block>
+			<print>
+				<constant type="string" value="Inside else" />
+			</print>
+		</block>
+	</operator>
+
+
+
+	<!--
+		<operator value="!="> <variable name="n" /> <variable name="m" />
+		<block> <print> <constant type="string" value="If condition" />
+		</print> </block> <block> <print> <constant type="string" value="Else
+		condition" /> </print> </block> </operator>
+	-->
+	</block>
+</uXML>

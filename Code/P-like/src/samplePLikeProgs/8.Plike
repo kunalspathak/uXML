@@ -1,0 +1,41 @@
+// This program test the non-local acccess
+PROGRAM static_dynamic;
+
+	var m: int;
+	
+	procedure square(num : int) : int;
+	begin
+		num := m;
+		write("inside square", m);
+		return num * num;
+	end
+	
+	procedure answer(x : int; procedure evaluator(k : int) : int) : int;
+	var m : int := 23; // Global variable redefined.
+	begin
+		return call evaluator(x);
+	end
+	
+begin { main }
+	m := 5;
+	write("inside main", m);
+	call answer(5,square);
+	write("inside main", m);
+end
+	
+/*
+---OUTPUT---
+Static scope :-
+
+inside main 5 
+inside square 5 
+inside main 5 
+
+
+Dynamic scope :-
+
+inside main 5 
+inside square 23 
+inside main 5 
+
+*/

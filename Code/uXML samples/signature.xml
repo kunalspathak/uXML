@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    Desc : List of function signatures 
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="overall.xsd"> 
+    <block> 
+        <!-- 
+        Desc : Signature definition (one or more)
+                - Defines the signature of a function. This signature can be later used 
+                  while defining a function of this signature type.  
+        Attr : name
+                - Name of the signature. This name will be used in the function definition. For more information
+                  check function.xml
+    -->
+        <function-type name="sig1">
+
+            <!-- 
+            Desc : Member variables (zero or more)
+                    - Specifies the data-type of formal parameters. If this element is not present, it means
+                      signature doesn't take any argument.
+                      
+                      Formal parameters contains name attribute so that user can re-order the parameters while calling the function.
+                      User need to simply map the variables with the name before calling. (Allowed in some Programming Languages)
+                      
+                      For this example, there are set of arguments declared eg. int, function having signature 'sigName',.., array of int, pointer to int and
+                      a map. For each of the type definition, see variableDeclaration1.xml
+                      
+                      Data-type could be anything defined in variableDeclaration.xml
+                      
+                      Data-type should adhere to the rules of programming language whose source code the uXML is representating.
+                      eg. Java can't pass a parameter of type function, but C,C++, LISP, Python can do that.
+        -->
+
+            <var name="a" type="int"/>
+            <var name="b" type="sigName"/>
+            <!-- List of other variable names -->
+            <var name="c" type="arrayA1"/>
+            <var name="d" type="ptrP1"/>
+            <var name="e" type="mapM1"/>
+
+            <!--
+            Desc : Specifies the return-type.
+                    As mentioned in variableDeclaration1.xml, the value could be any string representing the language-defined or user-defined 
+                    datatype. Data-type should adhere to the rules of programming language whose source code the uXML is representating.
+                    eg. Java can't pass a parameter of type function, but C,C++, LISP, Python can do that.
+                    
+                    Also, if function doesn't return anything, then it needs to be specified explicitely by <var type="void"/>
+                    If nothing is specified then the function returns a data-type of "#any#". This is useful for languages like LISP, JavaScript
+                    
+            For demonstration purpose, I am returning a pointer to a pointer to a variable containing 'integer' number. 
+            Check the definition of 'ptrP2' in variableDeclaration1.xml
+        -->
+            <returns type="ptrP2"/>
+        </function-type>
+    </block> 
+</uXML>

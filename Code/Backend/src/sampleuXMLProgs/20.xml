@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		This program demonstrates returning function pointers and then
+		executing them - Part 1 int sum(int var, int var2) { return var1 +
+		var2; } typedef int (*funcPointer)(int,int); funcPointer i; int
+		(*getFuncPointer())(int,int) { i = &sum; return i; } main() {
+		getFuncPointer()(2,3); }
+	-->
+<uXML scope="static">
+	<block>
+		<function-type name="twoToOne">
+			<automatic-Var>
+				<var name="var1" type="int" mutable="yes" />
+				<var name="var2" type="int" mutable="yes" />
+			</automatic-Var>
+			<returns type="int" />
+		</function-type>
+
+
+		<!-- int sum(num1, num2) -->
+		<function name="sum" type="twoToOne">
+			<block>
+				<return>
+					<operator value="*">
+						<variable name="var1" />
+						<variable name="var2" />
+					</operator>
+				</return>
+			</block>
+		</function>
+
+		<!-- typedef int (*funcPointer)(int,int) -->
+		<pointer-type name="funcPointer" refType="twoToOne" />
+
+		<!-- funcPointer i -->
+		<automatic-Var>
+			<var name="i" type="funcPointer" mutable="yes" />
+		</automatic-Var>
+
+		<!-- int (*getFuncPointer())(int,int) -->
+		<function name="getFuncPointer">
+			<returns type="funcPointer" />
+			<block>
+				<!-- i = &sum -->
+				<assign>
+					<variable name="i" />
+					<operator value="@">
+						<variable name="sum" />
+					</operator>
+				</assign>
+				<return>
+					<variable name="i" />
+				</return>
+			</block>
+		</function>
+
+		<!-- getFuncPointer()(2,3)  -->
+		<print>
+			<call>
+				<operator value="#">
+					<call>
+						<variable name="getFuncPointer" />
+					</call>
+				</operator>
+				<constant type="int" value="2" />
+				<constant type="int" value="3" />
+			</call>
+		</print>
+	</block>
+</uXML>
+
+	<!--
+ Output :
+ 6
+-->

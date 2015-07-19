@@ -1,0 +1,70 @@
+/**
+* This program demonstrates type casting, accessing member variables and 
+* assigning one object to another.
+*/
+
+PROGRAM D; // Name of main class 'A'
+
+class A {
+	int i = 0;
+	constructor A() {
+		print("A()");
+	}
+	
+	constructor A(string str) {
+		print("A(string)");
+	}
+	
+	function void fun(int str) {
+		i = str;
+		print("A.fun(",str,")");
+	}
+}
+
+class B inherits A {
+	
+	constructor B() {
+		// super("kunal");
+		print("B()");
+	} 
+	
+	constructor B(string str) {
+		print("B(string)",str);
+	}
+	
+	function void fun(int str) {
+		i = str;
+		print("B.fun(",str,")");
+	}
+}
+	
+class D {
+	
+	function void main() {
+		class A objA1, objA2;
+		class B objB;
+		objA1 = new A(void);
+		objA2 = new A(void);
+		objB = new B(void);
+		objA2 = objA1;	// All changes made to objA2/objA1 will be reflected in both objects.
+		objA1 = objB;	// All changes made to objA1/objB will be reflected in both objects.
+//		call objA1.fun(5); 	// Calls objB's fun
+//		objB = objA1; 		// Compilation error
+		
+		objA1.i = 23;
+		objA2.i = 5;
+		print(objA1.i,objB.i,objA2.i);
+//		call objA1.fun(320); fun changes the value of 'i'. So it will be affected in objA1 and objB
+		print(objA1.i,objB.i,objA2.i);
+		
+		/* Access the member variable of parent class
+		objB.i = 32;
+		print(objB.i);
+		*/
+	} 
+}
+
+/*
+ * In-built call new D().main() 
+ */
+

@@ -1,0 +1,20 @@
+# This program demonstrates the usage of if check.
+def fun(x,y)
+{
+	if x == y
+	{
+		print "equal"
+	}
+	else
+	{
+		print "not equal"
+	}
+	return 1
+}
+
+call fun(5,5)
+call fun(5.090,5.09)
+print call fun('G','G')
+# call fun(5,'G') <--- error
+# call fun("rit","rit")  <--- error
+#

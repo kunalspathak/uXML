@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This program demonstrates function overloading feature - Part 2 -->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static">
+<block>
+	<!-- function prototype 'f1' that takes 2 integer and return an integer -->
+	<function-type name="f1">
+		<automatic-Var>	
+			<var name="var1" type="int" mutable="yes"/>
+			<var name="var2" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+	</function-type>
+
+	<!-- function 'func' that takes an integer value and return a function of type 'f1' -->
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="f1"/>
+		<block>
+			<println>
+				<variable name="i"/>
+			</println>
+			<!-- return the addition function -->
+			<return>
+				<function type="f1">
+					<block>
+						<return>
+							<operator value="+">
+								<variable name="var1"/>
+								<variable name="var2"/>
+							</operator>
+						</return>
+					</block>
+				</function>
+			</return>
+			
+		</block>
+	</function>
+	
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="int" mutable="yes"/>
+			<var name="j" type="string" mutable="yes"/>
+		</automatic-Var>	
+		<block>
+			<println>
+				<variable name="i"/>
+				<variable name="j"/>
+			</println>
+		</block>
+	</function>
+	
+	<function name="func">
+		<automatic-Var>
+			<var name="i" type="int" mutable="yes"/>
+			<var name="j" type="int" mutable="yes"/>
+		</automatic-Var>	
+		<block>
+			<println>
+				<variable name="i"/>
+				<variable name="j"/>
+			</println>
+		</block>
+	</function>
+
+	<!-- call 'func' to get the function and then call the returned function -->
+	<println>
+	<call>
+		<call>
+			<variable name="func"/>
+			<constant type="int" value="5"/>
+		</call>
+		<constant type="int" value="6"/>
+		<constant type="int" value="8"/>
+	</call>
+	</println>
+	
+	<call>
+		<variable name="func"/>
+		<constant type="int" value="41"/>
+		<constant type="int" value="50"/>
+	</call>
+	
+		<call>
+		<variable name="func"/>
+		<constant type="int" value="50"/>
+		<constant type="string" value="fifty"/>
+	</call>
+</block>
+</uXML>
+<!--
+Output :
+5
+14
+
+41
+50
+
+50
+fifty
+-->

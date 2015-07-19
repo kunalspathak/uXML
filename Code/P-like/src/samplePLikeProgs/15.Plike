@@ -1,0 +1,14 @@
+// This program test the static vs. dynamic scoping
+{
+	The example below is taken from 
+	http://en.wikipedia.org/wiki/Scope_%28programming%29#Example
+}
+PROGRAM string_datatype;
+	
+	var
+		a : string := "Kunal";
+	
+begin { main }
+	write(a);
+end
+	

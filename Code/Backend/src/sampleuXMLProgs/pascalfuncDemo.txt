@@ -1,0 +1,38 @@
+main {
+	int level_00 = 0;
+	
+	int fun1(int level_10) {
+		int level_11 = 0;
+		print(level_10);
+		print(level_00);
+		print(level_10);
+
+		void fun2(int level_20, int level_21) {
+			level_00 = false;
+			fun3();
+
+			print(level_00);
+			print(level_10);
+			print(level_20);	
+		}
+
+		fun2(23,true);
+		return 5;
+	}
+
+	void fun3() {
+		char level_12 = ' ';
+		print(level_00);
+		print(level_10);
+		print(level_20);
+	}
+
+	level_00 = true;
+	fun1(5);
+	fun3();
+	
+	print(level_00);
+	print(level_10);
+	print(level_20);
+	
+}

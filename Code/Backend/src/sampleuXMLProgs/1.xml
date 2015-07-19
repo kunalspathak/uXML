@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<block>
+	<!--<var name="var1" type="int" mutable="yes"/>
+	<var name="var2" type="decimal" mutable="yes"/>
+	<var name="var3" type="boolean" mutable="yes"/>-->
+	<var name="level00" type="int" mutable="yes"/>
+	<var name="level01" type="int" mutable="yes"/>
+	
+	<operator value="!=">
+		<variable name="level00"/>
+		<variable name="level01"/>
+		<block>
+			<print>
+				<constant type="string" value="If condition"/>
+			</print>
+		</block>
+		<block>
+			<print>
+				<constant type="string" value="Else condition"/>
+			</print>
+		</block>
+	</operator>
+	
+	<function name="fun1">
+		<automatic-Var>
+			<var name="level10" type="int" mutable="yes"/>
+		</automatic-Var>
+		<returns type="int"/>
+		<block>
+			<!--
+			<var name="level11" type="int" mutable="no"/>
+			<variable name="level10"/>
+			<variable name="level00"/>
+			<variable name="level11"/>
+			-->
+			<function name="fun2">
+				<automatic-Var>
+					<var name="level20" type="int" mutable="yes"/>
+					<var name="level21" type="function" mutable="yes"/>
+				</automatic-Var>
+				<returns type="void"/>
+				<block>
+					<!--
+					<var name="level01" type="int" mutable="yes"/>
+					<assign>
+						<variable name="level00"/>
+						<constant type="boolean" value="false"/>
+					</assign>
+					
+					<assign>
+						<variable name="level01"/>
+						<constant type="int" value="32"/>
+					</assign>-->
+					<variable name="level20"/>
+					<call>
+						<variable name="level21"/>
+					</call>
+					
+<!--					<variable name="level01"/>
+					<variable name="level10"/>
+					<variable name="level20"/>
+					<variable name="level21"/>
+-->				</block>
+			</function>
+			
+			<function name="fun3">
+				<block>
+					<var name="level12" type="char"/>
+					
+					<variable name="level20"/>
+					<!--<variable name="level10"/>
+						<variable name="level20"/>-->
+				</block>
+			</function> 
+			
+			<call>
+				<variable name="fun2"/>
+				<constant type="int" value="23"/>
+				<!--<constant type="boolean" value="true"/>-->
+				<variable name="fun3"/>
+			</call>
+			
+			<return>
+				<constant type="int" value="5"/>
+			</return>
+		</block>
+		
+	</function>
+	
+	<!--
+	
+	<assign>
+		<variable name="level00"/>
+		<constant type="boolean" value="true"/>
+	</assign>
+	
+	<call>
+		<variable name="fun1"/>
+		<constant type="int" value="5"/>
+	</call>
+	
+	<call>
+		<variable name="fun2"/>
+		<constant type="int" value="5"/>
+		<variable name="fun3"/>
+	</call>
+	
+	<variable name="level00"/>
+	<variable name="level01"/>
+	<variable name="level10"/>
+	<variable name="level20"/>
+	
+	
+	<assign>
+		<variable name="var5"/>
+		<constant type="int" value="5"/>
+	</assign> -->
+	
+	
+	
+	<!--<operator value="+">
+		<constant type="int" value="18"/>
+		<constant type="int" value="5"/>
+	</operator>
+	
+	
+	<operator value="%">
+		<constant type="int" value="18"/>
+		<variable name="var5"/>
+	</operator>
+	
+	Assign arithmetic expression's result
+	<assign>
+		<variable name="var4"/>
+		<operator value="+">
+			<constant type="int" value="18"/>
+			<variable name="var5"/>
+		</operator>
+	</assign>
+	
+	
+	If-else Conditional
+	<operator value="!">
+		<variable name="var4"/>
+		<variable name="var5"/>
+		<block></block>
+		<block></block>
+	</operator>
+	
+	-->
+	<!--
+		For loop
+	<for-loop>
+		<from>
+			<assign>
+				<variable name="var4"/>
+				<constant type="int" value="5"/>
+			</assign>
+		</from>
+		specify the comparison criteria of index variable with the final value 
+		<to> 
+			<operator value=")"> 
+				<variable name="var4"/>
+				<constant type="int" value="0"/>
+			</operator> 
+		</to>
+		<step>
+			<assign>
+				<variable name="var4"/>
+				<operator value="-+">
+					<variable name="var4"/>
+					<constant type="int" value="1"/>
+				</operator>
+			</assign>
+		</step>
+		
+		 for-loop body 
+		<block/>
+	</for-loop> 
+	
+		
+	do-while or while-do
+	<iterate>
+		<till>
+			<operator value="=="> 
+				<variable name="var5"/>
+				<constant type="int" value="0"/>
+			</operator> 
+		</till>
+		<block/>
+	</iterate>
+	
+	-->
+	
+	<!--
+	<assign>
+		<variable name="var1"/>
+		<variable name="var4"/>
+	</assign>
+	-->
+	<!--<variable name="var4"/>
+	<variable name="var5"/>
+    
+    <constant type="uint" value="5a"/> 
+    <constant type="decimal" value="5"/>
+    <constant type="string" value="5"/>
+    <constant type="boolean" value="trUE"/>
+    <constant type="char" value="a"/>
+	-->
+	</block>
+</uXML>

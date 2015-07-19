@@ -1,0 +1,39 @@
+# This program demonstrates working of array of functions 
+
+def exe(a)
+{
+	for i = 0 to 4
+	{
+		call a[i](i,i+1)
+	}
+}
+
+def add(x,y) {
+	print "x+y=", x+y
+}
+
+def sub(x,y) {
+	print "x-y=", x-y
+}
+
+def mul(x,y) {
+	print "x*y=", x*y
+}
+
+def div(x,y) {
+	print "x/y=", x/y
+}
+
+def mod(x,y) {
+	print "x%y=", x%y
+}
+
+x = [add,sub,mul,div,mod]
+call exe(x)
+
+# Output
+# x+y= 1 
+# x-y= -1 
+# x*y= 6 
+# x/y= 0 
+# x%y= 4

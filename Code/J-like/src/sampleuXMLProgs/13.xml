@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<uXML language="Jlike" poly="yes" scope="static">
+	<block>
+		<global-Var />
+		<class-type name="A">
+			<member-Var />
+			<function name="a">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<print>
+						<constant type="string" value="Inside A.a" />
+					</print>
+				</block>
+			</function>
+		</class-type>
+		<class-type name="SCOPE">
+			<member-Var>
+				<array-type name="[A]5" type="A">
+					<dim size="5" />
+				</array-type>
+			</member-Var>
+			<function name="main">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="arr" type="[A]5" />
+					<assign>
+						<operator value="[]">
+							<variable name="arr" />
+							<constant type="int" value="0" />
+						</operator>
+						<call>
+							<variable name="#new#" />
+							<variable name="A" />
+						</call>
+					</assign>
+					<call>
+						<variable name="a" />
+						<operator value="[]">
+							<variable name="arr" />
+							<constant type="int" value="0" />
+						</operator>
+					</call>
+				</block>
+			</function>
+		</class-type>
+		<call>
+			<variable name="main" />
+			<call>
+				<variable name="#new#" />
+				<variable name="SCOPE" />
+			</call>
+		</call>
+	</block>
+</uXML>

@@ -1,0 +1,53 @@
+/**
+* This program demonstrates various constructor call
+*/
+
+PROGRAM C; // Name of main class 'A'
+
+class A {
+	
+	constructor A() {
+		print("A()");
+	}
+	
+	constructor A(string str) {
+		print("A(string)");
+	}
+
+	function void fun(int j) {
+		print("A.fun(",j,")");
+	}
+}
+
+class B inherits A {
+	
+	constructor B() {
+		// super("kunal");
+		print("B()");
+	} 
+	
+	constructor B(string str) {
+		print("B(string)",str);
+	}
+	
+	function void fun(int j) {
+		print("B.fun(",j,")");
+	}
+}
+	
+class C {
+	
+	/*constructor C() {
+		print("Inside constructor C");
+	}*/
+	
+	function void main() {
+		class A objB = new B(void); // Assigning subclass's instance to parent class object
+		call objB.fun(5);
+	} 
+}
+
+/*
+ * In-built call new A().main() 
+ */
+

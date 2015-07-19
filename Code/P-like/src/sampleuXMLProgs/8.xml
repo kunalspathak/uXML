@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="dynamic">
+	<block>
+		<global-Var>
+			<var mutable="yes" name="m" type="int" />
+			<function-type name="int(int)">
+				<automatic-Var>
+					<var mutable="yes" name="k" type="int" />
+				</automatic-Var>
+				<returns type="int" />
+			</function-type>
+		</global-Var>
+		<function name="square">
+			<automatic-Var>
+				<var mutable="yes" name="num" type="int" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<assign>
+					<variable name="num" />
+					<variable name="m" />
+				</assign>
+				<print>
+					<constant type="string" value="inside square" />
+					<variable name="m" />
+				</print>
+				<return>
+					<operator value="*">
+						<variable name="num" />
+						<variable name="num" />
+					</operator>
+				</return>
+			</block>
+		</function>
+		<function name="answer">
+			<automatic-Var>
+				<var mutable="yes" name="x" type="int" />
+				<var mutable="yes" name="evaluator" type="int(int)" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<var mutable="yes" name="m" type="int">
+					<constant type="int" value="23" />
+				</var>
+				<return>
+					<call>
+						<variable name="evaluator" />
+						<variable name="x" />
+					</call>
+				</return>
+			</block>
+		</function>
+		<assign>
+			<variable name="m" />
+			<constant type="int" value="5" />
+		</assign>
+		<print>
+			<constant type="string" value="inside main" />
+			<variable name="m" />
+		</print>
+		<print>
+			<call>
+				<variable name="answer" />
+				<constant type="int" value="5" />
+				<variable name="square" />
+			</call>
+		</print>
+		<print>
+			<constant type="string" value="inside main" />
+			<variable name="m" />
+		</print>
+	</block>
+</uXML>

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<global-Var />
+		<function name="factorial">
+			<automatic-Var>
+				<var mutable="yes" name="number" type="int" />
+			</automatic-Var>
+			<returns type="int" />
+			<block>
+				<operator value="==">
+					<variable name="number" />
+					<constant type="int" value="1" />
+					<block>
+						<return>
+							<constant type="int" value="1" />
+						</return>
+					</block>
+					<block>
+						<return>
+							<operator value="*">
+								<variable name="number" />
+								<call>
+									<variable name="factorial" />
+									<operator value="-">
+										<variable name="number" />
+										<constant type="int" value="1" />
+									</operator>
+								</call>
+							</operator>
+						</return>
+					</block>
+				</operator>
+			</block>
+		</function>
+		<print>
+			<call>
+				<variable name="factorial" />
+				<constant type="int" value="3" />
+			</call>
+		</print>
+	</block>
+</uXML>

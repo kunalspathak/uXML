@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<uXML language="Ylike" scope="static" var-declaration="no">
+	<block>
+		<function name="fun">
+			<automatic-Var>
+				<var mutable="yes" name="x" type="Dynamic" />
+				<var mutable="yes" name="y" type="Dynamic" />
+			</automatic-Var>
+			<block>
+				<!--
+					<print> <operator value="+"> <variable name="x" /> <variable
+					name="y" /> </operator> </print>
+				-->
+				<operator value="==">
+					<variable name="x" />
+					<variable name="y" />
+					<block>
+						<print>
+							<constant type="string" value="equal" />
+						</print>
+					</block>
+					<block>
+						<print>
+							<constant type="string" value="not equal" />
+						</print>
+					</block>
+				</operator>
+
+			</block>
+		</function>
+		<call>
+			<variable name="fun" />
+			<constant type="int" value="5" />
+			<constant type="int" value="5" />
+		</call>
+		<call>
+			<variable name="fun" />
+			<constant type="string" value="rit" />
+			<constant type="string" value="rit" />
+		</call>
+	</block>
+</uXML>

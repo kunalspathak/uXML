@@ -1,0 +1,17 @@
+/*
+ * Main function
+ */
+function void main() {		/* 1 */
+	int i = 1; 				/* 2 */
+	if(i == 2) 				/* 3 */
+	{						/* 4 */
+		print("If");		/* 5 */
+	} else {				/* 6 */
+		print("Else");		/* 7 */
+	}
+}
+
+main();						/* 8 */
+
+
+

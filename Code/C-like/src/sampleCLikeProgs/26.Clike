@@ -1,0 +1,24 @@
+/*
+ * Test the return type of pointers and also assignment of 1 pointer type to another.
+ */
+
+function void func() {
+	
+	/*Check 1
+	int i = 5, **j, *k;
+	k = &i;
+	j = &k;
+	return j;*/
+	
+	/* Check 2
+	float i, *j;
+	int k;
+	j = &k;
+	return &i;*/
+}
+
+function void main() {
+	int *j;
+//	j = call func(void);
+	print(j);
+}

@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static"><var name="a" type="int"/><var name="b" type="int"/><var name="c" type="float"><constant type="float" value="5.0"/></var><var name="d" type="char"><constant type="char" value="a"/></var><var name="i" type="int"/><var name="a" type="int"/><var name="b" type="int"/><var name="d" type="[float]1..4"/><var name="a" type="int"/><var name="a" type="int"/><var name="a" type="int"/><var name="c" type="char"/><var name="a" type="int"/></uXML>

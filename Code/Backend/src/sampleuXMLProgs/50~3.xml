@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<uXML language="Jlike" poly="yes" scope="static">
+	<block>
+		<global-Var />
+		<class-type name="A">
+			<member-Var>
+				<var mutable="yes" name="i" type="int">
+					<constant type="int" value="0" />
+				</var>
+			</member-Var>
+		</class-type>
+		<class-type name="B">
+			<inherits>
+				<variable name="A" />
+			</inherits>
+			<member-Var />
+		</class-type>
+		<class-type name="D">
+			<member-Var />
+			<function name="main">
+				<automatic-Var />
+				<returns type="void" />
+				<block>
+					<var mutable="yes" name="objA1" type="A" />
+					<var mutable="yes" name="objA2" type="A" />
+					<var mutable="yes" name="objB" type="B" />
+					<assign>
+						<variable name="objA1" />
+						<call>
+							<variable name="#new#" />
+							<variable name="A" />
+						</call>
+					</assign>
+					<assign>
+						<variable name="objA2" />
+						<call>
+							<variable name="#new#" />
+							<variable name="A" />
+						</call>
+					</assign>
+					<assign>
+						<variable name="objA2" />
+						<variable name="objA1" />
+					</assign>
+					<assign>
+						<field name="i">
+							<variable name="objA1" />
+						</field>
+						<constant type="int" value="23" />
+					</assign>
+					<print>
+						<field name="i">
+							<variable name="objA1" />
+						</field>
+						<field name="i">
+							<variable name="objA2" />
+						</field>
+					</print>
+				</block>
+			</function>
+		</class-type>
+		<call>
+			<variable name="main" />
+			<call>
+				<variable name="#new#" />
+				<variable name="D" />
+			</call>
+		</call>
+	</block>
+</uXML>

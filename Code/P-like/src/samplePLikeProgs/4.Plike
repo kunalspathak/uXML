@@ -1,0 +1,24 @@
+// This program test the creation of arrays
+PROGRAM static_test;
+
+	var b: int;
+		x: int := 100; // Global variable
+	procedure foo(x: int);
+		var x1: int;
+		procedure baz(y: int);
+			procedure zab(z: int);
+			begin
+				x := y + z;
+				write(x);
+			end { zab }
+		begin { baz }
+			call zab(2);
+		end { baz }
+	begin { foo }
+		x1 := 3;
+		call baz(x1);
+	end { foo }
+	
+begin { main }
+	call foo(b);
+end

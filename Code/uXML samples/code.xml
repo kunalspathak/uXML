@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Desc : Code statements.
+    Here <code> element is simply given for understanding. Actual code will not be present inside
+    <code> element. In fact there won't be any <code> element. There will be variables elements containing 
+    all the variable declaration and this will be followed by code statements. 
+-->
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../overall.xsd">
+    <block>
+        <!-- Declaration of local variables -->
+        <automatic-Var> 
+            <var name="auto1" type="int"/>
+        </automatic-Var> 
+        <!-- Declaration of member variables --> 
+        <member-Var>
+            <var name="member1" type="int"/>
+        </member-Var>
+        <!-- Declaration of static variables -->
+        <global-Var>
+            <var name="global1" type="int"/>
+        </global-Var>
+        <!-- Assignment statements 
+            <assign>...</assign>
+        -->
+        <!-- Define function within functions 
+            <Functions>...</Functions>
+        -->
+        <!--  Define Function type 
+            <Function-Types>...</Function-Types>
+        -->
+        <!-- Class definition 
+            <class-type name="class1"/>
+            <class-type name="class2"/>
+        -->
+        <!-- Arithmetic 
+            <operator value="+"/>, <operator value="-"/>, <operator value="*"/>, <operator value="/"/>, <operator value="%"/>,--> 
+        
+        <!-- Bitwise 
+            <operator value="$"/>, <operator value="|"/>, <operator value="^"/>,--> 
+        
+        <!-- Logical 
+            <operator value="$$"/>, <operator value="||"/>,--> 
+        
+        <!-- Comparison 
+            <operator value="=="/>, <operator value="!="/>, <operator value=")"/>, <operator value=")="/>, <operator value="("/>, <operator value="(="/>,--> 
+        
+        <!-- Functional programming 
+            <operator value=")=("/>, <operator value="(=)"/>, --> 
+        <!-- for loop -->
+        <for-loop>
+            <from>
+                <assign>
+                    <variable name="index"/>
+                    <constant type="int" value="0"/>
+                </assign>
+            </from>
+            <!-- specify the comparison criteria of index variable with the final value -->
+            <to> 
+                <operator value="("> 
+                    <variable name="index"/>
+                    <variable name="i"/>
+                </operator> 
+            </to>
+            <step>
+                <assign>
+                    <variable name="index"/>
+                    <operator value="+">
+                        <variable name="index"/>
+                        <constant type="int" value="2"/>
+                    </operator>
+                </assign>
+            </step>
+
+            <!-- for-loop body -->
+            <block/>
+        </for-loop> 
+        <!-- do-while -->
+        <iterate>
+            <!-- do-while body -->
+            <block/>
+
+            <till>
+                <operator value="==">
+                    <variable name="i"/>
+                    <constant type="int" value="10"/>
+                </operator>
+            </till>
+        </iterate>
+        <!-- while-do -->
+        <iterate>
+            <till>
+                <operator value="==">
+                    <variable name="i"/>
+                    <constant type="int" value="10"/>
+                </operator>
+            </till>
+
+            <!-- while-do body -->
+            <block/>
+        </iterate>
+    </block>
+</uXML>

@@ -1,0 +1,58 @@
+{
+ Factorial of a number
+}
+
+PROGRAM procedure_call;
+
+	procedure sum(var1,var2 : int) : int;
+	begin
+		write("sum");
+		return var1 + var2;
+	end
+	
+	procedure diff(var1,var2 : int) : int;
+	begin
+		write("diff");
+		return var1 - var2;
+	end
+	
+	procedure prdt(var1,var2 : int) : int;
+	begin
+		write("prdt");
+		return var1 * var2;
+	end
+	
+	
+	procedure div(var1,var2 : int) : int;
+	begin
+		write("div");
+		return var1 / var2;
+	end
+	
+	procedure calc(procedure func(a,b:int):int);
+	begin
+		write("Calling function...");
+		write(call func(10,5));
+	end
+
+begin
+	call calc(sum);
+	call calc(diff);
+	call calc(prdt);
+	call calc(div);
+end
+
+{
+Calling function... 
+sum 
+15 
+Calling function... 
+diff 
+5 
+Calling function... 
+prdt 
+50 
+Calling function... 
+div 
+2 
+}

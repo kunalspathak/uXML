@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- 
+		This program defines 3 classes A,B and C, C inherits from B inherits A.
+		It demonstrates accessing/changing field variables  
+	-->
+
+<uXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" scope="static"
+	poly="yes">
+<block>
+	<class-type name="A">
+	
+		<member-Var>	
+			<var name="i" type="int" mutable="yes">	
+				<constant type="int" value="5"/>
+			</var>
+		</member-Var>
+		
+		<function name="_a">
+			<block>	
+				<print>	
+					<constant type="string" value="A._a()"/>
+				</print>
+			</block>	
+		</function>
+		
+	</class-type>
+
+	<class-type name="B">
+		<inherits>
+			<variable name="A" />
+		</inherits>
+
+		<member-Var>	
+			<var name="i" type="int" mutable="yes">	
+				<constant type="int" value="23"/>
+			</var>
+		</member-Var>
+
+		 <function name="_a">
+			<block>	
+				<print>	
+					<constant type="string" value="B._a()"/>
+				</print>
+			</block>	
+		</function>
+	</class-type>
+	
+	<!-- A a1 = new A() -->
+	<var name="a1" type="A" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="A"/>
+		</call>
+	</var>
+	
+	<!-- A a2 = new A() -->
+	<var name="a2" type="A" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="A"/>
+		</call>
+	</var>
+	
+	<!-- B b1 = new B() -->
+	<var name="b1" type="B" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="B"/>
+		</call>
+	</var>
+	
+	<!-- B b2 = new B() -->
+	<var name="b2" type="B" mutable="yes">
+		<call>	
+			<variable name="#new#"/>
+			<variable name="B"/>
+		</call>
+	</var>
+	
+	<!-- a1.i = 32 -->
+	<assign>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<constant type="int" value="32"/>
+	</assign>
+
+	<!-- 
+	print(a1.i, a2.i)
+	Should print 32, 5
+	 -->
+	<println>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<field name="i">
+			<variable name="a2"/>
+		</field>
+	</println>
+	
+	<!-- 
+	print(b1.i, b2.i)
+	Should print 23,23
+	 -->
+	<println>
+		<field name="i">
+			<variable name="b1"/>
+		</field>
+		<field name="i">
+			<variable name="b2"/>
+		</field>
+	</println>
+		
+	<!-- 
+	a1 = a2
+	Now every change to a1 will affect the value of a2 and vice versa.
+	 -->
+	<assign>
+		<variable name="a1"/>
+		<variable name="a2"/>
+	</assign>
+	
+	<!-- 
+	print(a1.i, a2.i) 
+	Should print 5,5
+	 -->
+	<println>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<field name="i">
+			<variable name="a2"/>
+		</field>
+	</println>
+	
+	<!-- a1.i = 14. This should affect a2.i as well -->
+	<assign>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<constant type="int" value="14"/>
+	</assign>
+	
+	<!-- 
+	print(a1.i, a2.i)
+	Should print 14,14
+	 -->
+	<println>
+		<field name="i">
+			<variable name="a1"/>
+		</field>
+		<field name="i">
+			<variable name="a2"/>
+		</field>
+	</println>
+	
+	<!--
+
+	 new C()._a() 
+	<call>
+		<variable name="_a"/>
+		Below C() should call A, B and C's constructor in order
+		<call>
+			<variable name="#new#" />
+			<variable name="B" />
+		</call>
+		
+	</call>
+
+
+-->
+</block>
+</uXML>

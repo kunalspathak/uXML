@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<uXML language="Plike" scope="static">
+	<block>
+		<!--<global-Var />
+		--><function name="b">
+			<automatic-Var>
+				<var mutable="yes" name="b_a" type="int" />
+			</automatic-Var>
+			<returns type="void" />
+			<block>
+				<var mutable="yes" name="b_i" type="int" />
+				<function name="b_b">
+					<automatic-Var>
+						<var mutable="yes" name="b_b_a" type="int" />
+					</automatic-Var>
+					<returns type="void" />
+					<block>
+						<var mutable="yes" name="b_b_i" type="int" />
+						<print>
+							<constant type="string" value="Inside b_b" />
+						</print>
+					</block>
+				</function>
+				<function name="b_b_c">
+					<automatic-Var>
+						<var mutable="yes" name="b_b_a" type="int" />
+					</automatic-Var>
+					<returns type="void" />
+					<block>
+						<var mutable="yes" name="b_b_i" type="int" />
+						<print>
+							<constant type="string" value="Inside b_b_c" />
+						</print>
+						<assign>
+							<variable name="b_b_i" />
+							<constant type="int" value="1" />
+						</assign>
+						<call>
+							<variable name="b_b" />
+							<variable name="b_a" />
+						</call>
+					</block>
+				</function>
+				<call>
+					<variable name="b_b_c" />
+					<constant type="int" value="5" />
+				</call>
+			</block>
+		</function>
+		<call>
+			<variable name="b" />
+			<constant type="int" value="5" />
+		</call>
+	</block>
+</uXML>
